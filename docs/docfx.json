@@ -1,0 +1,39 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": [
+            "EnsembleWeather/EnsembleWeather.csproj",
+            "EnsembleWeather.Extensions.DependencyInjection/EnsembleWeather.Extensions.DependencyInjection.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "properties": {
+        "TargetFramework": "net8.0"
+      },
+      "disableGitFeatures": true
+    }
+  ],
+  "build": {
+    "content": [
+      { "files": [ "index.md", "toc.yml", "articles/**.md", "articles/**/toc.yml" ] },
+      { "files": [ "api/**.yml", "api/index.md" ] }
+    ],
+    "resource": [ { "files": [ "images/**" ] } ],
+    "output": "_site",
+    "template": [ "default", "modern" ],
+    "globalMetadata": {
+      "_appName": "EnsembleWeather for .NET",
+      "_appTitle": "EnsembleWeather for .NET",
+      "_appFooter": "Copyright (c) 2026 Ourea Technologies. BSD-2-Clause. <a href=\"https://oureawx.com\">oureawx.com</a> · <a href=\"https://docs.oureawx.com\">docs.oureawx.com</a>",
+      "_enableSearch": true,
+      "_disableContribution": true
+    },
+    "warningsAsErrors": true,
+    "disableGitFeatures": true
+  }
+}

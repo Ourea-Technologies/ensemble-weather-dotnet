@@ -331,3 +331,39 @@ public sealed class DependencyInjectionTests
         Assert.False(Assert.IsType<SocketsHttpHandler>(handler).AllowAutoRedirect);
     }
 }
+
+public sealed class RepositoryTests
+{
+    [Fact]
+    public void TheReadmeQuickstartIsTheQuickstartExample()
+    {
+        string readme = File.ReadAllText(Path.Combine(RepoPaths.Root, "README.md")).Replace("\r\n", "\n", StringComparison.Ordinal);
+        string section = readme[readme.IndexOf("## Quickstart", StringComparison.Ordinal)..];
+        int start = section.IndexOf("```csharp\n", StringComparison.Ordinal) + "```csharp\n".Length;
+        string code = section[start..section.IndexOf("```", start, StringComparison.Ordinal)];
+        string example = File.ReadAllText(Path.Combine(RepoPaths.Root, "examples", "Quickstart", "Program.cs")).Replace("\r\n", "\n", StringComparison.Ordinal);
+
+        Assert.Equal(example, code);
+    }
+
+    [Theory]
+    [InlineData("README.md")]
+    [InlineData("LICENSE")]
+    [InlineData("CHANGELOG.md")]
+    [InlineData("CONTRIBUTING.md")]
+    [InlineData("SECURITY.md")]
+    [InlineData("CODE_OF_CONDUCT.md")]
+    [InlineData(".github/workflows/ci.yml")]
+    [InlineData(".github/workflows/live.yml")]
+    [InlineData(".github/workflows/release.yml")]
+    [InlineData(".github/workflows/security.yml")]
+    [InlineData(".github/workflows/codeql.yml")]
+    [InlineData(".github/workflows/scorecard.yml")]
+    [InlineData(".github/dependabot.yml")]
+    [InlineData(".github/ISSUE_TEMPLATE/config.yml")]
+    [InlineData(".github/pull_request_template.md")]
+    [InlineData("spec/VERSION")]
+    [InlineData("scripts/sync-spec")]
+    public void EverySdkStandardFileExists(string path)
+        => Assert.True(File.Exists(Path.Combine(RepoPaths.Root, path)), $"{path} is missing");
+}
