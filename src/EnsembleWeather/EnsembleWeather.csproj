@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <RootNamespace>EnsembleWeather</RootNamespace>
+    <PackageId>EnsembleWeather</PackageId>
+    <Title>Ourea ensemble weather SDK</Title>
+    <Description>Official .NET SDK for the Ourea probabilistic weather API (https://oureawx.com): ensemble forecasts as distributions, server-computed probabilities and storm totals, with canonical edge-cacheable requests, retries and an ETag cache.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- Runtime dependencies: none on net8.0 (BCL only). On netstandard2.0 only the
+       two BCL back-ports below; scripts/check-dependencies enforces this list. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Bcl.TimeProvider" />
+    <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EnsembleWeather.Tests" />
+  </ItemGroup>
+
+</Project>

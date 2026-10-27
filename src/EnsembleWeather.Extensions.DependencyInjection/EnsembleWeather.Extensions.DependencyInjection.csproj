@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <RootNamespace>EnsembleWeather</RootNamespace>
+    <PackageId>EnsembleWeather.Extensions.DependencyInjection</PackageId>
+    <Title>Ourea ensemble weather SDK: dependency injection</Title>
+    <Description>Registers the Ourea weather API client (EnsembleWeather, https://oureawx.com) with Microsoft.Extensions.DependencyInjection: services.AddEnsembleWeather(o => ...), IHttpClientFactory, IOptions and ILogger.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Optional integration (SDK-STANDARD "Dependencies"): kept out of the core package. -->
+    <PackageReference Include="Microsoft.Extensions.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../EnsembleWeather/EnsembleWeather.csproj" />
+  </ItemGroup>
+
+</Project>

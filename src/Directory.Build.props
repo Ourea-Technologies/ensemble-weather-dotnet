@@ -1,0 +1,22 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags>ourea;weather;forecast;ensemble;probabilistic;snow;meteorology</PackageTags>
+    <PackageReleaseNotes>https://github.com/Ourea-Technologies/ensemble-weather-dotnet/blob/main/CHANGELOG.md</PackageReleaseNotes>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)../assets/icon.png" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
+</Project>
