@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-2-Clause
+"""Fail when a shipped package gains a runtime dependency without its justification in CONTRIBUTING.md.
+
+SDK-STANDARD "Dependencies": the core package (EnsembleWeather) takes nothing beyond the BCL on net8.0, and on
+netstandard2.0 only the BCL back-ports it needs (Microsoft.Bcl.TimeProvider, System.Text.Json). Every
+PackageReference of every package under src/ must have a line in CONTRIBUTING.md's "Runtime dependencies" list:
+
+    - `PackageId` (ProjectName): why.
+
+The resolved core lock file is checked too, so nothing slips in as a direct dependency some other way.
+"""
+from __future__ import annotations
+
+import json
+import re
+import sys
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+CORE = "EnsembleWeather"
+CORE_ALLOWED = {
+    "netstandard2.0": {"Microsoft.Bcl.TimeProvider", "System.Text.Json", "NETStandard.Library"},
+    "net8.0": {"Microsoft.NET.ILLink.Tasks"},  # build-time trimming analysis only (PrivateAssets), never shipped
+}
+
+
+def main() -> int:
+    problems: list[str] = []
+    contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    section = contributing.split("### Runtime dependencies", 1)[-1].split("\n## ", 1)[0].split("\n### ", 1)[0]
+    justified = set(re.findall(r"^- `([^`]+)` \(([^)]+)\): \S", section, flags=re.MULTILINE))
+
+    declared: set[tuple[str, str]] = set()
+    for csproj in sorted((ROOT / "src").glob("*/*.csproj")):
+        project = csproj.stem
+        for ref in ET.parse(csproj).getroot().iter("PackageReference"):
+            package = ref.get("Include")
+            declared.add((package, project))
+            if (package, project) not in justified:
+                problems.append(f"{project} depends on {package}, which has no justification line in CONTRIBUTING.md")
+    for package, project in sorted(justified - declared):
+        problems.append(f"CONTRIBUTING.md justifies {package} ({project}), which is no longer a dependency; remove the line")
+
+    lock = json.loads((ROOT / "src" / CORE / "packages.lock.json").read_text(encoding="utf-8"))
+    for framework, packages in lock["dependencies"].items():
+        tfm = "netstandard2.0" if "NETStandard" in framework else "net8.0" if framework == "net8.0" else framework
+        allowed = CORE_ALLOWED.get(tfm)
+        if allowed is None:
+            problems.append(f"{CORE}: unexpected target framework {framework} in packages.lock.json")
+            continue
+        for name, info in packages.items():
+            if info.get("type") == "Direct" and name not in allowed:
+                problems.append(f"{CORE} ({tfm}) has the direct dependency {name}; the core takes only {sorted(allowed)}")
+
+    for p in problems:
+        print(p, file=sys.stderr)
+    print(f"dependency check: {len(declared)} declared, {len(problems)} problem(s)")
+    return 1 if problems else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

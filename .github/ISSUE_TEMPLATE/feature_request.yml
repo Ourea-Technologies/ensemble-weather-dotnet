@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest an improvement to the .NET SDK.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help?
+      description: Remember that the server computes every statistic; a helper that needs client-side math is a request for a new API query.

@@ -97,6 +97,8 @@ dotnet_diagnostic.CA1707.severity = none
 dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA1515.severity = none
 dotnet_diagnostic.CA1861.severity = none
+# Test doubles (in-memory handlers, clients) hold no unmanaged resources; disposal noise only.
+dotnet_diagnostic.CA2000.severity = none
 
 [{examples,tools}/**.cs]
 dotnet_diagnostic.CA2007.severity = none

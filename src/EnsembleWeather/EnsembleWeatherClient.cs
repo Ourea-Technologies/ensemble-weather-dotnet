@@ -498,21 +498,26 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     private static HttpClient CreateHttpClient()
     {
+        // TLS validation is the platform's, with certificate revocation checked; nothing here can turn it off.
+#pragma warning disable CA2000 // The HttpClient owns the handler (disposeHandler: true) and the client disposes the HttpClient.
 #if NET5_0_OR_GREATER
         var handler = new SocketsHttpHandler
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = DecompressionMethods.All,
             PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+            SslOptions = { CertificateRevocationCheckMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.Online },
         };
 #else
         var handler = new HttpClientHandler
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            CheckCertificateRevocationList = true,
         };
 #endif
         return new HttpClient(handler, disposeHandler: true) { Timeout = Timeout.InfiniteTimeSpan };
+#pragma warning restore CA2000
     }
 
     private static string LocationPath(LocationId location)

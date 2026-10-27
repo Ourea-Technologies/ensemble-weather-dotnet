@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Nightly contract run against the live API with a read-only CI key. Never runs on pull requests (so never for
+# forks); skipped when the OUREA_CI_API_KEY secret is not set.
+name: Live
+
+on:
+  schedule:
+    - cron: "23 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  live:
+    name: Quickstart and contract run against api.oureawx.com
+    if: github.repository == 'Ourea-Technologies/ensemble-weather-dotnet'
+    runs-on: ubuntu-latest
+    environment: live
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - name: Quickstart (anonymous, as a new user runs it)
+        run: env -u OUREA_API_KEY -u OUREA_BASE_URL dotnet run --project examples/Quickstart -c Release
+      - name: Contract run (every example, with the read-only key)
+        env:
+          OUREA_API_KEY: ${{ secrets.OUREA_CI_API_KEY }}
+        run: |
+          if [ -z "$OUREA_API_KEY" ]; then echo "OUREA_CI_API_KEY is not set; skipping the keyed run."; exit 0; fi
+          for name in Quickstart PointForecast ChanceOfSnow StormTotal SearchAndCatalog CurrentAndAlerts ErrorHandling Units; do
+            echo "=== $name"
+            dotnet run --project "examples/$name" -c Release
+          done

@@ -1,0 +1,36 @@
+name: Bug report
+description: Something in the .NET SDK does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security problems: please report them privately (see SECURITY.md), not here.
+        Never paste an API key.
+  - type: input
+    id: version
+    attributes:
+      label: SDK version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: .NET runtime and OS
+      placeholder: ".NET 8.0.11 on Ubuntu 24.04"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal code to reproduce
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened (include the exception's ErrorCode and RequestId)
+    validations:
+      required: true

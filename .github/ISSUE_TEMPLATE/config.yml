@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://docs.oureawx.com/dotnet
+    about: The .NET SDK guide and API reference.
+  - name: Ourea API guides
+    url: https://docs.oureawx.com
+    about: Concepts, probabilities, pricing and the API itself.
+  - name: Report a vulnerability
+    url: https://github.com/Ourea-Technologies/ensemble-weather-dotnet/security/advisories/new
+    about: Privately, never in a public issue.

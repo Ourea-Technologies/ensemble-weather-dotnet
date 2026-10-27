@@ -89,12 +89,14 @@ public static class EnsembleWeatherServiceCollectionExtensions
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = System.Net.DecompressionMethods.All,
+            SslOptions = { CertificateRevocationCheckMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.Online },
         };
 #else
         return new HttpClientHandler
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate,
+            CheckCertificateRevocationList = true,
         };
 #endif
     }

@@ -4,6 +4,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <!-- SDK-STANDARD "Security": every .NET security rule (CA2xxx/CA3xxx/CA5xxx) on, as errors with the rest. -->
+    <AnalysisLevelSecurity>latest-all</AnalysisLevelSecurity>
+    <AnalysisLevelReliability>latest-all</AnalysisLevelReliability>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Deterministic>true</Deterministic>

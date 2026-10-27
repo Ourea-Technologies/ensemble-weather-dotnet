@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Tag vX.Y.Z on main -> build, test, pack, attest, publish to NuGet.org with trusted publishing (OIDC: no stored
+# API key), GitHub release with the changelog section and an SBOM.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  build:
+    name: Build, test, pack
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # build provenance
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - name: The tag matches the package version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)"
+          test "v$version" = "$TAG" || { echo "tag $TAG != version $version"; exit 1; }
+      - run: dotnet restore EnsembleWeather.sln --locked-mode
+      - run: dotnet format EnsembleWeather.sln --verify-no-changes --no-restore
+      - run: dotnet build EnsembleWeather.sln -c Release --no-restore
+      - run: dotnet test EnsembleWeather.sln -c Release --no-build
+      - run: scripts/check-dependencies
+      - run: scripts/audit-dependencies
+      - run: scripts/run-examples
+      - run: dotnet pack EnsembleWeather.sln -c Release --no-build -o artifacts
+      - uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          path: src
+          format: spdx-json
+          output-file: artifacts/ensemble-weather-dotnet.spdx.json
+          upload-artifact: false
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: artifacts/*.nupkg
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: artifacts/
+
+  publish:
+    name: Publish to NuGet.org (trusted publishing)
+    needs: build
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write # exchanged by NuGet/login for a short-lived API key
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: artifacts
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        id: login
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Push packages and symbols
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+  github-release:
+    name: GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: artifacts
+      - name: Changelog section
+        env:
+          TAG: ${{ github.ref_name }}
+        run: awk -v v="${TAG#v}" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes-file notes.md artifacts/*.nupkg artifacts/*.snupkg artifacts/*.spdx.json
