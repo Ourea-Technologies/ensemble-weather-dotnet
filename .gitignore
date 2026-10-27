@@ -1,0 +1,14 @@
+bin/
+obj/
+artifacts/
+.scratch/
+TestResults/
+*.user
+*.suo
+.vs/
+.idea/
+.DS_Store
+docs/_site/
+docs/api/*.yml
+docs/api/.manifest
+coverage/

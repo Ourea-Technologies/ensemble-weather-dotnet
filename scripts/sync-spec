@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Writes spec/ as an exact copy of ensemble-weather-spec at the ref named in
+# spec/VERSION (or the ref given as the first argument, which is then written
+# to spec/VERSION).
+#
+#   scripts/sync-spec            # re-sync spec/ to spec/VERSION
+#   scripts/sync-spec v1.0.0     # pin a new spec ref
+#   scripts/sync-spec --check    # exit 1 if spec/ differs from spec/VERSION
+#
+# ENSEMBLE_WEATHER_SPEC_REPO overrides where the spec is fetched from (a URL or
+# a local clone); the default is the public GitHub repository.
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo="${ENSEMBLE_WEATHER_SPEC_REPO:-https://github.com/Ourea-Technologies/ensemble-weather-spec}"
+check=0
+ref=""
+case "${1:-}" in
+  --check) check=1 ;;
+  "") ;;
+  *) ref="$1" ;;
+esac
+if [[ -z "$ref" ]]; then
+  ref="$(tr -d '[:space:]' < "$root/spec/VERSION")"
+fi
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+out="$work/spec"
+mkdir -p "$out"
+
+src="$repo"
+if [[ ! -d "$repo/.git" && ! -f "$repo/HEAD" ]]; then
+  git clone -q --no-checkout "$repo" "$work/clone"
+  src="$work/clone"
+fi
+git -C "$src" archive --format=tar "$ref" | tar -x -C "$out"
+printf '%s\n' "$ref" > "$out/VERSION"
+
+if [[ $check -eq 1 ]]; then
+  if diff -r "$out" "$root/spec" > /dev/null; then
+    echo "spec/ matches ensemble-weather-spec@$ref"
+    exit 0
+  fi
+  echo "spec/ differs from ensemble-weather-spec@$ref; run scripts/sync-spec" >&2
+  diff -r "$out" "$root/spec" >&2 || true
+  exit 1
+fi
+
+rm -rf "$root/spec"
+mkdir -p "$root/spec"
+cp -R "$out/." "$root/spec/"
+echo "spec/ synced to ensemble-weather-spec@$ref"
