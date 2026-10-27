@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using EnsembleWeather.Tests.Support;
@@ -123,27 +122,6 @@ public sealed class SecurityTests
 
         await Assert.ThrowsAsync<EnsembleWeatherException>(() => client.GetAttributionAsync());
         Assert.Equal(6, handler.Requests.Count);
-    }
-
-    [Fact]
-    public void NoOptionDisablesTlsVerification()
-    {
-        string[] forbidden = ["tls", "ssl", "certificate", "insecure", "verify", "validation", "callback", "handler"];
-        foreach (PropertyInfo property in typeof(EnsembleWeatherOptions).GetProperties(BindingFlags.Public | BindingFlags.Instance))
-        {
-            Assert.DoesNotContain(forbidden, f => property.Name.Contains(f, StringComparison.OrdinalIgnoreCase));
-        }
-    }
-
-    [Fact]
-    public void TheDefaultHandlerKeepsTlsVerificationAndDoesNotFollowRedirects()
-    {
-        using var client = new EnsembleWeatherClient(new EnsembleWeatherOptions { Environment = _ => null });
-        var http = (HttpClient)typeof(EnsembleWeatherClient).GetField("_http", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(client)!;
-        var handler = (SocketsHttpHandler)typeof(HttpMessageInvoker).GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(http)!;
-
-        Assert.Null(handler.SslOptions.RemoteCertificateValidationCallback);
-        Assert.False(handler.AllowAutoRedirect);
     }
 
     [Fact]

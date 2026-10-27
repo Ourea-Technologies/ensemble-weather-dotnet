@@ -30,3 +30,9 @@ Requests are canonical (defaults omitted, parameters sorted, RFC 3986 encoding),
 edge-cache entry. Locally, an `ETag` LRU cache (256 entries, 32 MiB) is on by default: a repeated call sends
 `If-None-Match`, and a `304` returns the stored body with `Metadata.Revalidated` set. Disable it with
 `EnableCache = false`, or supply your own <xref:EnsembleWeather.IResponseCache>.
+
+## TLS and proxies
+
+Certificates are always validated. Revocation is checked by default; behind a proxy or on an offline network that
+blocks CRL/OCSP fetches, set <xref:EnsembleWeather.EnsembleWeatherOptions.CheckCertificateRevocation> to `false`
+to skip only that lookup (a certificate revoked before it expires would then be accepted).

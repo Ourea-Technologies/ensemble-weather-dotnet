@@ -14,7 +14,8 @@ These are tested in `tests/EnsembleWeather.Tests/SecurityTests.cs` and the share
 - The API key is never logged, never in an exception message or `ToString()`, and never sent to a host other
   than the configured base URL's (a redirect to another origin drops it). The DI package also redacts
   `X-API-Key` from `IHttpClientFactory`'s request logging.
-- TLS certificate validation is always on, with revocation checking, and there is no option to turn it off.
+- TLS certificate validation is always on and there is no option to turn it off. Revocation is checked by
+  default; `CheckCertificateRevocation = false` skips only that lookup (for proxies that block CRL/OCSP fetches).
 - Response bodies are bounded at 64 MiB: a larger body is an error, never an out-of-memory.
 - JSON is parsed into fixed, source-generated types only: no code evaluation, no polymorphic deserialisation.
 

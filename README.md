@@ -149,6 +149,23 @@ the latest is on `client.RateLimit`. Read it rather than hard-coding limits. Ano
 may cache carry none. `result.Metadata` also says whether a cached body was revalidated (`Revalidated`, from the
 `ETag` cache that is on by default), the `RequestId`, and any `Deprecation` notice.
 
+### Networking behind proxies
+
+TLS certificates are always validated, and there is no way to turn that off. By default the client also checks
+whether the server's certificate has been revoked, which means fetching CRL/OCSP data from the certificate
+authority. If a restrictive corporate proxy or an offline network blocks those fetches, every call fails with a
+`ServiceConnectionException` ("could not be verified") although the certificate is fine. Only then, skip the
+revocation lookup:
+
+```csharp
+using var client = new EnsembleWeatherClient(new EnsembleWeatherOptions { CheckCertificateRevocation = false });
+// or: services.AddEnsembleWeather(o => o.CheckCertificateRevocation = false);
+```
+
+The trade-off: a certificate revoked before it expires would still be accepted. The setting applies to the
+handler the SDK creates; an `HttpClient` you pass in keeps its own settings (and must not follow redirects
+itself). The SDK uses the system proxy settings (`HTTPS_PROXY` and the OS configuration).
+
 ## Documentation
 
 - Guides: https://docs.oureawx.com

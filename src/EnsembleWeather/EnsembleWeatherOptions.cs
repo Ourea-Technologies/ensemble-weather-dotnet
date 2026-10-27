@@ -9,7 +9,8 @@ namespace EnsembleWeather;
 /// <c>new EnsembleWeatherOptions()</c> calls the production API anonymously (or with <c>OUREA_API_KEY</c>).
 /// </summary>
 /// <remarks>
-/// There is deliberately no setting that disables TLS certificate validation.
+/// There is deliberately no setting that disables TLS certificate validation;
+/// <see cref="CheckCertificateRevocation"/> controls only the revocation lookup.
 /// </remarks>
 public sealed class EnsembleWeatherOptions
 {
@@ -69,6 +70,30 @@ public sealed class EnsembleWeatherOptions
     /// requests go keyless and share the edge cache with every other caller.
     /// </summary>
     public bool SendApiKeyOnOpenRoutes { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the server certificate's revocation status is checked (CRL/OCSP) when the client
+    /// creates its own HTTP handler. Defaults to <see langword="true"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This controls <em>only</em> the revocation lookup. Certificate validation itself (a trusted chain, a valid
+    /// date, a matching host name) is always performed by the platform and cannot be turned off.
+    /// </para>
+    /// <para>
+    /// Checking revocation means fetching CRL or OCSP data from the certificate authority. Behind a restrictive
+    /// corporate proxy or on an offline or air-gapped network those fetches can be blocked, and every connection
+    /// then fails with a TLS error even though the certificate is valid. Set this to <see langword="false"/> only
+    /// in that situation. The trade-off: a certificate that was revoked after it was issued (for example because
+    /// its private key leaked) would still be accepted until it expires.
+    /// </para>
+    /// <para>
+    /// It applies to the handler the SDK creates (the parameterless and options constructors, and the
+    /// dependency-injection package); an <see cref="System.Net.Http.HttpClient"/> you pass in keeps its own
+    /// handler's settings.
+    /// </para>
+    /// </remarks>
+    public bool CheckCertificateRevocation { get; set; } = true;
 
     /// <summary>
     /// Gets or sets your application's product token (for example <c>my-ski-app/2.1</c>), appended to the SDK's

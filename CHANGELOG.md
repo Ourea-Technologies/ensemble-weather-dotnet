@@ -20,6 +20,9 @@ All notable changes to this project are documented here. The format follows
   bound; typed exceptions per error category; rate-limit and deprecation metadata.
 - `EnsembleWeather.Extensions.DependencyInjection`: `services.AddEnsembleWeather(...)` with
   `IHttpClientFactory`, `IOptions<EnsembleWeatherOptions>` and `ILogger`.
+- Certificate revocation is checked by default; `EnsembleWeatherOptions.CheckCertificateRevocation = false`
+  (also through `AddEnsembleWeather`) skips only the CRL/OCSP lookup, for proxies or offline networks that
+  block it. Certificate validation itself can never be turned off.
 - Targets .NET 8 and .NET Standard 2.0; trimming and Native AOT compatible on .NET 8+.
 
 [Unreleased]: https://github.com/Ourea-Technologies/ensemble-weather-dotnet/compare/v0.1.0...HEAD

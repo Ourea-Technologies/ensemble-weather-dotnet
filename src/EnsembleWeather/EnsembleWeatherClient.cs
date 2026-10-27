@@ -63,7 +63,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <exception cref="ArgumentNullException"><paramref name="options"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">An option is invalid.</exception>
     public EnsembleWeatherClient(EnsembleWeatherOptions options)
-        : this(CreateHttpClient(), options ?? throw new ArgumentNullException(nameof(options)), ownsHttpClient: true)
+        : this(CreateHttpClient(options ?? throw new ArgumentNullException(nameof(options))), options, ownsHttpClient: true)
     {
     }
 
@@ -496,9 +496,11 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     // ---- Internals --------------------------------------------------------------------------------------------
 
-    private static HttpClient CreateHttpClient()
+    private static HttpClient CreateHttpClient(EnsembleWeatherOptions options)
     {
-        // TLS validation is the platform's, with certificate revocation checked; nothing here can turn it off.
+        // TLS validation is always the platform's and nothing here can turn it off. Only the revocation lookup
+        // (an extra network fetch of CRL/OCSP data) can be skipped, through CheckCertificateRevocation.
+        bool checkRevocation = options.CheckCertificateRevocation;
 #pragma warning disable CA2000 // The HttpClient owns the handler (disposeHandler: true) and the client disposes the HttpClient.
 #if NET5_0_OR_GREATER
         var handler = new SocketsHttpHandler
@@ -506,14 +508,23 @@ public sealed class EnsembleWeatherClient : IDisposable
             AllowAutoRedirect = false,
             AutomaticDecompression = DecompressionMethods.All,
             PooledConnectionLifetime = TimeSpan.FromMinutes(5),
-            SslOptions = { CertificateRevocationCheckMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.Online },
+#pragma warning disable CA5399 // Revocation is checked by default; the documented opt-out exists for proxies that block CRL/OCSP fetches. Chain and name validation stay on.
+            SslOptions =
+            {
+                CertificateRevocationCheckMode = checkRevocation
+                    ? System.Security.Cryptography.X509Certificates.X509RevocationMode.Online
+                    : System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck,
+            },
+#pragma warning restore CA5399
         };
 #else
         var handler = new HttpClientHandler
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-            CheckCertificateRevocationList = true,
+#pragma warning disable CA5399 // As above: only the revocation lookup is optional.
+            CheckCertificateRevocationList = checkRevocation,
+#pragma warning restore CA5399
         };
 #endif
         return new HttpClient(handler, disposeHandler: true) { Timeout = Timeout.InfiniteTimeSpan };

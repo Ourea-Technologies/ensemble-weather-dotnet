@@ -55,7 +55,8 @@ public static class EnsembleWeatherServiceCollectionExtensions
         IHttpClientBuilder builder = services
             .AddHttpClient(HttpClientName)
             .ConfigureHttpClient(http => http.Timeout = Timeout.InfiniteTimeSpan)
-            .ConfigurePrimaryHttpMessageHandler(CreateHandler)
+            .ConfigurePrimaryHttpMessageHandler(provider => CreateHandler(
+                provider.GetRequiredService<IOptions<EnsembleWeatherOptions>>().Value.CheckCertificateRevocation))
             // IHttpClientFactory's trace logging prints request headers; the API key must never reach a log.
             .RedactLoggedHeaders(RedactedHeaders);
         builder.AddTypedClient<EnsembleWeatherClient>((http, provider) =>
@@ -71,6 +72,7 @@ public static class EnsembleWeatherServiceCollectionExtensions
                     EnableCache = configured.EnableCache,
                     Cache = configured.Cache ?? provider.GetRequiredService<IResponseCache>(),
                     SendApiKeyOnOpenRoutes = configured.SendApiKeyOnOpenRoutes,
+                    CheckCertificateRevocation = configured.CheckCertificateRevocation,
                     ApplicationId = configured.ApplicationId,
                     TimeProvider = configured.TimeProvider ?? provider.GetService<TimeProvider>(),
                     OnDeprecation = configured.OnDeprecation ?? LogDeprecation(provider.GetService<ILoggerFactory>()),
@@ -82,24 +84,37 @@ public static class EnsembleWeatherServiceCollectionExtensions
 
     private static readonly string[] RedactedHeaders = ["X-API-Key", "Authorization", "Cookie", "Set-Cookie"];
 
-    private static HttpMessageHandler CreateHandler()
-    {
+    // Certificate validation is always on; only the revocation lookup follows the option.
 #if NET5_0_OR_GREATER
+    private static SocketsHttpHandler CreateHandler(bool checkRevocation)
+    {
         return new SocketsHttpHandler
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = System.Net.DecompressionMethods.All,
-            SslOptions = { CertificateRevocationCheckMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.Online },
+#pragma warning disable CA5399 // Revocation is checked by default; the documented opt-out is for proxies that block CRL/OCSP fetches.
+            SslOptions =
+            {
+                CertificateRevocationCheckMode = checkRevocation
+                    ? System.Security.Cryptography.X509Certificates.X509RevocationMode.Online
+                    : System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck,
+            },
+#pragma warning restore CA5399
         };
+    }
 #else
+    private static HttpClientHandler CreateHandler(bool checkRevocation)
+    {
         return new HttpClientHandler
         {
             AllowAutoRedirect = false,
             AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate,
-            CheckCertificateRevocationList = true,
+#pragma warning disable CA5399 // As above: only the revocation lookup is optional.
+            CheckCertificateRevocationList = checkRevocation,
+#pragma warning restore CA5399
         };
-#endif
     }
+#endif
 
     private static Action<DeprecationNotice>? LogDeprecation(ILoggerFactory? loggers)
     {
