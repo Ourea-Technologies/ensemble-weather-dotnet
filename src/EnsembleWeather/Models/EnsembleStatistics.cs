@@ -13,7 +13,7 @@ public sealed class EnsembleStatistics
     /// Temperature.
     /// </summary>
     [JsonPropertyName("temperature")]
-    public Quantiles? Temperature { get; init; }
+    public Quantiles Temperature { get; init; } = null!;
 
     /// <summary>
     /// Apparent temperature, the NWS convention: the wind chill (NWS 2001, Osczevski &amp; Bluestein 2005) where the
@@ -48,13 +48,13 @@ public sealed class EnsembleStatistics
     /// Precipitation.
     /// </summary>
     [JsonPropertyName("precipitation")]
-    public Quantiles? Precipitation { get; init; }
+    public Quantiles Precipitation { get; init; } = null!;
 
     /// <summary>
     /// Wind speed.
     /// </summary>
     [JsonPropertyName("wind_speed")]
-    public Quantiles? WindSpeed { get; init; }
+    public Quantiles WindSpeed { get; init; } = null!;
 
     /// <summary>
     /// Peak gust (same unit as <c>wind_speed</c>). Indicates lift closure risk at ski areas. Derived from the served
@@ -70,7 +70,7 @@ public sealed class EnsembleStatistics
     /// CIRCLE, so this <c>Quantiles</c> describes an ARC, not an interval on the number line:
     /// </summary>
     [JsonPropertyName("wind_direction")]
-    public Quantiles? WindDirection { get; init; }
+    public Quantiles WindDirection { get; init; } = null!;
 
     /// <summary>
     /// The wind direction as a CIRCULAR distribution: the resultant mean, an offset-frame standard deviation, and the

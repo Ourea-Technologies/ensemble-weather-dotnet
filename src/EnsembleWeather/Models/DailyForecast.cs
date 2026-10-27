@@ -62,7 +62,7 @@ public sealed class DailyForecast
     /// only). On day 0, the part of the day the model run covers.
     /// </summary>
     [JsonPropertyName("high")]
-    public Quantiles? High { get; init; }
+    public Quantiles High { get; init; } = null!;
 
     /// <summary>
     /// Calendar-day minimum: the min over local midnight to midnight on <c>date</c>, the same hours as <c>high</c>
@@ -70,7 +70,7 @@ public sealed class DailyForecast
     /// part of the day the model run covers. Label it "Low", not "Tonight".
     /// </summary>
     [JsonPropertyName("low")]
-    public Quantiles? Low { get; init; }
+    public Quantiles Low { get; init; } = null!;
 
     /// <summary>
     /// Calendar-day maximum of the hourly <c>feels_like</c> (the NWS apparent temperature), per member: each ensemble
@@ -110,7 +110,7 @@ public sealed class DailyForecast
     /// The day's total precipitation.
     /// </summary>
     [JsonPropertyName("total_precip")]
-    public Quantiles? TotalPrecipitation { get; init; }
+    public Quantiles TotalPrecipitation { get; init; } = null!;
 
     /// <summary>
     /// The day's total snowfall.
@@ -175,7 +175,7 @@ public sealed class DailyForecast
     /// The day's precipitation headline.
     /// </summary>
     [JsonPropertyName("precip_display")]
-    public PrecipitationDisplay? PrecipitationDisplay { get; init; }
+    public PrecipitationDisplay PrecipitationDisplay { get; init; } = null!;
 
     /// <summary>
     /// Average cloud cover for the day (0-100%). This is the mean of the day's hourly cloud-cover means and its
@@ -212,7 +212,7 @@ public sealed class DailyForecast
     /// Sun and moon for the day.
     /// </summary>
     [JsonPropertyName("astro")]
-    public DailyAstronomy? Astronomy { get; init; }
+    public DailyAstronomy Astronomy { get; init; } = null!;
 
     /// <summary>
     /// The day's temperature climatology.

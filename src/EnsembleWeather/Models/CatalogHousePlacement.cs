@@ -25,5 +25,5 @@ public sealed class CatalogHousePlacement
     /// Published content entries (<c>include=content</c>).
     /// </summary>
     [JsonPropertyName("content")]
-    public CatalogAdCreative? Content { get; init; }
+    public CatalogAdCreative Content { get; init; } = null!;
 }

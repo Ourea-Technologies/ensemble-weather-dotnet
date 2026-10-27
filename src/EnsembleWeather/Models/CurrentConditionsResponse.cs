@@ -16,7 +16,7 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// <c>timezone</c>).
     /// </summary>
     [JsonPropertyName("location")]
-    public LocationReference? Location { get; init; }
+    public LocationReference Location { get; init; } = null!;
 
     /// <summary>
     /// Active NWS watches/warnings/advisories for this location (zone- and polygon-matched). Rides the fresh /current
@@ -87,7 +87,7 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// The data sources this response drew on and the credit they require.
     /// </summary>
     [JsonPropertyName("attribution")]
-    public ResponseAttribution? Attribution { get; init; }
+    public ResponseAttribution Attribution { get; init; } = null!;
 
     /// <summary>
     /// The live nowcast sources <c>nowcast_hours</c> and <c>current</c> were built without because their read did not

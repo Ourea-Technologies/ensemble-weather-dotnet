@@ -52,13 +52,13 @@ public sealed class ForecastResponse : ApiResult
     /// The location.
     /// </summary>
     [JsonPropertyName("location")]
-    public LocationReference? Location { get; init; }
+    public LocationReference Location { get; init; } = null!;
 
     /// <summary>
     /// The model run this forecast was served from.
     /// </summary>
     [JsonPropertyName("model_run")]
-    public ModelRunInfo? ModelRun { get; init; }
+    public ModelRunInfo ModelRun { get; init; } = null!;
 
     /// <summary>
     /// The unit system every value in this body is in -- the request's <c>units=</c> (or its alias
@@ -77,7 +77,7 @@ public sealed class ForecastResponse : ApiResult
     /// The forecast series and daily summaries.
     /// </summary>
     [JsonPropertyName("forecast")]
-    public ForecastData? Forecast { get; init; }
+    public ForecastData Forecast { get; init; } = null!;
 
     /// <summary>
     /// Forecasts at the location's other named elevations (ski areas), when requested.
@@ -145,5 +145,5 @@ public sealed class ForecastResponse : ApiResult
     /// The data sources this response drew on and the credit they require.
     /// </summary>
     [JsonPropertyName("attribution")]
-    public ResponseAttribution? Attribution { get; init; }
+    public ResponseAttribution Attribution { get; init; } = null!;
 }

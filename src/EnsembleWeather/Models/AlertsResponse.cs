@@ -15,7 +15,7 @@ public sealed class AlertsResponse : ApiResult
     /// (D-4) -- the one location reference (it was the display name).
     /// </summary>
     [JsonPropertyName("location")]
-    public LocationReference? Location { get; init; }
+    public LocationReference Location { get; init; } = null!;
 
     /// <summary>
     /// The number of active alerts.
@@ -39,5 +39,5 @@ public sealed class AlertsResponse : ApiResult
     /// The data sources this response drew on and the credit they require.
     /// </summary>
     [JsonPropertyName("attribution")]
-    public ResponseAttribution? Attribution { get; init; }
+    public ResponseAttribution Attribution { get; init; } = null!;
 }

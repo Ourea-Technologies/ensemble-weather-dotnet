@@ -26,7 +26,7 @@ public sealed class ElevationTimeSeriesPoint
     /// Temperature.
     /// </summary>
     [JsonPropertyName("temperature")]
-    public Quantiles? Temperature { get; init; }
+    public Quantiles Temperature { get; init; } = null!;
 
     /// <summary>
     /// Elevation minus snow level (positive = above the snow level = snow expected; negative = below it = rain)
@@ -52,7 +52,7 @@ public sealed class ElevationTimeSeriesPoint
     /// <c>mean</c> for display.
     /// </summary>
     [JsonPropertyName("precipitation")]
-    public Quantiles? Precipitation { get; init; }
+    public Quantiles Precipitation { get; init; } = null!;
 
     /// <summary>
     /// The machine code, as <c>TimeSeriesPoint.condition</c>.

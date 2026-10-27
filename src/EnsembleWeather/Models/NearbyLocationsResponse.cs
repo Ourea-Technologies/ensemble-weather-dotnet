@@ -14,7 +14,7 @@ public sealed class NearbyLocationsResponse : ApiResult
     /// The location.
     /// </summary>
     [JsonPropertyName("location")]
-    public LocationSummary? Location { get; init; }
+    public LocationSummary Location { get; init; } = null!;
 
     /// <summary>
     /// The radius applied, after the cap.

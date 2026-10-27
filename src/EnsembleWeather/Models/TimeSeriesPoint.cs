@@ -88,7 +88,7 @@ public sealed class TimeSeriesPoint
     /// The ensemble distribution of every variable at this hour.
     /// </summary>
     [JsonPropertyName("ensemble")]
-    public EnsembleStatistics? Ensemble { get; init; }
+    public EnsembleStatistics Ensemble { get; init; } = null!;
 
     /// <summary>
     /// Present only with <c>?diagnostics=provenance</c> -- which post-processing rule shaped each variable this hour.

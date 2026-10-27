@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Runs every program in examples/ against the local mock API (tools/EnsembleWeather.MockServer), anonymously,
+# exactly as CI does. Fails on the first example that exits non-zero. Never calls the real API.
+#
+#   scripts/run-examples            # build, start the mock, run all examples
+#   PORT=5199 scripts/run-examples
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+port="${PORT:-5099}"
+config="${CONFIGURATION:-Release}"
+examples=(Quickstart PointForecast ChanceOfSnow StormTotal SearchAndCatalog CurrentAndAlerts ErrorHandling Units)
+
+dotnet build "$root/tools/EnsembleWeather.MockServer" -c "$config" --nologo -v quiet -clp:ErrorsOnly
+for name in "${examples[@]}"; do
+  dotnet build "$root/examples/$name" -c "$config" --nologo -v quiet -clp:ErrorsOnly
+done
+
+dotnet "$root/tools/EnsembleWeather.MockServer/bin/$config/net8.0/EnsembleWeather.MockServer.dll" "$port" > "${TMPDIR:-/tmp}/ensemble-weather-mock.log" 2>&1 &
+mock=$!
+trap 'kill "$mock" 2>/dev/null || true' EXIT
+for _ in $(seq 1 50); do
+  if curl -fsS "http://127.0.0.1:$port/api/v1/attribution" > /dev/null 2>&1; then break; fi
+  sleep 0.2
+done
+
+for name in "${examples[@]}"; do
+  echo "=== examples/$name"
+  env -u OUREA_API_KEY OUREA_BASE_URL="http://127.0.0.1:$port" \
+    dotnet "$root/examples/$name/bin/$config/net8.0/$name.dll"
+done
+echo "all ${#examples[@]} examples passed"

@@ -29,11 +29,11 @@ public sealed class CircularStatistics
     /// The central 50 % of the members — the clockwise arc from the 25th to the 75th circular percentile.
     /// </summary>
     [JsonPropertyName("sector_50")]
-    public DirectionSector? Sector50 { get; init; }
+    public DirectionSector Sector50 { get; init; } = null!;
 
     /// <summary>
     /// The central 90 % of the members — the clockwise arc from the 5th to the 95th circular percentile.
     /// </summary>
     [JsonPropertyName("sector_90")]
-    public DirectionSector? Sector90 { get; init; }
+    public DirectionSector Sector90 { get; init; } = null!;
 }
