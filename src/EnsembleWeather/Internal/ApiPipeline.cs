@@ -192,7 +192,7 @@ internal sealed class ApiPipeline
 
             ApiErrorDetails details = ReadError(status, body, response, rateLimit, requestId);
             bool retryableStatus = status is 429 or 502 or 503 or 504;
-            bool honoursRetryAfter = status is 429 or 503 && details.RetryAfter is not null;
+            bool honoursRetryAfter = status is 429 or 503 or 504 && details.RetryAfter is not null;
             if (retryableStatus && canRetry && (!honoursRetryAfter || details.RetryAfter <= MaxRetryAfter))
             {
                 TimeSpan delay = honoursRetryAfter ? details.RetryAfter!.Value : Backoff(attempt + 1);
@@ -336,13 +336,10 @@ internal sealed class ApiPipeline
 
     private ApiErrorDetails ReadError(int status, byte[] body, HttpResponseMessage response, RateLimitState? rateLimit, string? requestId)
     {
-        string? code = null;
-        string? message = null;
+        ErrorBody? error = null;
         try
         {
-            ErrorBody? error = JsonSerializer.Deserialize(body, EnsembleWeatherJsonContext.Default.ErrorBody);
-            code = error?.Error;
-            message = error?.Message;
+            error = JsonSerializer.Deserialize(body, EnsembleWeatherJsonContext.Default.ErrorBody);
         }
         catch (JsonException)
         {
@@ -352,9 +349,12 @@ internal sealed class ApiPipeline
         return new ApiErrorDetails
         {
             StatusCode = status,
-            ErrorCode = code,
-            Message = Redact(message),
-            RequestId = requestId,
+            ErrorCode = error?.Error,
+            Message = Redact(error?.Message),
+            RequestId = error?.RequestId ?? requestId,
+            DocUrl = Uri.TryCreate(error?.DocUrl, UriKind.Absolute, out Uri? docUrl) ? docUrl : null,
+            Parameter = error?.Param,
+            NearestLocation = error?.NearestLocation,
             RetryAfter = ReadRetryAfter(response),
             RateLimit = rateLimit,
         };

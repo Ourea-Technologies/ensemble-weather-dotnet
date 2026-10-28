@@ -5,7 +5,7 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// The server refused the request as malformed (<c>BAD_REQUEST</c>, <c>INVALID_COORDINATES</c>, <c>INVALID_ELEVATION</c>, <c>INVALID_MAX_HOURS</c>, <c>ELEVATION_REQUIRED</c>, <c>AMBIGUOUS</c>, <c>FEELS_LIKE_UNAVAILABLE</c>, or HTTP 400).
+/// The server refused the request as malformed (<c>BAD_REQUEST</c>, <c>INVALID_COORDINATES</c>, <c>INVALID_ELEVATION</c>, <c>ELEVATION_REQUIRED</c>, or HTTP 400).
 /// </summary>
 public sealed class InvalidRequestException : EnsembleWeatherException
 {

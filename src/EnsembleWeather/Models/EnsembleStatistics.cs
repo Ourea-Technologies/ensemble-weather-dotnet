@@ -24,19 +24,10 @@ public sealed class EnsembleStatistics
     /// calm member and a warm, windy one never combine into a cold, windy extreme. Every quantile lies within the
     /// range of the members' own values. A member with no dewpoint of its own takes the ensemble's mean dewpoint;
     /// with no dewpoint at all for the hour, no heat index is applied. Omitted when the hour has no members to
-    /// compute it from. This is the default index (<c>feels_like=nws</c>); see <c>feels_like_utci</c>.
+    /// compute it from. This is the default (and only) index, <c>feels_like=nws</c>.
     /// </summary>
     [JsonPropertyName("feels_like")]
     public Quantiles? FeelsLike { get; init; }
-
-    /// <summary>
-    /// The Universal Thermal Climate Index (Bröde et al. 2012), same unit as <c>temperature</c>, with a mean radiant
-    /// temperature from the members' surface radiation, computed per member like <c>feels_like</c>. Present only with
-    /// <c>feels_like=utci</c> (or <c>nws,utci</c>), which is NOT served yet -- a <c>400 FEELS_LIKE_UNAVAILABLE</c>
-    /// until -- so it is absent from every response today.
-    /// </summary>
-    [JsonPropertyName("feels_like_utci")]
-    public Quantiles? FeelsLikeUtci { get; init; }
 
     /// <summary>
     /// Dewpoint.
@@ -66,19 +57,12 @@ public sealed class EnsembleStatistics
     public Quantiles? WindGust { get; init; }
 
     /// <summary>
-    /// **Circular — read this before using any of these numbers.** Wind direction is pooled across models ON THE
-    /// CIRCLE, so this <c>Quantiles</c> describes an ARC, not an interval on the number line:
+    /// The wind direction as a CIRCULAR distribution: the resultant mean bearing, an offset-frame standard deviation,
+    /// and the central 50 % and 90 % of the members as clockwise arcs. A sector's <c>to</c> may be numerically less
+    /// than its <c>from</c> (an arc through north).
     /// </summary>
     [JsonPropertyName("wind_direction")]
-    public Quantiles WindDirection { get; init; } = null!;
-
-    /// <summary>
-    /// The wind direction as a CIRCULAR distribution: the resultant mean, an offset-frame standard deviation, and the
-    /// central 50 % and 90 % of the members as clockwise arcs. Present on every hour that carries
-    /// <c>wind_direction</c>.
-    /// </summary>
-    [JsonPropertyName("wind_direction_circular")]
-    public CircularStatistics? WindDirectionCircular { get; init; }
+    public CircularStatistics WindDirection { get; init; } = null!;
 
     /// <summary>
     /// Snow level, in the request's length unit.
@@ -113,26 +97,16 @@ public sealed class EnsembleStatistics
     /// <summary>
     /// Skin / ground surface temperature in the caller's temperature units. Sourced from IFS ENS <c>skt</c> — a proxy
     /// for snow-surface temperature at ski areas and pavement-approximate temperature off-road. Null when no model
-    /// with this variable contributed to this hour's blend.
+    /// with this variable contributed to this hour's blend. Served only when
+    /// <see cref="ForecastOptions.Include"/> names <c>skin_temperature</c>.
     /// </summary>
     [JsonPropertyName("skin_temperature")]
     public Quantiles? SkinTemperature { get; init; }
 
     /// <summary>
-    /// Present only with <c>?diagnostics=ptype</c> (a model-native diagnostic; per-category probabilities are a
-    /// follow-up). Model-native precipitation type code (ECMWF <c>ptype</c> convention). 1 = rain, 3 = freezing rain,
-    /// 5 = snow, 6 = wet snow, 7 = mixed, 8 = ice pellets. Encoded as <c>Quantiles</c> so ensemble agreement is
-    /// visible — e.g. <c>p25 == p75 == 5</c> means all members agree on snow. Distinct from the derived
-    /// <c>precip_type</c> label on <c>TimeSeriesPoint</c>, which is a friendlier snow/rain/mix categorization derived
-    /// from SLR plus snow level.
-    /// </summary>
-    [JsonPropertyName("ptype")]
-    public Quantiles? PrecipitationTypeCode { get; init; }
-
-    /// <summary>
     /// Mean sea-level pressure: hPa for <c>metric</c> and <c>kelvin</c>, inHg for <c>imperial</c>. A raw blend of the
     /// contributing models; no pressure observation trains a correction. Omitted when no contributing model published
-    /// it for this hour.
+    /// it for this hour. Served only when <see cref="ForecastOptions.Include"/> names <c>mslp</c>.
     /// </summary>
     [JsonPropertyName("mslp")]
     public Quantiles? MeanSeaLevelPressure { get; init; }

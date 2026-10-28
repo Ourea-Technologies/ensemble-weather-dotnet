@@ -15,10 +15,10 @@ public sealed class LocationReference
 {
     /// <summary>
     /// The location's key: its catalog slug. With <c>state</c>, the URL <c>/api/v1/locations/{state}/{slug}</c>; what
-    /// a favorite stores.
+    /// a favorite stores. <see langword="null"/> on a point (coordinate) forecast, which names no catalog place.
     /// </summary>
     [JsonPropertyName("slug")]
-    public string Slug { get; init; } = string.Empty;
+    public string? Slug { get; init; }
 
     /// <summary>
     /// The lowercase USPS state code.
@@ -51,10 +51,10 @@ public sealed class LocationReference
     public double ElevationMeters { get; init; }
 
     /// <summary>
-    /// The primary location type, snake_case (D-5).
+    /// The primary location type; <see langword="null"/> on a point (coordinate) forecast.
     /// </summary>
     [JsonPropertyName("type")]
-    public LocationType Type { get; init; }
+    public LocationType? Type { get; init; }
 
     /// <summary>
     /// The IANA zone the location's local days and hours are kept in -- the zone <c>daily</c> dates, sunrise and

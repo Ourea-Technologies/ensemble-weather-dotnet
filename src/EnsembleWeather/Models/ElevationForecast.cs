@@ -34,12 +34,6 @@ public sealed class ElevationForecast
     public double Elevation { get; init; }
 
     /// <summary>
-    /// Whether this is the default elevation to show in the UI.
-    /// </summary>
-    [JsonPropertyName("default")]
-    public bool? IsDefault { get; init; }
-
-    /// <summary>
     /// Where this elevation was forecast — its own coordinates when the catalog has them, else the location's.
     /// </summary>
     [JsonPropertyName("lat")]
@@ -50,17 +44,6 @@ public sealed class ElevationForecast
     /// </summary>
     [JsonPropertyName("lon")]
     public double Longitude { get; init; }
-
-    /// <summary>
-    /// LEGACY compact hourly points, derived from <c>hourly</c> (kept for clients that read only these; new clients
-    /// should read <c>hourly</c>). Each also carries the hour's <c>precipitation</c>, <c>condition</c> and
-    /// <c>condition_icon</c> -- the same values as the <c>hourly</c> hour at that <c>valid_time</c>, so an hour's
-    /// precipitation type (<c>snow_level_delta</c>) can be shown only when something is likely to fall. Omitted with
-    /// <c>hourly=false</c>. Carries the same gaps as the primary <c>forecast.timeseries</c> — a refused hour is
-    /// absent here too — so key on <c>valid_time</c>, not position.
-    /// </summary>
-    [JsonPropertyName("timeseries")]
-    public IReadOnlyList<ElevationTimeSeriesPoint> Timeseries { get; init; } = [];
 
     /// <summary>
     /// The full hourly series at this elevation — the same shape and the same code as <c>forecast.timeseries</c>

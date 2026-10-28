@@ -63,6 +63,10 @@ internal sealed class ApiRequest
     public ApiRequest Add(string name, double? value, double? defaultValue = null)
         => value is double v && !v.Equals(defaultValue) ? AddEncoded(name, WireRules.PercentEncode(WireRules.FormatNumber(v))) : this;
 
+    /// <summary>
+    /// A comma list in the API's canonical form: each distinct value once, sorted, so equal sets share one URL (any
+    /// other order is a 301 from the server).
+    /// </summary>
     public ApiRequest AddList(string name, ICollection<string> values, string? defaultValue = null)
     {
         if (values.Count == 0)
@@ -70,18 +74,7 @@ internal sealed class ApiRequest
             return this;
         }
 
-        return Add(name, string.Join(",", values), defaultValue);
-    }
-
-    /// <summary>A repeated (exploded) parameter: each distinct value once, sorted, so equal sets share one URL.</summary>
-    public ApiRequest AddRepeated(string name, IEnumerable<string> values)
-    {
-        foreach (string value in values.Distinct(StringComparer.Ordinal).OrderBy(v => v, StringComparer.Ordinal))
-        {
-            Add(name, value);
-        }
-
-        return this;
+        return Add(name, string.Join(",", values.Distinct(StringComparer.Ordinal).OrderBy(v => v, StringComparer.Ordinal)), defaultValue);
     }
 
     public ApiRequest AddUnits(UnitSystem units) => Add("units", units.Value, UnitSystem.Metric.Value);

@@ -11,7 +11,13 @@ namespace EnsembleWeather;
 public sealed class ObservingStation
 {
     /// <summary>
-    /// The name.
+    /// The station's id in its network, as <c>nearest_sensors[].station_id</c>.
+    /// </summary>
+    [JsonPropertyName("station_id")]
+    public string StationId { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The station's registry name, else its id.
     /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;

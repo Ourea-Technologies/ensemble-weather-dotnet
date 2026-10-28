@@ -85,7 +85,7 @@ public sealed class SecurityTests
                 ("Link", "<https://docs.oureawx.com/changelog>; rel=\"deprecation\""))));
         using ServiceProvider provider = services.BuildServiceProvider();
 
-        await provider.GetRequiredService<EnsembleWeatherClient>().GetStormReportsAsync();
+        await provider.GetRequiredService<EnsembleWeatherClient>().GetAvailableRunsAsync();
 
         Assert.NotEmpty(logs.Messages);
         Assert.All(logs.Messages, m => Assert.DoesNotContain(Key, m, StringComparison.Ordinal));

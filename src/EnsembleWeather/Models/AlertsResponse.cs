@@ -12,7 +12,7 @@ namespace EnsembleWeather;
 public sealed class AlertsResponse : ApiResult
 {
     /// <summary>
-    /// (D-4) -- the one location reference (it was the display name).
+    /// The one location reference.
     /// </summary>
     [JsonPropertyName("location")]
     public LocationReference Location { get; init; } = null!;

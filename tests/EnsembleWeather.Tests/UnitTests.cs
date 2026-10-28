@@ -180,6 +180,71 @@ public sealed class TransportTests
     }
 
     [Fact]
+    public async Task RetryAfterOnA504IsHonoured()
+    {
+        var handler = new MockHandler(
+        [
+            MockHandler.Json(504, """{"error":"TIMEOUT","message":"x"}""", ("Retry-After", "5")),
+            MockHandler.Json(200, Forecast),
+        ]);
+        (EnsembleWeatherClient client, RecordingTimeProvider clock) = Client(handler);
+
+        await client.GetLocationForecastAsync("or/mt-hood-meadows");
+
+        Assert.Equal([5.0], clock.Delays.Select(d => d.TotalSeconds));
+    }
+
+    [Fact]
+    public async Task AnErrorBodysRequestIdDocUrlParamAndNearestLocationAreKept()
+    {
+        const string body = """
+            {"error":"PRO_REQUIRED","message":"Coordinates need a Pro key.","param":"lat",
+             "request_id":"01JBQ6ZK3V8M4T2N7XQH5R9W0C",
+             "doc_url":"https://docs.oureawx.com/features/errors/#pro_required",
+             "nearest_location":{"slug":"mt-hood-meadows","url":"/api/v1/locations/or/mt-hood-meadows",
+                                 "distance_km":4.25,"elevation_m":1635.6}}
+            """;
+        var handler = new MockHandler([MockHandler.Json(403, body, ("X-Request-Id", "header-id"))]);
+        (EnsembleWeatherClient client, _) = Client(handler);
+
+        PermissionDeniedException ex = await Assert.ThrowsAsync<PermissionDeniedException>(
+            () => client.GetPointForecastAsync(45.3, -121.7));
+
+        Assert.Equal("PRO_REQUIRED", ex.ErrorCode);
+        Assert.Equal("01JBQ6ZK3V8M4T2N7XQH5R9W0C", ex.RequestId);
+        Assert.Equal(new Uri("https://docs.oureawx.com/features/errors/#pro_required"), ex.DocUrl);
+        Assert.Equal("lat", ex.Parameter);
+        Assert.Equal("mt-hood-meadows", ex.NearestLocation?.Slug);
+        Assert.Equal("/api/v1/locations/or/mt-hood-meadows", ex.NearestLocation?.Url);
+    }
+
+    [Theory]
+    [InlineData("FORBIDDEN", 400)]
+    [InlineData("GONE", 400)]
+    [InlineData("MODEL_RUN_NOT_FOUND", 400)]
+    [InlineData("AMBIGUOUS", 400)]
+    [InlineData("INVALID_MAX_HOURS", 400)]
+    public async Task WithdrawnCodesKeepTheirStringAndMapByStatus(string code, int status)
+    {
+        var handler = new MockHandler([MockHandler.Json(status, $$"""{"error":"{{code}}","message":"x"}""")]);
+        (EnsembleWeatherClient client, _) = Client(handler);
+
+        InvalidRequestException ex = await Assert.ThrowsAsync<InvalidRequestException>(
+            () => client.GetLocationForecastAsync("or/mt-hood-meadows"));
+
+        Assert.Equal(code, ex.ErrorCode);
+    }
+
+    [Fact]
+    public async Task AuthUnavailableIsAServiceError()
+    {
+        var handler = new MockHandler(responder: _ => MockHandler.Json(503, """{"error":"AUTH_UNAVAILABLE","message":"x"}""", ("Retry-After", "1")));
+        (EnsembleWeatherClient client, _) = Client(handler);
+
+        await Assert.ThrowsAsync<ServiceUnavailableException>(() => client.GetLocationForecastAsync("or/mt-hood-meadows"));
+    }
+
+    [Fact]
     public async Task BackoffIsCappedAtEightSeconds()
     {
         var handler = new MockHandler(responder: _ => MockHandler.Json(502, "{}"));

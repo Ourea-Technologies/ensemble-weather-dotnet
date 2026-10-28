@@ -17,7 +17,9 @@ catch (OutsideCoverageException ex)
 ## Retries
 
 Connection failures (except TLS verification), `429`, `502`, `503` and `504` are retried `MaxRetries` times
-(default 2) with full-jitter backoff, or after exactly `Retry-After` when the server sends 60 s or less.
+(default 2) with full-jitter backoff, or after exactly `Retry-After` (on a `429`, `503` or `504`) when the server
+sends 60 s or less. `RequestId` comes from the error body (else `X-Request-Id`), `DocUrl` links the code's
+explanation, and `Parameter` names the query parameter a `400` is about.
 
 ## Rate limits
 

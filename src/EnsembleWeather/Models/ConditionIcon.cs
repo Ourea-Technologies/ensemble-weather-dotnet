@@ -16,7 +16,7 @@ namespace EnsembleWeather;
 [JsonConverter(typeof(Serialization.ConditionIconConverter))]
 public readonly struct ConditionIcon : IEquatable<ConditionIcon>
 {
-    private static readonly string[] Known = ["chance_rain", "chance_showers", "cloudy", "freezing_rain", "heavy_rain", "light_rain", "mostly_cloudy", "mostly_sunny", "night_chance_showers", "night_clear", "night_cloudy", "night_freezing_rain", "night_heavy_rain", "night_light_rain", "night_moon_chance_showers", "night_moon_showers_likely", "night_mostly_clear", "night_mostly_cloudy", "night_partly_cloudy", "night_rain", "night_rain_snow_mix", "night_showers_likely", "night_snow", "partly_cloudy", "rain", "rain_likely", "rain_snow_mix", "showers", "showers_likely", "snow", "sun_chance_showers", "sun_showers", "sun_showers_likely", "sunny"];
+    private static readonly string[] Known = ["chance_rain", "chance_showers", "cloudy", "freezing_rain", "heavy_rain", "light_rain", "mostly_cloudy", "mostly_sunny", "night_chance_showers", "night_clear", "night_cloudy", "night_freezing_rain", "night_heavy_rain", "night_light_rain", "night_moon_chance_showers", "night_moon_showers_likely", "night_mostly_clear", "night_mostly_cloudy", "night_partly_cloudy", "night_rain", "night_rain_snow_mix", "night_showers_likely", "night_snow", "partly_cloudy", "rain", "rain_likely", "rain_snow_mix", "showers", "showers_likely", "snow", "sun_chance_showers", "sun_showers", "sun_showers_likely", "sunny", "night_moon_showers", "night_chance_rain", "night_rain_likely", "night_showers"];
     private readonly string? _value;
 
     /// <summary>Initializes a value from its wire string.</summary>
@@ -128,6 +128,18 @@ public readonly struct ConditionIcon : IEquatable<ConditionIcon>
 
     /// <summary><c>sunny</c>.</summary>
     public static ConditionIcon Sunny { get; } = new("sunny");
+
+    /// <summary><c>night_moon_showers</c>.</summary>
+    public static ConditionIcon NightMoonShowers { get; } = new("night_moon_showers");
+
+    /// <summary><c>night_chance_rain</c>.</summary>
+    public static ConditionIcon NightChanceRain { get; } = new("night_chance_rain");
+
+    /// <summary><c>night_rain_likely</c>.</summary>
+    public static ConditionIcon NightRainLikely { get; } = new("night_rain_likely");
+
+    /// <summary><c>night_showers</c>.</summary>
+    public static ConditionIcon NightShowers { get; } = new("night_showers");
 
     /// <summary>Gets the wire string, exactly as the API sent it.</summary>
     public string Value => _value ?? string.Empty;

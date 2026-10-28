@@ -69,7 +69,7 @@ public sealed class TimeSeriesPoint
     /// <summary>
     /// Present only when precipitation &gt; 0.
     /// </summary>
-    [JsonPropertyName("precip_type")]
+    [JsonPropertyName("precipitation_type")]
     public PrecipitationTypeInfo? PrecipitationType { get; init; }
 
     /// <summary>
@@ -105,7 +105,7 @@ public sealed class TimeSeriesPoint
 
     /// <summary>
     /// Per-member ensemble values, one <c>{id, members}</c> per model with members at this hour, in
-    /// <c>model_run.models</c> order (D-8: it was an object keyed by model). Only present with <c>?members=true</c>
+    /// <c>model_run.models</c> order. Only present with <c>?members=true</c>
     /// -- for spaghetti plots and plumes. A model with no members at this hour is absent. The 6-hourly models have
     /// members at every 6th hour, rrfs at every hour to 84 h.
     /// </summary>

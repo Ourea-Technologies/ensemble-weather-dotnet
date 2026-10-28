@@ -61,8 +61,8 @@ public sealed class ForecastResponse : ApiResult
     public ModelRunInfo ModelRun { get; init; } = null!;
 
     /// <summary>
-    /// The unit system every value in this body is in -- the request's <c>units=</c> (or its alias
-    /// <c>unit_system=</c>), <c>metric</c> when neither is given. Always present, so a cached or shared body says
+    /// The unit system every value in this body is in -- the request's <c>units=</c>, <c>metric</c> when it is not
+    /// given. Always present, so a cached or shared body says
     /// whether <c>32.0</c> is °F or °C. The Cap'n Proto body carries the same as <c>ForecastResponse.units</c> (set
     /// when <c>hasUnits</c>).
     /// </summary>

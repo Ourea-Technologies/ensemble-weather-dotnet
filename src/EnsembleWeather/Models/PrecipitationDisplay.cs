@@ -6,9 +6,9 @@ namespace EnsembleWeather;
 
 /// <summary>
 /// A day's precipitation headline, chosen by the server so every client says the same thing: <c>kind</c>
-/// <c>none</c> when the chance of a wet day (<c>precip_occurrence_probability</c>) is under 15 %, else the day's
-/// <c>precip_type</c>; <c>chance</c> that chance; <c>amount</c> the median amount if wet
-/// (<c>total_snowfall_if_wet.p50</c> for snow, <c>total_precip_if_wet.p50</c> otherwise).
+/// <c>none</c> when the chance of a wet day (<c>precipitation_occurrence_probability</c>) is under 15 %, else the day's
+/// <c>precipitation_type</c>; <c>chance</c> that chance; <c>amount</c> the median amount if wet
+/// (<c>total_snowfall_if_wet.p50</c> for snow, <c>total_precipitation_if_wet.p50</c> otherwise).
 /// </summary>
 public sealed class PrecipitationDisplay
 {

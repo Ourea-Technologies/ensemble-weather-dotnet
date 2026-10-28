@@ -17,7 +17,7 @@ public sealed class AvailableRunsResponse : ApiResult
     public ServedRun? Served { get; init; }
 
     /// <summary>
-    /// Init times at least two models completed, newest first (it was <c>available_runs</c>, bare strings).
+    /// Init times at least two models completed, newest first.
     /// </summary>
     [JsonPropertyName("runs")]
     public IReadOnlyList<AvailableRun> Runs { get; init; } = [];
@@ -27,4 +27,11 @@ public sealed class AvailableRunsResponse : ApiResult
     /// </summary>
     [JsonPropertyName("count")]
     public int Count { get; init; }
+
+    /// <summary>
+    /// Pass it back as the cursor (with the same <c>limit</c>) for the next page; <see langword="null"/> on the last
+    /// page.
+    /// </summary>
+    [JsonPropertyName("next_cursor")]
+    public string? NextCursor { get; init; }
 }

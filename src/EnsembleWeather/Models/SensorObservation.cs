@@ -86,7 +86,7 @@ public sealed class SensorObservation
     /// <summary>
     /// Radar precipitation rate: mm/h, or in/h (imperial).
     /// </summary>
-    [JsonPropertyName("precip_rate")]
+    [JsonPropertyName("precipitation_rate")]
     public double? PrecipitationRate { get; init; }
 
     /// <summary>

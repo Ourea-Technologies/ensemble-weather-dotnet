@@ -23,15 +23,15 @@ public sealed class ProbabilityThresholds
     public double HourlySnowfall { get; init; }
 
     /// <summary>
-    /// <c>daily[].precip_probability</c>'s day-total threshold (2.5 mm).
+    /// <c>daily[].precipitation_probability</c>'s day-total threshold (2.5 mm).
     /// </summary>
-    [JsonPropertyName("daily_precip_probability")]
+    [JsonPropertyName("daily_precipitation_probability")]
     public double DailyPrecipitationProbability { get; init; }
 
     /// <summary>
-    /// <c>daily[].precip_occurrence_probability</c>'s threshold (1.0 mm), also the "if wet" condition.
+    /// <c>daily[].precipitation_occurrence_probability</c>'s threshold (1.0 mm), also the "if wet" condition.
     /// </summary>
-    [JsonPropertyName("daily_precip_occurrence_probability")]
+    [JsonPropertyName("daily_precipitation_occurrence_probability")]
     public double DailyPrecipitationOccurrenceProbability { get; init; }
 
     /// <summary>

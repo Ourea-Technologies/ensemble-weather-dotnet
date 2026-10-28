@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace EnsembleWeather;
 
 /// <summary>
-/// A list, <c>/nearby</c> or favorite row: the [<c>LocationRef</c>] fields (D-4) plus the county, the catalog
+/// A list, <c>/nearby</c> or favorite row: the [<c>LocationRef</c>] fields plus the county, the catalog
 /// blurb and the location's named elevations.
 /// </summary>
 public class LocationSummary
@@ -49,7 +49,7 @@ public class LocationSummary
     public double ElevationMeters { get; init; }
 
     /// <summary>
-    /// The primary location type, snake_case (D-5).
+    /// The primary location type, snake_case.
     /// </summary>
     [JsonPropertyName("type")]
     public LocationType Type { get; init; }

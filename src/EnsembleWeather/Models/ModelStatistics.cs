@@ -43,10 +43,11 @@ public sealed class ModelStatistics
     public Quantiles? WindSpeed { get; init; }
 
     /// <summary>
-    /// Absent when this model published nothing for the hour; never 0.
+    /// The model's own wind direction as a circular distribution; absent when this model published nothing for the
+    /// hour.
     /// </summary>
     [JsonPropertyName("wind_direction")]
-    public Quantiles? WindDirection { get; init; }
+    public CircularStatistics? WindDirection { get; init; }
 
     /// <summary>
     /// Snow level, in the request's length unit.

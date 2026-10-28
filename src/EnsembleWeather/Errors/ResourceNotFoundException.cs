@@ -5,7 +5,7 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// The location, run or resource does not exist (<c>LOCATION_NOT_FOUND</c>, <c>MODEL_RUN_NOT_FOUND</c>, <c>NOT_FOUND</c>, <c>GONE</c>, or HTTP 404/410).
+/// The location or resource does not exist (<c>LOCATION_NOT_FOUND</c>, <c>NOT_FOUND</c>, or HTTP 404/410).
 /// </summary>
 public sealed class ResourceNotFoundException : EnsembleWeatherException
 {

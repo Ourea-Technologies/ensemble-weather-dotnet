@@ -11,6 +11,13 @@ namespace EnsembleWeather;
 public sealed class ProbabilityResult
 {
     /// <summary>
+    /// The term's canonical spelling, as the SDK sent it (<c>snowfall:ge:6.000:24h</c>): the key the SDK matches the
+    /// caller's term by.
+    /// </summary>
+    [JsonPropertyName("term")]
+    public string Term { get; init; } = string.Empty;
+
+    /// <summary>
     /// The forecast variable.
     /// </summary>
     [JsonPropertyName("variable")]
@@ -59,8 +66,8 @@ public sealed class ProbabilityResult
     public DateTimeOffset? To { get; init; }
 
     /// <summary>
-    /// The share of members meeting the term, 0..1 (0.001); <c>null</c> when the served series does not reach the
-    /// window's end or carries no members (<c>hourly=false</c>).
+    /// The share of members meeting the term, 0..1 (0.001); <see langword="null"/> (never 0) when it cannot be
+    /// answered: <see cref="NullReason"/> says why.
     /// </summary>
     [JsonPropertyName("probability")]
     public double? Probability { get; init; }
@@ -71,4 +78,10 @@ public sealed class ProbabilityResult
     /// </summary>
     [JsonPropertyName("members")]
     public int Members { get; init; }
+
+    /// <summary>
+    /// Why <see cref="Probability"/> is <see langword="null"/>; <see langword="null"/> when it is not.
+    /// </summary>
+    [JsonPropertyName("null_reason")]
+    public NullReason? NullReason { get; init; }
 }

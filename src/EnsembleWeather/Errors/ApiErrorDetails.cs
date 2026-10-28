@@ -15,24 +15,19 @@ internal sealed class ApiErrorDetails
             ["INVALID_API_KEY"] = d => new AuthenticationFailedException(d),
             ["UNAUTHORIZED"] = d => new AuthenticationFailedException(d),
             ["PRO_REQUIRED"] = d => new PermissionDeniedException(d),
-            ["FORBIDDEN"] = d => new PermissionDeniedException(d),
             ["LOCATION_NOT_FOUND"] = d => new ResourceNotFoundException(d),
-            ["MODEL_RUN_NOT_FOUND"] = d => new ResourceNotFoundException(d),
             ["NOT_FOUND"] = d => new ResourceNotFoundException(d),
-            ["GONE"] = d => new ResourceNotFoundException(d),
             ["BAD_REQUEST"] = d => new InvalidRequestException(d),
             ["INVALID_COORDINATES"] = d => new InvalidRequestException(d),
             ["INVALID_ELEVATION"] = d => new InvalidRequestException(d),
-            ["INVALID_MAX_HOURS"] = d => new InvalidRequestException(d),
             ["ELEVATION_REQUIRED"] = d => new InvalidRequestException(d),
-            ["AMBIGUOUS"] = d => new InvalidRequestException(d),
-            ["FEELS_LIKE_UNAVAILABLE"] = d => new InvalidRequestException(d),
             ["OUTSIDE_COVERAGE"] = d => new OutsideCoverageException(d),
             ["TOO_MANY_REQUESTS"] = d => new RateLimitExceededException(d),
             ["FORECAST_UNAVAILABLE"] = d => new ServiceUnavailableException(d),
             ["TIMEOUT"] = d => new ServiceUnavailableException(d),
             ["INTERNAL_ERROR"] = d => new ServiceUnavailableException(d),
             ["DATABASE_ERROR"] = d => new ServiceUnavailableException(d),
+            ["AUTH_UNAVAILABLE"] = d => new ServiceUnavailableException(d),
         };
 
     public int StatusCode { get; init; }
@@ -42,6 +37,12 @@ internal sealed class ApiErrorDetails
     public string? Message { get; init; }
 
     public string? RequestId { get; init; }
+
+    public Uri? DocUrl { get; init; }
+
+    public string? Parameter { get; init; }
+
+    public NearestLocation? NearestLocation { get; init; }
 
     public TimeSpan? RetryAfter { get; init; }
 

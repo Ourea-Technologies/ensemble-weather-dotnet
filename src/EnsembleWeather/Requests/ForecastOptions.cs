@@ -77,9 +77,16 @@ public sealed class ForecastOptions
     /// </summary>
     public IList<WindowTotalTerm> WindowTotals { get; } = new List<WindowTotalTerm>();
 
-    /// <summary>Gets the serve-path diagnostics to include (<c>provenance</c>, <c>ptype</c>).</summary>
+    /// <summary>Gets the serve-path diagnostics to include (<c>provenance</c>).</summary>
     public IList<string> Diagnostics { get; } = new List<string>();
 
-    /// <summary>Gets the "feels like" indices to serve (<c>nws</c>, the default; <c>utci</c> is not served yet).</summary>
+    /// <summary>
+    /// Gets the opt-in forecast variables to serve (<c>include=</c>): <c>skin_temperature</c>
+    /// (<see cref="EnsembleStatistics.SkinTemperature"/>) and <c>mslp</c>
+    /// (<see cref="EnsembleStatistics.MeanSeaLevelPressure"/>). Neither is served unless named here.
+    /// </summary>
+    public IList<string> Include { get; } = new List<string>();
+
+    /// <summary>Gets the "feels like" indices to serve (<c>nws</c>, the default and the only one served).</summary>
     public IList<string> FeelsLike { get; } = new List<string>();
 }

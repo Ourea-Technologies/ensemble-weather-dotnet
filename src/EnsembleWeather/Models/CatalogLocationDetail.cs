@@ -52,7 +52,7 @@ public sealed class CatalogLocationDetail : ApiResult
     public double ElevationMeters { get; init; }
 
     /// <summary>
-    /// The primary location type, snake_case (D-5).
+    /// The primary location type, snake_case.
     /// </summary>
     [JsonPropertyName("type")]
     public LocationType Type { get; init; }
@@ -177,10 +177,4 @@ public sealed class CatalogLocationDetail : ApiResult
     /// </summary>
     [JsonPropertyName("content")]
     public IReadOnlyList<CatalogResolvedEntry> Content { get; init; } = [];
-
-    /// <summary>
-    /// Resolved ad placements (<c>include=ads</c>).
-    /// </summary>
-    [JsonPropertyName("ads")]
-    public IReadOnlyList<CatalogResolvedAdSlot> Ads { get; init; } = [];
 }

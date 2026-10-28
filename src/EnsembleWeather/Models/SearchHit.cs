@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace EnsembleWeather;
 
 /// <summary>
-/// One location search result: the [<c>LocationRef</c>] fields (D-4), the county and <c>key</c>. <c>Types[]</c>
+/// One location search result: the [<c>LocationRef</c>] fields, the county and <c>key</c>. <c>Types[]</c>
 /// is gone (<c>type</c> is the primary type).
 /// </summary>
 public sealed class SearchHit
@@ -55,7 +55,7 @@ public sealed class SearchHit
     public double ElevationMeters { get; init; }
 
     /// <summary>
-    /// The primary location type, snake_case (D-5).
+    /// The primary location type, snake_case.
     /// </summary>
     [JsonPropertyName("type")]
     public LocationType Type { get; init; }

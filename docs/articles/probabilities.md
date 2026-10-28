@@ -21,7 +21,9 @@ foreach (ProbabilityResult p in forecast.Probabilities) // in the order asked
   zero, as the server rounds. That is the only arithmetic the SDK does.
 - `precipitation` and `snowfall` are window totals (`total`, the only aggregation for them); the others take
   `any` (the default) or `all`. A mismatch throws `ArgumentException` before anything is sent.
-- A `null` `Probability` means the forecast does not reach the window's end. It is never 0.
+- Each answer echoes its canonical `Term`, and the SDK matches it to your term by that string, never by position.
+- A `null` `Probability` is never 0: `NullReason` says why (`window_not_covered`, `too_few_members`,
+  `variable_unavailable`).
 
 ## Storm totals
 
@@ -31,11 +33,14 @@ WindowTotal total = forecast.WindowTotals[0];
 QuantileRange? range = total.Quantiles?.GetRange(10, 90);
 ```
 
-Each member's own total over the window, as quantiles. Never sum hourly quantiles: percentiles are not
-additive.
+Each member's own total over the window, as quantiles; `null`, with its `NullReason`, when the window cannot be
+answered. Never sum hourly quantiles: percentiles are not additive.
 
 ## Ranges and the median
 
 `GetRange(10, 90)` and `GetRange(25, 75)` are the served ranges; any other pair throws, because the SDK never
-interpolates. `Median` is `P50`, the ensemble median, not "the forecast". `wind_direction` quantiles are
-circular: `Max` may be less than `Min`.
+interpolates. `Median` is `P50`, the ensemble median, not "the forecast".
+
+`WindDirection` is not a `Quantiles` but a `CircularStatistics`: a mean bearing, a standard deviation, and the
+central 50 % and 90 % of the members as clockwise sectors. A sector's `To` may be less than its `From` (the arc
+runs through north).

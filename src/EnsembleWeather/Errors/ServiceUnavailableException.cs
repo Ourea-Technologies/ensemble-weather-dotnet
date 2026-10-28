@@ -5,7 +5,7 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// The service could not answer (<c>FORECAST_UNAVAILABLE</c>, <c>TIMEOUT</c>, <c>INTERNAL_ERROR</c>, <c>DATABASE_ERROR</c>, or HTTP 5xx). 502, 503 and 504 were retried first.
+/// The service could not answer (<c>FORECAST_UNAVAILABLE</c>, <c>TIMEOUT</c>, <c>INTERNAL_ERROR</c>, <c>DATABASE_ERROR</c>, <c>AUTH_UNAVAILABLE</c>, or HTTP 5xx). 502, 503 and 504 were retried first.
 /// </summary>
 public sealed class ServiceUnavailableException : EnsembleWeatherException
 {

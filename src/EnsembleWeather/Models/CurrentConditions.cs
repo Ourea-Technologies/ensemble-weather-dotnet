@@ -47,7 +47,7 @@ public sealed class CurrentConditions
     /// The condition icon name.
     /// </summary>
     [JsonPropertyName("condition_icon")]
-    public string ConditionIcon { get; init; } = string.Empty;
+    public ConditionIcon ConditionIcon { get; init; }
 
     /// <summary>
     /// M/s (metric, kelvin) or mph (imperial).
@@ -82,7 +82,7 @@ public sealed class CurrentConditions
     /// <summary>
     /// Probability (0–1) of at least a 0.1 mm trace in the hour.
     /// </summary>
-    [JsonPropertyName("precip_probability")]
+    [JsonPropertyName("precipitation_probability")]
     public double? PrecipitationProbability { get; init; }
 
     /// <summary>

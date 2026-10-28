@@ -8,8 +8,8 @@ using System.Linq;
 namespace EnsembleWeather;
 
 /// <summary>
-/// Builds the canonical <c>prob=</c> and <c>totals=</c> values (BEHAVIOR.md 4 and 5) and maps the server's answers,
-/// which come back in the order sent, to the caller's own order.
+/// Builds the canonical <c>prob=</c> and <c>totals=</c> values (BEHAVIOR.md 4 and 5) and maps the server's answers to
+/// the caller's own order by the canonical <c>term</c> each answer echoes, never by position.
 /// </summary>
 internal static class TermCodec
 {
@@ -62,16 +62,9 @@ internal static class TermCodec
         var results = new ProbabilityResult[plan.Keys.Count];
         for (int i = 0; i < plan.Keys.Count; i++)
         {
-            ProbabilityKey wanted = plan.Keys[i];
-            ProbabilityResult? match = answers.FirstOrDefault(a =>
-                a.Variable.Value == wanted.Variable
-                && a.Operator.Value == wanted.Operator
-                && Scaled(a.Threshold, wanted.Decimals) == wanted.Threshold
-                && a.WindowStartHours == wanted.Start
-                && a.WindowEndHours == wanted.End
-                && a.Aggregation.Value == wanted.Aggregation);
-            results[i] = match ?? throw new EnsembleWeatherException(
-                $"The response did not answer the probability term '{wanted.Wire()}'.");
+            string wanted = plan.Keys[i].Wire();
+            results[i] = answers.FirstOrDefault(a => string.Equals(a.Term, wanted, StringComparison.Ordinal))
+                ?? throw new EnsembleWeatherException($"The response did not answer the probability term '{wanted}'.");
         }
 
         return results;
@@ -106,8 +99,7 @@ internal static class TermCodec
         for (int i = 0; i < plan.Keys.Count; i++)
         {
             TotalsKey wanted = plan.Keys[i];
-            results[i] = answers.FirstOrDefault(a =>
-                    a.Variable.Value == wanted.Variable && a.WindowStartHours == wanted.Start && a.WindowEndHours == wanted.End)
+            results[i] = answers.FirstOrDefault(a => string.Equals(a.Term, wanted.Wire, StringComparison.Ordinal))
                 ?? throw new EnsembleWeatherException($"The response did not answer the window total '{wanted.Wire}'.");
         }
 

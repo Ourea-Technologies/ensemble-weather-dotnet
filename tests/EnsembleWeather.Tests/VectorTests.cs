@@ -245,11 +245,7 @@ public sealed class VectorTests
             case "getCatalogStation":
                 return await client.GetCatalogStationAsync(Str(a, "slug")!);
             case "getAvailableRuns":
-                return await client.GetAvailableRunsAsync(Int(a, "limit"));
-            case "getStormReports":
-                return await client.GetStormReportsAsync(Int(a, "limit"));
-            case "getStormReport":
-                return await client.GetStormReportAsync(a.GetProperty("id").GetInt64());
+                return await client.GetAvailableRunsAsync(Int(a, "limit"), Str(a, "cursor"));
             case "getAttribution":
                 return await client.GetAttributionAsync();
             default:
@@ -269,7 +265,7 @@ public sealed class VectorTests
     }
 
     private static LocationId Location(JsonElement a)
-        => a.TryGetProperty("location", out JsonElement l) ? LocationId.Parse(l.GetString()!) : new LocationId(Str(a, "state")!, Str(a, "name")!);
+        => a.TryGetProperty("location", out JsonElement l) ? LocationId.Parse(l.GetString()!) : new LocationId(Str(a, "state")!, Str(a, "slug")!);
 
     private static ForecastOptions Forecast(JsonElement a)
     {

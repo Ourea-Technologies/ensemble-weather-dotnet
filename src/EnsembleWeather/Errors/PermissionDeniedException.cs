@@ -5,7 +5,7 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// The caller's tier does not allow the request (<c>PRO_REQUIRED</c>, <c>FORBIDDEN</c>, or HTTP 403), for example a coordinate forecast without a Pro key.
+/// The caller's tier does not allow the request (<c>PRO_REQUIRED</c>, or HTTP 403), for example a coordinate forecast without a Pro key.
 /// </summary>
 public sealed class PermissionDeniedException : EnsembleWeatherException
 {

@@ -437,39 +437,22 @@ public sealed class EnsembleWeatherClient : IDisposable
             EnsembleWeatherJsonContext.Default.CatalogStationDetail,
             cancellationToken);
 
-    // ---- Runs, storm reports, attribution ---------------------------------------------------------------------
+    // ---- Runs, attribution ------------------------------------------------------------------------------------
 
-    /// <summary>Gets the model runs a pinned <c>run</c> can name, and what a forecast serves now (<c>getAvailableRuns</c>).</summary>
-    /// <param name="limit">The most runs wanted (up to 100); <see langword="null"/> for the API's default of 10.</param>
+    /// <summary>
+    /// Gets one page of the model runs a pinned <c>run</c> can name, and what a forecast serves now
+    /// (<c>getAvailableRuns</c>).
+    /// </summary>
+    /// <param name="limit">The page size (1 to 100); <see langword="null"/> for the API's default of 10.</param>
+    /// <param name="cursor">The previous page's <see cref="AvailableRunsResponse.NextCursor"/>; <see langword="null"/> for the first page.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
-    /// <returns>The runs, newest first.</returns>
+    /// <returns>The runs, newest first; <see cref="AvailableRunsResponse.NextCursor"/> is <see langword="null"/> on the last page.</returns>
     /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
-    public Task<AvailableRunsResponse> GetAvailableRunsAsync(int? limit = null, CancellationToken cancellationToken = default)
+    public Task<AvailableRunsResponse> GetAvailableRunsAsync(
+        int? limit = null, string? cursor = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
-            new ApiRequest("getAvailableRuns", "/api/v1/runs").Add("limit", limit, 10),
+            new ApiRequest("getAvailableRuns", "/api/v1/runs").Add("limit", limit, 10).Add("cursor", cursor),
             EnsembleWeatherJsonContext.Default.AvailableRunsResponse,
-            cancellationToken);
-
-    /// <summary>Gets published storm report cards (<c>getStormReports</c>).</summary>
-    /// <param name="limit">The most reports wanted (up to 100); <see langword="null"/> for the API's default of 20.</param>
-    /// <param name="cancellationToken">Cancels the call.</param>
-    /// <returns>The reports, most recent onset first.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
-    public Task<StormReportsResponse> GetStormReportsAsync(int? limit = null, CancellationToken cancellationToken = default)
-        => _pipeline.SendAsync(
-            new ApiRequest("getStormReports", "/api/v1/storm-reports").Add("limit", limit, 20),
-            EnsembleWeatherJsonContext.Default.StormReportsResponse,
-            cancellationToken);
-
-    /// <summary>Gets one storm report card (<c>getStormReport</c>).</summary>
-    /// <param name="id">The report id.</param>
-    /// <param name="cancellationToken">Cancels the call.</param>
-    /// <returns>The report.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
-    public Task<StormReport> GetStormReportAsync(long id, CancellationToken cancellationToken = default)
-        => _pipeline.SendAsync(
-            new ApiRequest("getStormReport", "/api/v1/storm-reports/" + id.ToString(CultureInfo.InvariantCulture)),
-            EnsembleWeatherJsonContext.Default.StormReport,
             cancellationToken);
 
     /// <summary>
@@ -575,6 +558,7 @@ public sealed class EnsembleWeatherClient : IDisposable
             .AddEncoded("prob", probabilities?.Wire)
             .AddEncoded("totals", totals?.Wire)
             .AddList("diagnostics", options.Diagnostics)
+            .AddList("include", options.Include)
             .AddList("feels_like", options.FeelsLike, "nws");
 
         ForecastResponse forecast = await _pipeline
@@ -641,7 +625,7 @@ public sealed class EnsembleWeatherClient : IDisposable
             .Add("admin1", options?.Admin1)
             .Add("country", options?.Country)
             .AddList("network", options?.Networks ?? [])
-            .AddRepeated("capability", options?.Capabilities ?? [])
+            .AddList("capability", options?.Capabilities ?? [])
             .Add("status", options?.Status)
             .Add("limit", options?.Limit, 20)
             .Add("cursor", cursor);

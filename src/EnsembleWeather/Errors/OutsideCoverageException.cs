@@ -5,7 +5,7 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// The point is outside the forecast coverage (<c>OUTSIDE_COVERAGE</c>): the contiguous United States, over land.
+/// The point is outside the forecast coverage (<c>OUTSIDE_COVERAGE</c>, a 404): the contiguous United States, over land.
 /// </summary>
 public sealed class OutsideCoverageException : EnsembleWeatherException
 {

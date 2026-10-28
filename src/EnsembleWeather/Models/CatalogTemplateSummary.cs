@@ -18,13 +18,13 @@ public sealed class CatalogTemplateSummary
     public string Id { get; init; } = string.Empty;
 
     /// <summary>
-    /// Null = wildcard scope.
+    /// The location type the template applies to, snake_case (<c>ski_area</c>); <see langword="null"/> = wildcard scope.
     /// </summary>
     [JsonPropertyName("location_type")]
     public string? LocationType { get; init; }
 
     /// <summary>
-    /// Null = wildcard scope.
+    /// The page-template variant, snake_case (<c>mountain</c>); <see langword="null"/> = wildcard scope.
     /// </summary>
     [JsonPropertyName("template_variant")]
     public string? TemplateVariant { get; init; }

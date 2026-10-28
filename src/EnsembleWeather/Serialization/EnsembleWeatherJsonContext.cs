@@ -23,8 +23,6 @@ namespace EnsembleWeather.Serialization;
 [JsonSerializable(typeof(CatalogStationPage))]
 [JsonSerializable(typeof(CatalogStationDetail))]
 [JsonSerializable(typeof(AvailableRunsResponse))]
-[JsonSerializable(typeof(StormReportsResponse))]
-[JsonSerializable(typeof(StormReport))]
 [JsonSerializable(typeof(AttributionRegistry))]
 [JsonSerializable(typeof(ErrorBody))]
 internal sealed partial class EnsembleWeatherJsonContext : JsonSerializerContext

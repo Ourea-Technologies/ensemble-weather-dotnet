@@ -120,6 +120,7 @@ string Forecast(bool imperial, System.Collections.Specialized.NameValueCollectio
             bool amount = f[0] is "precipitation" or "snowfall";
             answers.Add(new JsonObject
             {
+                ["term"] = term,
                 ["variable"] = f[0],
                 ["op"] = f[1],
                 ["threshold"] = double.Parse(f[2], CultureInfo.InvariantCulture),
@@ -130,6 +131,7 @@ string Forecast(bool imperial, System.Collections.Specialized.NameValueCollectio
                 ["to"] = from.AddHours(end).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
                 ["probability"] = Math.Round(0.9 / (1 + (Math.Abs(double.Parse(f[2], CultureInfo.InvariantCulture)) / 100)), 3),
                 ["members"] = 131,
+                ["null_reason"] = null,
             });
         }
 
@@ -146,11 +148,13 @@ string Forecast(bool imperial, System.Collections.Specialized.NameValueCollectio
             double scale = (end - start) / 24.0 * (imperial ? 0.04 : 1);
             answers.Add(new JsonObject
             {
+                ["term"] = term,
                 ["variable"] = f[0],
                 ["window_start_hours"] = start,
                 ["window_end_hours"] = end,
                 ["from"] = from.AddHours(start).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
                 ["to"] = from.AddHours(end).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                ["aggregation"] = "total",
                 ["quantiles"] = new JsonObject
                 {
                     ["mean"] = Math.Round(14 * scale, 2),
@@ -163,6 +167,7 @@ string Forecast(bool imperial, System.Collections.Specialized.NameValueCollectio
                     ["max"] = Math.Round(41 * scale, 2),
                 },
                 ["members"] = 131,
+                ["null_reason"] = null,
             });
         }
 
@@ -181,7 +186,13 @@ static (int Start, int End) Window(string window)
 }
 
 (int, string) Error(int status, string code, string message)
-    => (status, new JsonObject { ["error"] = code, ["message"] = message }.ToJsonString());
+    => (status, new JsonObject
+    {
+        ["error"] = code,
+        ["message"] = message,
+        ["request_id"] = Guid.NewGuid().ToString(),
+        ["doc_url"] = "https://docs.oureawx.com/features/errors/#" + code.ToLowerInvariant(),
+    }.ToJsonString());
 
 string Vector(string name) => File.ReadAllText(Path.Combine(vectorBodies, name));
 

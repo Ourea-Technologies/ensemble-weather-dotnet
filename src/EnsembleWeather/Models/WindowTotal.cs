@@ -11,6 +11,13 @@ namespace EnsembleWeather;
 public sealed class WindowTotal
 {
     /// <summary>
+    /// The term's canonical spelling, as the SDK sent it (<c>snowfall:72h</c>): the key the SDK matches the caller's
+    /// term by.
+    /// </summary>
+    [JsonPropertyName("term")]
+    public string Term { get; init; } = string.Empty;
+
+    /// <summary>
     /// The forecast variable.
     /// </summary>
     [JsonPropertyName("variable")]
@@ -53,4 +60,16 @@ public sealed class WindowTotal
     /// </summary>
     [JsonPropertyName("members")]
     public int Members { get; init; }
+
+    /// <summary>
+    /// What each member contributes: <see cref="WindowTotalAggregation.Total"/> for precipitation and snowfall.
+    /// </summary>
+    [JsonPropertyName("aggregation")]
+    public WindowTotalAggregation Aggregation { get; init; }
+
+    /// <summary>
+    /// Why <see cref="Quantiles"/> is <see langword="null"/>; <see langword="null"/> when it is not.
+    /// </summary>
+    [JsonPropertyName("null_reason")]
+    public NullReason? NullReason { get; init; }
 }

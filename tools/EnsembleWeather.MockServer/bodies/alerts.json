@@ -15,8 +15,9 @@
     {
       "id": "urn:oid:2.49.0.1.840.0.mock",
       "event": "Winter Storm Warning",
-      "severity": "Moderate",
-      "urgency": "Expected",
+      "severity": "moderate",
+      "urgency": "expected",
+      "certainty": "likely",
       "headline": "Winter Storm Warning until 10 AM PST Sunday",
       "onset": "2026-11-15T00:00:00Z",
       "expires": "2026-11-16T18:00:00Z"

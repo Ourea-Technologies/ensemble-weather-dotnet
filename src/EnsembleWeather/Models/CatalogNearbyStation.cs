@@ -23,13 +23,13 @@ public sealed class CatalogNearbyStation
     public string Name { get; init; } = string.Empty;
 
     /// <summary>
-    /// The observation network.
+    /// The observation network, snake_case (<c>snotel</c>, <c>rwis_wsdot</c>, <c>mt_mesonet</c>).
     /// </summary>
     [JsonPropertyName("network")]
     public string Network { get; init; } = string.Empty;
 
     /// <summary>
-    /// The station status.
+    /// The live-feed status, snake_case: <c>active</c>, <c>intermittent</c>, <c>inactive</c>, <c>decommissioned</c> or <c>unknown</c>.
     /// </summary>
     [JsonPropertyName("station_status")]
     public string StationStatus { get; init; } = string.Empty;

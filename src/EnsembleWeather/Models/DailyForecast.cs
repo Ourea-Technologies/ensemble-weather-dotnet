@@ -44,9 +44,9 @@ public sealed class DailyForecast
     public ConditionIcon ConditionIcon { get; init; }
 
     /// <summary>
-    /// The day's precipitation type, <c>null</c> when <c>precip_occurrence_probability</c> is under 0.15. Read off
+    /// The day's precipitation type, <c>null</c> when <c>precipitation_occurrence_probability</c> is under 0.15. Read off
     /// the day's HOURLY phases: the day's snow share is the precipitation-weighted mean of the
-    /// <c>timeseries[].precip_type.snow_probability</c> of its wet hours (the share of each hour's water that falls
+    /// <c>timeseries[].precipitation_type.snow_probability</c> of its wet hours (the share of each hour's water that falls
     /// as snow), read at that field's 0.01 resolution — <c>snow</c> when at least 99.5% of the day's water is snow,
     /// <c>rain</c> when under 0.5% is (or no hour is typed), <c>rain_snow_mix</c> between. So a day whose wet hours
     /// are all <c>rain_snow_mix</c> is <c>rain_snow_mix</c>, and a rain day with one heavy snow hour is
@@ -54,7 +54,7 @@ public sealed class DailyForecast
     /// Rain/Snow Mix label, or a liquid label. <c>freezing_rain</c> is an hourly type only; such hours count as
     /// liquid.
     /// </summary>
-    [JsonPropertyName("precip_type")]
+    [JsonPropertyName("precipitation_type")]
     public PrecipitationKind? PrecipitationType { get; init; }
 
     /// <summary>
@@ -93,23 +93,9 @@ public sealed class DailyForecast
     public Quantiles? FeelsLikeLow { get; init; }
 
     /// <summary>
-    /// The daily UTCI maximum, built like <c>feels_like_high</c> from the hourly <c>feels_like_utci</c>. Present only
-    /// with <c>feels_like=utci</c>, not served yet: absent today.
-    /// </summary>
-    [JsonPropertyName("feels_like_utci_high")]
-    public Quantiles? FeelsLikeUtciHigh { get; init; }
-
-    /// <summary>
-    /// The daily UTCI minimum, built like <c>feels_like_low</c> from the hourly <c>feels_like_utci</c>. Present only
-    /// with <c>feels_like=utci</c>, not served yet: absent today.
-    /// </summary>
-    [JsonPropertyName("feels_like_utci_low")]
-    public Quantiles? FeelsLikeUtciLow { get; init; }
-
-    /// <summary>
     /// The day's total precipitation.
     /// </summary>
-    [JsonPropertyName("total_precip")]
+    [JsonPropertyName("total_precipitation")]
     public Quantiles TotalPrecipitation { get; init; } = null!;
 
     /// <summary>
@@ -121,24 +107,24 @@ public sealed class DailyForecast
     /// <summary>
     /// **MEANINGFUL precipitation: <c>P(day total &gt;= 2.5 mm)</c>** (0-1) — the headline number, the chance the day
     /// accumulates a tenth of an inch or more. For "will it precipitate at all", read
-    /// <c>precip_occurrence_probability</c> instead; the two answer different questions and <c>precip_probability</c>
+    /// <c>precipitation_occurrence_probability</c> instead; the two answer different questions and <c>precipitation_probability</c>
     /// is always the smaller of the two.
     /// </summary>
-    [JsonPropertyName("precip_probability")]
+    [JsonPropertyName("precipitation_probability")]
     public double PrecipitationProbability { get; init; }
 
     /// <summary>
     /// **OCCURRENCE: <c>P(day total &gt;= 1.0 mm)</c>** (0-1) — the chance the day precipitates at all, as opposed to
-    /// <c>precip_probability</c>'s chance that it amounts to anything. This is the number <c>condition</c>'s tier and
-    /// <c>precip_type</c>'s dry gate read; their PHASE comes from the day's hourly phases (see <c>precip_type</c>).
+    /// <c>precipitation_probability</c>'s chance that it amounts to anything. This is the number <c>condition</c>'s tier and
+    /// <c>precipitation_type</c>'s dry gate read; their PHASE comes from the day's hourly phases (see <c>precipitation_type</c>).
     /// </summary>
-    [JsonPropertyName("precip_occurrence_probability")]
+    [JsonPropertyName("precipitation_occurrence_probability")]
     public double PrecipitationOccurrenceProbability { get; init; }
 
     /// <summary>
     /// <c>P(day snowfall total &gt;= 2.5 mm)</c> (0-1), inclusive. Same estimator, threshold and caveats as
-    /// <c>precip_probability</c> — see its description. There is no snowfall counterpart to
-    /// <c>precip_occurrence_probability</c>: snow occurrence is not separately calibrated.
+    /// <c>precipitation_probability</c> — see its description. There is no snowfall counterpart to
+    /// <c>precipitation_occurrence_probability</c>: snow occurrence is not separately calibrated.
     /// </summary>
     [JsonPropertyName("snow_probability")]
     public double SnowProbability { get; init; }
@@ -157,16 +143,16 @@ public sealed class DailyForecast
     public Quantiles? SnowLevel { get; init; }
 
     /// <summary>
-    /// The day total GIVEN a wet day (total &gt;= the <c>daily_precip_occurrence_probability</c> threshold, 1.0 mm):
+    /// The day total GIVEN a wet day (total &gt;= the <c>daily_precipitation_occurrence_probability</c> threshold, 1.0 mm):
     /// the upper part of the day-total distribution, renormalized. Not the mean divided by the probability. Omitted
     /// under a 0.1 % chance.
     /// </summary>
-    [JsonPropertyName("total_precip_if_wet")]
+    [JsonPropertyName("total_precipitation_if_wet")]
     public Quantiles? TotalPrecipitationIfWet { get; init; }
 
     /// <summary>
     /// The day's snowfall given a snowy day (&gt;= the <c>daily_snow_probability</c> threshold, 2.5 mm), as
-    /// <c>total_precip_if_wet</c>.
+    /// <c>total_precipitation_if_wet</c>.
     /// </summary>
     [JsonPropertyName("total_snowfall_if_wet")]
     public Quantiles? TotalSnowfallIfWet { get; init; }
@@ -174,7 +160,7 @@ public sealed class DailyForecast
     /// <summary>
     /// The day's precipitation headline.
     /// </summary>
-    [JsonPropertyName("precip_display")]
+    [JsonPropertyName("precipitation_display")]
     public PrecipitationDisplay PrecipitationDisplay { get; init; } = null!;
 
     /// <summary>

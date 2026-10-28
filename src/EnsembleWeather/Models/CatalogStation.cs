@@ -52,7 +52,7 @@ public class CatalogStation
     public double ElevationMeters { get; init; }
 
     /// <summary>
-    /// The primary location type, snake_case (D-5).
+    /// The primary location type, snake_case.
     /// </summary>
     [JsonPropertyName("type")]
     public LocationType Type { get; init; }
@@ -83,7 +83,7 @@ public class CatalogStation
     public IReadOnlyList<string>? Aliases { get; init; }
 
     /// <summary>
-    /// The observation network.
+    /// The observation network, snake_case (<c>snotel</c>, <c>rwis_wsdot</c>, <c>mt_mesonet</c>).
     /// </summary>
     [JsonPropertyName("network")]
     public string? Network { get; init; }
@@ -113,7 +113,7 @@ public class CatalogStation
     public IReadOnlyList<string>? SensorCapabilities { get; init; }
 
     /// <summary>
-    /// The station status.
+    /// The live-feed status, snake_case: <c>active</c>, <c>intermittent</c>, <c>inactive</c>, <c>decommissioned</c> or <c>unknown</c>.
     /// </summary>
     [JsonPropertyName("station_status")]
     public string? StationStatus { get; init; }

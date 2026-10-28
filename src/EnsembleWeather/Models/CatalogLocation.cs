@@ -52,7 +52,7 @@ public class CatalogLocation
     public double ElevationMeters { get; init; }
 
     /// <summary>
-    /// The primary location type, snake_case (D-5).
+    /// The primary location type, snake_case.
     /// </summary>
     [JsonPropertyName("type")]
     public LocationType Type { get; init; }

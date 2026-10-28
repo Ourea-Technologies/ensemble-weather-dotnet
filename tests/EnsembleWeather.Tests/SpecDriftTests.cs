@@ -41,8 +41,6 @@ public sealed class SpecDriftTests
         ["listCatalogStations"] = ["GetCatalogStationsPageAsync", "GetCatalogStationsAsync"],
         ["getCatalogStation"] = ["GetCatalogStationAsync"],
         ["getAvailableRuns"] = ["GetAvailableRunsAsync"],
-        ["getStormReports"] = ["GetStormReportsAsync"],
-        ["getStormReport"] = ["GetStormReportAsync"],
         ["getAttribution"] = ["GetAttributionAsync"],
     };
 
@@ -63,8 +61,6 @@ public sealed class SpecDriftTests
         ["PublicCatalogStationPage"] = typeof(CatalogStationPage),
         ["PublicCatalogStationDetail"] = typeof(CatalogStationDetail),
         ["RunsResponse"] = typeof(AvailableRunsResponse),
-        ["StormReportsResponse"] = typeof(StormReportsResponse),
-        ["StormReportCard"] = typeof(StormReport),
         ["AttributionRegistry"] = typeof(AttributionRegistry),
     };
 

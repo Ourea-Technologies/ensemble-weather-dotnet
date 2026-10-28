@@ -134,3 +134,17 @@ internal sealed class WindStatusConverter : WireStringConverter<WindStatus>
 
     protected override string GetValue(WindStatus value) => value.Value;
 }
+
+internal sealed class NullReasonConverter : WireStringConverter<NullReason>
+{
+    protected override NullReason Create(string value) => new(value);
+
+    protected override string GetValue(NullReason value) => value.Value;
+}
+
+internal sealed class WindowTotalAggregationConverter : WireStringConverter<WindowTotalAggregation>
+{
+    protected override WindowTotalAggregation Create(string value) => new(value);
+
+    protected override string GetValue(WindowTotalAggregation value) => value.Value;
+}

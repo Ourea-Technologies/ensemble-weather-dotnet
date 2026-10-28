@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace EnsembleWeather;
 
 /// <summary>
-/// (D-8) -- one contributing model.
+/// One contributing model.
 /// </summary>
 public sealed class ModelEntry
 {

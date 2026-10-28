@@ -6,6 +6,47 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+The v1 contract as deployed on api.oureawx.com (KAN-1561): pinned spec `8b85fea`, the server's public spec
+byte for byte. Breaking for callers of the removed and renamed members below.
+
+### Removed
+
+- `GetStormReportsAsync`, `GetStormReportAsync`, `StormReportsResponse` and `StormReport`:
+  `/api/v1/storm-reports` is not in the public API.
+- The catalog's `Ads` and the `CatalogResolvedAdSlot`, `CatalogHousePlacement`, `CatalogThirdPartyPlacement` and
+  `CatalogAdCreative` types: not in the public API.
+- `EnsembleStatistics.FeelsLikeUtci`, `.WindDirectionCircular` and `.PrecipitationTypeCode` (`ptype`),
+  `DailyForecast.FeelsLikeUtciHigh`/`Low`, `ElevationForecast.Timeseries`/`IsDefault` and
+  `ElevationTimeSeriesPoint`: withdrawn by the server.
+- The `FORBIDDEN`, `MODEL_RUN_NOT_FOUND`, `GONE`, `INVALID_MAX_HOURS`, `AMBIGUOUS` and `FEELS_LIKE_UNAVAILABLE`
+  code mappings: not public codes (an unknown code still keeps its string and maps by HTTP status).
+
+### Changed
+
+- `EnsembleStatistics.WindDirection` and `ModelStatistics.WindDirection` are `CircularStatistics` (mean,
+  standard deviation, 50 % and 90 % sectors), not `Quantiles`.
+- Probability and window-total answers are matched to the caller's terms by the canonical `Term` the server
+  echoes, never by position.
+- The `precip_*` wire names are `precipitation_*` (daily, hourly, current, sensor and threshold fields); the C#
+  property names were already spelled out and are unchanged.
+- `LocationReference.Slug` and `.Type` are nullable: `null` on a point forecast.
+- `CurrentConditions.ConditionIcon` is a `ConditionIcon`; `ObservingStation` gains `StationId`; `ActiveAlert`
+  gains `Certainty`, and its `Severity` and `Urgency` are snake_case.
+- `GetAvailableRunsAsync(limit, cursor)` pages with `AvailableRunsResponse.NextCursor`.
+- Comma lists (`sources`, `elevations`, `network`, `capability`, ...) are sent sorted and de-duplicated, and
+  `capability` as one comma list, the server's canonical form. Catalog `network`, `status`, `type` and
+  `template` values are snake_case (`snotel`, `active`, `ski_area`, `mountain`).
+- `OUTSIDE_COVERAGE` is a 404; `Retry-After` is honoured on `504` as well as `429` and `503`.
+
+### Added
+
+- `EnsembleWeatherException.DocUrl`, `.Parameter` and `.NearestLocation`; `RequestId` is read from the error
+  body, else `X-Request-Id`. `AUTH_UNAVAILABLE` maps to `ServiceUnavailableException`.
+- `ProbabilityResult.Term`/`.NullReason`, `WindowTotal.Term`/`.Aggregation`/`.NullReason`, `NullReason`,
+  `WindowTotalAggregation`, `NearestLocation`.
+- `ForecastOptions.Include` (`skin_temperature`, `mslp`): those variables are served only when asked for.
+- Four night `ConditionIcon` values (`NightMoonShowers`, `NightChanceRain`, `NightRainLikely`, `NightShowers`).
+
 ## [0.1.0] - 2026-10-26
 
 ### Added

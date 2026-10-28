@@ -46,7 +46,7 @@ foreach (TimeSeriesPoint hour in forecast.Forecast.Timeseries)
 ProbabilityResult snow = forecast.Probabilities[0];
 Console.WriteLine(snow.Probability is double chance
     ? $"Chance of at least 6 in of snow in the next 24 h: {chance:P0} ({snow.Members} members)"
-    : "Chance of at least 6 in of snow in the next 24 h: not available (the forecast does not reach 24 h)");
+    : $"Chance of at least 6 in of snow in the next 24 h: not available ({snow.NullReason})");
 ```
 
 This exact program is [`examples/Quickstart`](examples/Quickstart/Program.cs); CI runs it on every change.
@@ -93,7 +93,7 @@ ProbabilityResult p = forecast.Probabilities[0];   // p.Probability, p.Members, 
 
 // window totals: the distribution of each member's own 72 h snowfall total (a storm total)
 options.WindowTotals.Add(WindowTotalTerm.Snowfall(ForecastWindow.Hours(72)));
-Quantiles? storm = forecast.WindowTotals[0].Quantiles;   // null when the forecast does not cover the window
+Quantiles? storm = forecast.WindowTotals[0].Quantiles;   // null (with NullReason) when it cannot be answered
 
 // quantiles: the served ranges only (p10-p90 or p25-p75), and the median
 QuantileRange? likely = hour.Ensemble.Temperature.GetRange(10, 90);
@@ -123,17 +123,19 @@ the real one: `scripts/run-examples`.
 ## Errors, retries and rate limits
 
 Errors are exceptions deriving from `EnsembleWeatherException`, which carries `StatusCode`, the API's
-`ErrorCode` (verbatim), `ApiMessage`, `RequestId` and, for `429`, `RetryAfter`:
+`ErrorCode` (verbatim), `ApiMessage`, `RequestId`, `DocUrl` (the code's entry on the docs errors page),
+`Parameter` (on a `400` about one query parameter), `NearestLocation` (on a `PRO_REQUIRED` coordinate request: a
+named location that answers without a key) and, for `429`/`503`/`504`, `RetryAfter`:
 
 | Exception | When |
 |---|---|
 | `AuthenticationFailedException` | `INVALID_API_KEY`, `UNAUTHORIZED`, 401 |
-| `PermissionDeniedException` | `PRO_REQUIRED`, `FORBIDDEN`, 403 |
-| `ResourceNotFoundException` | `LOCATION_NOT_FOUND`, `NOT_FOUND`, `GONE`, ..., 404/410 |
+| `PermissionDeniedException` | `PRO_REQUIRED`, 403 |
+| `ResourceNotFoundException` | `LOCATION_NOT_FOUND`, `NOT_FOUND`, 404/410 |
 | `InvalidRequestException` | `BAD_REQUEST`, `INVALID_COORDINATES`, ..., 400 |
-| `OutsideCoverageException` | `OUTSIDE_COVERAGE` |
+| `OutsideCoverageException` | `OUTSIDE_COVERAGE` (a 404) |
 | `RateLimitExceededException` | `TOO_MANY_REQUESTS`, 429 |
-| `ServiceUnavailableException` | `FORECAST_UNAVAILABLE`, `TIMEOUT`, 5xx |
+| `ServiceUnavailableException` | `FORECAST_UNAVAILABLE`, `TIMEOUT`, `AUTH_UNAVAILABLE`, ..., 5xx |
 | `ServiceConnectionException` | no response: DNS, TLS, reset, timeout |
 
 An invalid argument (a probability term whose aggregation does not fit its variable, an unserved quantile pair)

@@ -35,7 +35,7 @@ public sealed class ForecastData
     /// vanishingly rare — but a client must key on <c>valid_time</c> / <c>lead_time_hours</c> and must not assume
     /// <c>timeseries[i]</c> is <c>i</c> hours after <c>timeseries[0]</c>. The same hours are absent from <c>daily</c>
     /// (their day totals sum only the hours present, exactly as the first and last day of any forecast already do)
-    /// and from <c>elevation_forecasts[].timeseries</c>.
+    /// and from <c>elevation_forecasts[].hourly</c>.
     /// </summary>
     [JsonPropertyName("timeseries")]
     public IReadOnlyList<TimeSeriesPoint> Timeseries { get; init; } = [];

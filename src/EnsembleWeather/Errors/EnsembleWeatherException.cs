@@ -50,6 +50,9 @@ public class EnsembleWeatherException : Exception
         ErrorCode = details.ErrorCode;
         ApiMessage = details.Message;
         RequestId = details.RequestId;
+        DocUrl = details.DocUrl;
+        Parameter = details.Parameter;
+        NearestLocation = details.NearestLocation;
         RetryAfter = details.RetryAfter;
         RateLimit = details.RateLimit;
     }
@@ -66,12 +69,29 @@ public class EnsembleWeatherException : Exception
     /// <summary>Gets the API's own message, when the body carried one.</summary>
     public string? ApiMessage { get; }
 
-    /// <summary>Gets the response's <c>X-Request-Id</c>, when it carried one.</summary>
+    /// <summary>
+    /// Gets the request's id to quote to support: the error body's <c>request_id</c>, else the response's
+    /// <c>X-Request-Id</c>.
+    /// </summary>
     public string? RequestId { get; }
 
     /// <summary>
-    /// Gets the server's <c>Retry-After</c> (on a <c>429</c>, and on a <c>503</c> that sends one). When it is over
-    /// 60 s the SDK does not wait it out and throws with it set.
+    /// Gets the code's entry on the docs errors page (cause, fix, whether to retry), when the body carried one.
+    /// </summary>
+    public Uri? DocUrl { get; }
+
+    /// <summary>Gets the query parameter a <c>400</c> is about (<c>max_hours</c>, <c>prob</c>), when it names one.</summary>
+    public string? Parameter { get; }
+
+    /// <summary>
+    /// Gets, on a <c>PRO_REQUIRED</c> refusal of a coordinate request, a named location near the point whose forecast
+    /// answers without a key; <see langword="null"/> when none qualifies.
+    /// </summary>
+    public NearestLocation? NearestLocation { get; }
+
+    /// <summary>
+    /// Gets the server's <c>Retry-After</c> (on a <c>429</c>, <c>503</c> or <c>504</c> that sends one). When it is
+    /// over 60 s the SDK does not wait it out and throws with it set.
     /// </summary>
     public TimeSpan? RetryAfter { get; }
 
