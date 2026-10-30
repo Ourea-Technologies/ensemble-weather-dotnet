@@ -219,15 +219,15 @@ public sealed class VectorTests
             case "getCurrentConditions":
                 return await client.GetCurrentConditionsAsync(Location(a));
             case "getCurrentByCoordinates":
-                return await client.GetCurrentByCoordinatesAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value, Num(a, "elevation_m"));
+                return await client.GetPointCurrentAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value, Num(a, "elevation_m"));
             case "getLocationAlerts":
                 return await client.GetLocationAlertsAsync(Location(a));
             case "getAlertsByCoordinates":
-                return await client.GetAlertsByCoordinatesAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value);
+                return await client.GetPointAlertsAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value);
             case "getNearbyLocations":
                 return await client.GetNearbyLocationsAsync(Location(a), Nearby(a));
             case "getNearbyByCoordinates":
-                return await client.GetNearbyByCoordinatesAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value, Nearby(a));
+                return await client.GetPointNearbyAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value, Nearby(a));
             case "searchLocations":
                 return await client.SearchLocationsAsync(Str(a, "q")!, new SearchOptions { State = Str(a, "state"), County = Str(a, "county"), Limit = Int(a, "limit") });
             case "getAllLocations":

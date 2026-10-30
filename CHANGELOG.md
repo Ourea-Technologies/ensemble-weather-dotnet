@@ -23,6 +23,9 @@ byte for byte. Breaking for callers of the removed and renamed members below.
 
 ### Changed
 
+- The coordinate methods follow the operation ids: `GetCurrentByCoordinatesAsync` is `GetPointCurrentAsync`,
+  `GetAlertsByCoordinatesAsync` is `GetPointAlertsAsync` and `GetNearbyByCoordinatesAsync` is
+  `GetPointNearbyAsync`, beside `GetPointForecastAsync`. There are no aliases.
 - `EnsembleStatistics.WindDirection` and `ModelStatistics.WindDirection` are `CircularStatistics` (mean,
   standard deviation, 50 % and 90 % sectors), not `Quantiles`.
 - Probability and window-total answers are matched to the caller's terms by the canonical `Term` the server

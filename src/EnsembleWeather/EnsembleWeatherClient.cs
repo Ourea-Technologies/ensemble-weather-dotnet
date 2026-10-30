@@ -197,7 +197,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The current conditions.</returns>
     /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
-    public Task<CurrentConditionsResponse> GetCurrentByCoordinatesAsync(
+    public Task<CurrentConditionsResponse> GetPointCurrentAsync(
         double latitude,
         double longitude,
         double? elevationMeters = null,
@@ -236,7 +236,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The alerts (possibly none).</returns>
     /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
-    public Task<AlertsResponse> GetAlertsByCoordinatesAsync(
+    public Task<AlertsResponse> GetPointAlertsAsync(
         double latitude, double longitude, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
             new ApiRequest("getAlertsByCoordinates", "/api/v1/alerts").Add("lat", latitude).Add("lon", longitude),
@@ -273,7 +273,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The nearest locations, nearest first.</returns>
     /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
-    public Task<NearbyPointResponse> GetNearbyByCoordinatesAsync(
+    public Task<NearbyPointResponse> GetPointNearbyAsync(
         double latitude, double longitude, NearbyOptions? options = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
             Nearby(new ApiRequest("getNearbyByCoordinates", "/api/v1/nearby").Add("lat", latitude).Add("lon", longitude), options),
