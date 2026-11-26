@@ -192,6 +192,41 @@ internal static class WireRules
         return builder.ToString();
     }
 
+    /// <summary>
+    /// A point as <c>lat,lon</c> with a literal comma (BEHAVIOR.md 3), each number by <see cref="FormatNumber"/>.
+    /// </summary>
+    /// <exception cref="ArgumentException">A coordinate is out of range or not finite.</exception>
+    public static string FormatNear(GeoPoint point, string parameterName)
+        => Degrees(point.Latitude, 90, "latitude", parameterName) + "," + Degrees(point.Longitude, 180, "longitude", parameterName);
+
+    /// <summary>A box as <c>west,south,east,north</c> with literal commas, each number by <see cref="FormatNumber"/>.</summary>
+    /// <exception cref="ArgumentException">An edge is out of range, or west &gt; east or south &gt; north.</exception>
+    public static string FormatBox(BoundingBox box, string parameterName)
+    {
+        string west = Degrees(box.West, 180, "west", parameterName);
+        string south = Degrees(box.South, 90, "south", parameterName);
+        string east = Degrees(box.East, 180, "east", parameterName);
+        string north = Degrees(box.North, 90, "north", parameterName);
+        if (box.West > box.East || box.South > box.North)
+        {
+            throw new ArgumentException("A bounding box is (west, south, east, north) with west <= east and south <= north.", parameterName);
+        }
+
+        return west + "," + south + "," + east + "," + north;
+    }
+
+    private static string Degrees(double value, double bound, string what, string parameterName)
+    {
+        if (double.IsNaN(value) || double.IsInfinity(value) || value < -bound || value > bound)
+        {
+            throw new ArgumentException(
+                $"The {what} must be a number within -{bound} to {bound}, not {value.ToString("R", CultureInfo.InvariantCulture)}.",
+                parameterName);
+        }
+
+        return FormatNumber(value);
+    }
+
     public static string FormatBool(bool value) => value ? "true" : "false";
 
     public static string FormatInt(long value) => value.ToString(CultureInfo.InvariantCulture);

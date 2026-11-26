@@ -10,15 +10,15 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-/// <summary>Registers <see cref="EnsembleWeatherClient"/> with a service collection.</summary>
-public static class EnsembleWeatherServiceCollectionExtensions
+/// <summary>Registers <see cref="OureaClient"/> with a service collection.</summary>
+public static class OureaServiceCollectionExtensions
 {
     /// <summary>The name of the <see cref="HttpClient"/> the client uses, for further configuration.</summary>
     public const string HttpClientName = "EnsembleWeather";
 
     /// <summary>
-    /// Adds <see cref="EnsembleWeatherClient"/> as a typed <see cref="HttpClient"/> client, configured through
-    /// <see cref="IOptions{TOptions}"/> of <see cref="EnsembleWeatherOptions"/>.
+    /// Adds <see cref="OureaClient"/> as a typed <see cref="HttpClient"/> client, configured through
+    /// <see cref="IOptions{TOptions}"/> of <see cref="OureaClientOptions"/>.
     /// </summary>
     /// <remarks>
     /// The primary handler does not follow redirects (the SDK follows them itself and drops the API key on a
@@ -38,14 +38,14 @@ public static class EnsembleWeatherServiceCollectionExtensions
     /// </code>
     /// </example>
     public static IHttpClientBuilder AddEnsembleWeather(
-        this IServiceCollection services, Action<EnsembleWeatherOptions>? configure = null)
+        this IServiceCollection services, Action<OureaClientOptions>? configure = null)
     {
         if (services is null)
         {
             throw new ArgumentNullException(nameof(services));
         }
 
-        OptionsBuilder<EnsembleWeatherOptions> options = services.AddOptions<EnsembleWeatherOptions>();
+        OptionsBuilder<OureaClientOptions> options = services.AddOptions<OureaClientOptions>();
         if (configure is not null)
         {
             options.Configure(configure);
@@ -56,13 +56,13 @@ public static class EnsembleWeatherServiceCollectionExtensions
             .AddHttpClient(HttpClientName)
             .ConfigureHttpClient(http => http.Timeout = Timeout.InfiniteTimeSpan)
             .ConfigurePrimaryHttpMessageHandler(provider => CreateHandler(
-                provider.GetRequiredService<IOptions<EnsembleWeatherOptions>>().Value.CheckCertificateRevocation))
+                provider.GetRequiredService<IOptions<OureaClientOptions>>().Value.CheckCertificateRevocation))
             // IHttpClientFactory's trace logging prints request headers; the API key must never reach a log.
             .RedactLoggedHeaders(RedactedHeaders);
-        builder.AddTypedClient<EnsembleWeatherClient>((http, provider) =>
+        builder.AddTypedClient<OureaClient>((http, provider) =>
             {
-                EnsembleWeatherOptions configured = provider.GetRequiredService<IOptions<EnsembleWeatherOptions>>().Value;
-                var effective = new EnsembleWeatherOptions
+                OureaClientOptions configured = provider.GetRequiredService<IOptions<OureaClientOptions>>().Value;
+                var effective = new OureaClientOptions
                 {
                     ApiKey = configured.ApiKey,
                     BaseUrl = configured.BaseUrl,
@@ -77,7 +77,7 @@ public static class EnsembleWeatherServiceCollectionExtensions
                     TimeProvider = configured.TimeProvider ?? provider.GetService<TimeProvider>(),
                     OnDeprecation = configured.OnDeprecation ?? LogDeprecation(provider.GetService<ILoggerFactory>()),
                 };
-                return new EnsembleWeatherClient(http, effective);
+                return new OureaClient(http, effective);
             });
         return builder;
     }
@@ -123,7 +123,7 @@ public static class EnsembleWeatherServiceCollectionExtensions
             return null;
         }
 
-        ILogger logger = loggers.CreateLogger(typeof(EnsembleWeatherClient).FullName!);
+        ILogger logger = loggers.CreateLogger(typeof(OureaClient).FullName!);
         return notice => Log.Deprecated(logger, notice.Operation, notice.Deprecation, notice.Sunset, notice.Link);
     }
 

@@ -13,7 +13,7 @@ namespace EnsembleWeather;
 /// An API error carries the HTTP <see cref="StatusCode"/>, the API's <see cref="ErrorCode"/> (kept verbatim, even
 /// when this SDK does not know it) and message, and the <see cref="RequestId"/> to quote to support. The category is
 /// chosen by code first and by status when the code is unknown or the body is not JSON. An error the SDK cannot
-/// categorise is an <see cref="EnsembleWeatherException"/> itself.
+/// categorise is an <see cref="OureaException"/> itself.
 /// </para>
 /// <para>
 /// Usage errors (an invalid probability term, an unserved quantile pair) are found before anything is sent and are
@@ -21,16 +21,16 @@ namespace EnsembleWeather;
 /// </para>
 /// <para>The API key never appears in a message or in <see cref="Exception.ToString"/>.</para>
 /// </remarks>
-public class EnsembleWeatherException : Exception
+public class OureaException : Exception
 {
     /// <summary>Initializes a new instance.</summary>
-    public EnsembleWeatherException()
+    public OureaException()
     {
     }
 
     /// <summary>Initializes a new instance with a message.</summary>
     /// <param name="message">The message.</param>
-    public EnsembleWeatherException(string message)
+    public OureaException(string message)
         : base(message)
     {
     }
@@ -38,12 +38,12 @@ public class EnsembleWeatherException : Exception
     /// <summary>Initializes a new instance with a message and the exception that caused it.</summary>
     /// <param name="message">The message.</param>
     /// <param name="innerException">The cause.</param>
-    public EnsembleWeatherException(string message, Exception? innerException)
+    public OureaException(string message, Exception? innerException)
         : base(message, innerException)
     {
     }
 
-    internal EnsembleWeatherException(ApiErrorDetails details, Exception? innerException = null)
+    internal OureaException(ApiErrorDetails details, Exception? innerException = null)
         : base(details.Describe(), innerException)
     {
         StatusCode = details.StatusCode;

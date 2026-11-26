@@ -7,7 +7,7 @@ namespace EnsembleWeather;
 /// <summary>
 /// No response arrived: DNS, TLS, a reset connection or the per-attempt timeout. Connection failures other than TLS verification were retried first.
 /// </summary>
-public sealed class ServiceConnectionException : EnsembleWeatherException
+public sealed class ServiceConnectionException : OureaException
 {
     /// <summary>Initializes a new instance.</summary>
     public ServiceConnectionException()

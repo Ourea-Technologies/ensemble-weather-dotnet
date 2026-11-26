@@ -7,7 +7,7 @@ namespace EnsembleWeather;
 /// <summary>
 /// The point is outside the forecast coverage (<c>OUTSIDE_COVERAGE</c>, a 404): the contiguous United States, over land.
 /// </summary>
-public sealed class OutsideCoverageException : EnsembleWeatherException
+public sealed class OutsideCoverageException : OureaException
 {
     /// <summary>Initializes a new instance.</summary>
     public OutsideCoverageException()

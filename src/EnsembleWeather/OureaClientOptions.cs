@@ -5,14 +5,14 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// Settings for an <see cref="EnsembleWeatherClient"/>. Every setting has a working default: a client built from
-/// <c>new EnsembleWeatherOptions()</c> calls the production API anonymously (or with <c>OUREA_API_KEY</c>).
+/// Settings for an <see cref="OureaClient"/>. Every setting has a working default: a client built from
+/// <c>new OureaClientOptions()</c> calls the production API anonymously (or with <c>OUREA_API_KEY</c>).
 /// </summary>
 /// <remarks>
 /// There is deliberately no setting that disables TLS certificate validation;
 /// <see cref="CheckCertificateRevocation"/> controls only the revocation lookup.
 /// </remarks>
-public sealed class EnsembleWeatherOptions
+public sealed class OureaClientOptions
 {
     /// <summary>The production API, <c>https://api.oureawx.com</c>.</summary>
     public static readonly Uri DefaultBaseUrl = new("https://api.oureawx.com");
@@ -123,5 +123,5 @@ public sealed class EnsembleWeatherOptions
     /// <summary>Test hook: the environment the client reads <c>OUREA_API_KEY</c> and <c>OUREA_BASE_URL</c> from.</summary>
     internal Func<string, string?>? Environment { get; set; }
 
-    internal EnsembleWeatherOptions Clone() => (EnsembleWeatherOptions)MemberwiseClone();
+    internal OureaClientOptions Clone() => (OureaClientOptions)MemberwiseClone();
 }

@@ -64,17 +64,19 @@ internal sealed class ApiRequest
         => value is double v && !v.Equals(defaultValue) ? AddEncoded(name, WireRules.PercentEncode(WireRules.FormatNumber(v))) : this;
 
     /// <summary>
-    /// A comma list in the API's canonical form: each distinct value once, sorted, so equal sets share one URL (any
-    /// other order is a 301 from the server).
+    /// A comma list in the API's canonical form (BEHAVIOR.md 3.1 rule 5): each distinct value once, sorted, each
+    /// percent-encoded, joined by literal commas, so equal sets share one URL (any other order is a 301 from the
+    /// server, and <c>%2C</c> would be another edge-cache entry).
     /// </summary>
-    public ApiRequest AddList(string name, ICollection<string> values, string? defaultValue = null)
+    public ApiRequest AddList(string name, IEnumerable<string> values, string? defaultValue = null)
     {
-        if (values.Count == 0)
+        List<string> items = values.Distinct(StringComparer.Ordinal).OrderBy(v => v, StringComparer.Ordinal).ToList();
+        if (items.Count == 0 || (items.Count == 1 && string.Equals(items[0], defaultValue, StringComparison.Ordinal)))
         {
             return this;
         }
 
-        return Add(name, string.Join(",", values.Distinct(StringComparer.Ordinal).OrderBy(v => v, StringComparer.Ordinal)), defaultValue);
+        return AddEncoded(name, string.Join(",", items.Select(v => WireRules.PercentEncode(v))));
     }
 
     public ApiRequest AddUnits(UnitSystem units) => Add("units", units.Value, UnitSystem.Metric.Value);

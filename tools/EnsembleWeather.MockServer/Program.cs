@@ -7,7 +7,8 @@
 //
 // It serves the shared vector bodies (spec/vectors/bodies) plus a few of its own, answers prob=/totals= terms with
 // canned numbers (it is a test double: the real server computes them from the ensemble), and mimics the tier gate:
-// the coordinate routes answer 403 PRO_REQUIRED without an X-API-Key and 404 OUTSIDE_COVERAGE outside CONUS.
+// the coordinate routes answer 403 PRO_REQUIRED without an X-API-Key and 404 OUTSIDE_COVERAGE outside CONUS, and the
+// snow trend answers 403 PLUS_REQUIRED without one.
 
 using System;
 using System.Globalization;
@@ -90,15 +91,29 @@ void Handle(HttpListenerContext context)
             return Error(404, "LOCATION_NOT_FOUND", $"No location {parts[3]}/{parts[4]}.");
         }
 
-        return parts.Length == 5 ? (200, Forecast(imperial, query))
-            : parts[5] == "current" ? (200, Own("current.json"))
-            : parts[5] == "alerts" ? (200, Own("alerts.json"))
-            : Error(404, "NOT_FOUND", "No route for " + path);
+        string sub = string.Join("/", parts.Skip(5));
+        return sub switch
+        {
+            "" => query["members"] == "plume" ? (200, Vector("forecast-plume.json")) : (200, Forecast(imperial, query)),
+            "current" => (200, Own("current.json")),
+            "alerts" => (200, Own("alerts.json")),
+            "season" => (200, Vector("season.json")),
+            "snow-trend" => keyed
+                ? (200, Vector("snow-trend.json"))
+                : Error(403, "PLUS_REQUIRED", "The snow trend needs a Plus or Pro subscription."),
+            "snowpack" => (200, Vector("snowpack.json")),
+            "snowpack/plume" => (200, Vector("snowpack-plume.json")),
+            _ => Error(404, "NOT_FOUND", "No route for " + path),
+        };
     }
 
     return path switch
     {
-        "/api/v1/search/locations" => (200, Vector("search.json")),
+        "/api/v1/search/locations" => (200, Vector(query["sort"] is null ? "search.json" : "search-sorted.json")),
+        "/api/v1/explore" => (200, Vector("explore.json")),
+        "/api/v1/composition" => (200, Vector("composition.json")),
+        "/api/v1/alerts/outlines" => (200, Vector("alert-outlines.json")),
+        "/api/v1/avalanche/zones" => (200, Vector("avalanche-zones.json")),
         "/api/v1/catalog/locations" => (200, Vector(query["cursor"] == "c2" ? "catalog-page-2.json" : "catalog-page-1.json")),
         "/api/v1/catalog/locations/mt-hood-meadows" => (200, Vector("catalog-detail.json")),
         "/api/v1/attribution" => (200, Vector("attribution.json")),

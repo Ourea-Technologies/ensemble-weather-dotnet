@@ -64,7 +64,7 @@ internal static class TermCodec
         {
             string wanted = plan.Keys[i].Wire();
             results[i] = answers.FirstOrDefault(a => string.Equals(a.Term, wanted, StringComparison.Ordinal))
-                ?? throw new EnsembleWeatherException($"The response did not answer the probability term '{wanted}'.");
+                ?? throw new OureaException($"The response did not answer the probability term '{wanted}'.");
         }
 
         return results;
@@ -100,7 +100,7 @@ internal static class TermCodec
         {
             TotalsKey wanted = plan.Keys[i];
             results[i] = answers.FirstOrDefault(a => string.Equals(a.Term, wanted.Wire, StringComparison.Ordinal))
-                ?? throw new EnsembleWeatherException($"The response did not answer the window total '{wanted.Wire}'.");
+                ?? throw new OureaException($"The response did not answer the window total '{wanted.Wire}'.");
         }
 
         return results;

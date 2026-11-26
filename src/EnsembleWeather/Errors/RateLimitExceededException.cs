@@ -5,9 +5,9 @@ using System;
 namespace EnsembleWeather;
 
 /// <summary>
-/// A rate budget refused the request (<c>TOO_MANY_REQUESTS</c>, HTTP 429). <see cref="EnsembleWeatherException.RetryAfter"/> says how long to wait; the SDK already retried when the wait was 60 s or less.
+/// A rate budget refused the request (<c>TOO_MANY_REQUESTS</c>, HTTP 429). <see cref="OureaException.RetryAfter"/> says how long to wait; the SDK already retried when the wait was 60 s or less.
 /// </summary>
-public sealed class RateLimitExceededException : EnsembleWeatherException
+public sealed class RateLimitExceededException : OureaException
 {
     /// <summary>Initializes a new instance.</summary>
     public RateLimitExceededException()

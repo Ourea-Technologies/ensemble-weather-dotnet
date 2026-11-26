@@ -7,7 +7,7 @@ namespace EnsembleWeather;
 /// <summary>
 /// The API key was refused (<c>INVALID_API_KEY</c>, <c>UNAUTHORIZED</c>, or HTTP 401). Send a valid key, or none for anonymous Free access.
 /// </summary>
-public sealed class AuthenticationFailedException : EnsembleWeatherException
+public sealed class AuthenticationFailedException : OureaException
 {
     /// <summary>Initializes a new instance.</summary>
     public AuthenticationFailedException()

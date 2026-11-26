@@ -45,7 +45,7 @@ internal sealed class ApiPipeline
     private readonly bool _sendKeyOnOpenRoutes;
     private readonly string _userAgent;
 
-    public ApiPipeline(HttpClient http, EnsembleWeatherOptions options, Func<string, string?> environment)
+    public ApiPipeline(HttpClient http, OureaClientOptions options, Func<string, string?> environment)
     {
         _http = http;
         string? key = options.ApiKey ?? environment("OUREA_API_KEY");
@@ -62,7 +62,7 @@ internal sealed class ApiPipeline
             }
         }
 
-        _baseUrl = baseUrl ?? EnsembleWeatherOptions.DefaultBaseUrl;
+        _baseUrl = baseUrl ?? OureaClientOptions.DefaultBaseUrl;
         if (!_baseUrl.IsAbsoluteUri || (_baseUrl.Scheme != Uri.UriSchemeHttps && _baseUrl.Scheme != Uri.UriSchemeHttp))
         {
             throw new ArgumentException("The base URL must be an absolute http(s) URL.", nameof(options));
@@ -108,12 +108,12 @@ internal sealed class ApiPipeline
         }
         catch (JsonException ex)
         {
-            throw new EnsembleWeatherException("The Ourea API sent a response body this SDK could not read.", ex);
+            throw new OureaException("The Ourea API sent a response body this SDK could not read.", ex);
         }
 
         if (result is null)
         {
-            throw new EnsembleWeatherException("The Ourea API sent an empty response body.");
+            throw new OureaException("The Ourea API sent an empty response body.");
         }
 
         result.Metadata = metadata;
@@ -228,7 +228,7 @@ internal sealed class ApiPipeline
                     response.Dispose();
                     if (hop >= MaxRedirects)
                     {
-                        return Outcome.Fail(new EnsembleWeatherException(
+                        return Outcome.Fail(new OureaException(
                             $"The Ourea API redirected more than {MaxRedirects} times."), retryable: false);
                     }
 
@@ -301,7 +301,7 @@ internal sealed class ApiPipeline
     {
         if (content.Headers.ContentLength > MaxResponseBytes)
         {
-            throw new EnsembleWeatherException(
+            throw new OureaException(
                 $"The Ourea API response body is {content.Headers.ContentLength} bytes, over this SDK's {MaxResponseBytes}-byte bound.");
         }
 
@@ -326,7 +326,7 @@ internal sealed class ApiPipeline
 
             if (buffer.Length + read > MaxResponseBytes)
             {
-                throw new EnsembleWeatherException(
+                throw new OureaException(
                     $"The Ourea API response body is over this SDK's {MaxResponseBytes}-byte bound.");
             }
 
@@ -525,12 +525,12 @@ internal sealed class ApiPipeline
 
         public byte[]? Body { get; private init; }
 
-        public EnsembleWeatherException? Failure { get; private init; }
+        public OureaException? Failure { get; private init; }
 
         public bool Retryable { get; private init; }
 
         public static Outcome Ok(HttpResponseMessage response, byte[] body) => new() { Response = response, Body = body };
 
-        public static Outcome Fail(EnsembleWeatherException failure, bool retryable) => new() { Failure = failure, Retryable = retryable };
+        public static Outcome Fail(OureaException failure, bool retryable) => new() { Failure = failure, Retryable = retryable };
     }
 }
