@@ -4,3 +4,5 @@
   href: probabilities.md
 - name: Errors, retries and caching
   href: errors-and-retries.md
+- name: Snow, explore and map layers
+  href: snow-and-maps.md

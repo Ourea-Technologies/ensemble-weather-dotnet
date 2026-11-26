@@ -13,7 +13,7 @@ options.Probabilities.Add(ProbabilityTerm.AtMost(ForecastVariable.Temperature, T
 ForecastResponse forecast = await client.GetLocationForecastAsync("or/mt-hood-meadows", options);
 foreach (ProbabilityResult p in forecast.Probabilities) // in the order asked
 {
-    Console.WriteLine($"{p.Variable} {p.Operator} {p.Threshold}: {p.Probability:P0} of {p.Members} members, {p.From} to {p.To}");
+    Console.WriteLine($"{p.Variable} {p.Operator} {p.Threshold}: {p.Value:P0} of {p.Members} members, {p.From} to {p.To}");
 }
 ```
 

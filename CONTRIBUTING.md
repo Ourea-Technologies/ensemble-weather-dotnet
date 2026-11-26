@@ -48,7 +48,7 @@ To pin a newer spec: `scripts/sync-spec <ref>`, then make the vectors pass.
   (the library is trimming and Native AOT compatible on .NET 8+).
 
 - TLS: certificate validation is never optional (BEHAVIOR.md and SDK-STANDARD "Security"). The one TLS-related
-  setting is `EnsembleWeatherOptions.CheckCertificateRevocation` (default `true`), which controls only the CRL/OCSP
+  setting is `OureaClientOptions.CheckCertificateRevocation` (default `true`), which controls only the CRL/OCSP
   revocation lookup for users whose proxies block it; `TlsTests` pins that, including a real handshake against a
   self-signed certificate with the option on and off. Do not add a validation callback or any setting whose name
   suggests TLS can be disabled. The `CA5399` suppressions where the option is applied are deliberate and

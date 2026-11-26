@@ -1,6 +1,6 @@
 # Errors, retries and caching
 
-Every API or transport error derives from <xref:EnsembleWeather.EnsembleWeatherException>. Catch a category by
+Every API or transport error derives from <xref:EnsembleWeather.OureaException>. Catch a category by
 type, or test `ErrorCode` (the API's code, verbatim):
 
 ```csharp
@@ -36,5 +36,5 @@ edge-cache entry. Locally, an `ETag` LRU cache (256 entries, 32 MiB) is on by de
 ## TLS and proxies
 
 Certificates are always validated. Revocation is checked by default; behind a proxy or on an offline network that
-blocks CRL/OCSP fetches, set <xref:EnsembleWeather.EnsembleWeatherOptions.CheckCertificateRevocation> to `false`
+blocks CRL/OCSP fetches, set <xref:EnsembleWeather.OureaClientOptions.CheckCertificateRevocation> to `false`
 to skip only that lookup (a certificate revoked before it expires would then be accepted).

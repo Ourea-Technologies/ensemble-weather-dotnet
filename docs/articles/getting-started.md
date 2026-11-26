@@ -13,14 +13,14 @@ and `dotnet run`. It needs no key: anonymous calls are served at the Free tier.
 Pass a key to the constructor, or set `OUREA_API_KEY`:
 
 ```csharp
-using var client = new EnsembleWeatherClient(new EnsembleWeatherOptions
+using var client = new OureaClient(new OureaClientOptions
 {
     ApiKey = Environment.GetEnvironmentVariable("MY_OUREA_KEY"),
     Units = UnitSystem.Imperial,
 });
 ```
 
-Pro unlocks coordinates (<xref:EnsembleWeather.EnsembleWeatherClient.GetPointForecastAsync*>), the 15-day
+Pro unlocks coordinates (<xref:EnsembleWeather.OureaClient.GetPointForecastAsync*>), the 15-day
 horizon, per-model data and pinned runs. See [pricing](https://oureawx.com/pricing).
 
 ## Dependency injection
@@ -33,4 +33,4 @@ The client is a typed `HttpClient` client; one `ETag` cache is shared by every c
 
 ## One client, reused
 
-`EnsembleWeatherClient` is thread-safe. Create one and keep it: it holds the connection pool and the cache.
+`OureaClient` is thread-safe. Create one and keep it: it holds the connection pool and the cache.
