@@ -17,9 +17,9 @@ public sealed class SecurityTests
 {
     private const string Key = "ow_live_SECRET_must_never_leak";
 
-    private static EnsembleWeatherClient Client(HttpMessageHandler handler, Action<EnsembleWeatherOptions>? configure = null)
+    private static OureaClient Client(HttpMessageHandler handler, Action<OureaClientOptions>? configure = null)
     {
-        var options = new EnsembleWeatherOptions
+        var options = new OureaClientOptions
         {
             ApiKey = Key,
             TimeProvider = new RecordingTimeProvider(),
@@ -28,7 +28,7 @@ public sealed class SecurityTests
             Deprecations = new DeprecationRegistry(),
         };
         configure?.Invoke(options);
-        return new EnsembleWeatherClient(new HttpClient(handler), options);
+        return new OureaClient(new HttpClient(handler), options);
     }
 
     public static TheoryData<int> ErrorStatuses() => new() { 400, 401, 403, 404, 429, 500, 503 };
@@ -39,9 +39,9 @@ public sealed class SecurityTests
     {
         // Even a server (or proxy) that echoes the key back in its message does not get it into the exception.
         var handler = new MockHandler(responder: _ => MockHandler.Json(status, $"{{\"error\":\"X\",\"message\":\"bad key {Key}\"}}"));
-        using EnsembleWeatherClient client = Client(handler, o => o.MaxRetries = 0);
+        using OureaClient client = Client(handler, o => o.MaxRetries = 0);
 
-        EnsembleWeatherException ex = await Assert.ThrowsAnyAsync<EnsembleWeatherException>(
+        OureaException ex = await Assert.ThrowsAnyAsync<OureaException>(
             () => client.GetLocationForecastAsync("or/mt-hood-meadows"));
 
         Assert.DoesNotContain(Key, ex.Message, StringComparison.Ordinal);
@@ -53,7 +53,7 @@ public sealed class SecurityTests
     public async Task TheKeyIsNeverInAConnectionError()
     {
         var handler = new ThrowingHandler(new HttpRequestException("connection reset"));
-        using EnsembleWeatherClient client = Client(handler, o => o.MaxRetries = 0);
+        using OureaClient client = Client(handler, o => o.MaxRetries = 0);
 
         ServiceConnectionException ex = await Assert.ThrowsAsync<ServiceConnectionException>(
             () => client.GetLocationForecastAsync("or/mt-hood-meadows"));
@@ -64,8 +64,8 @@ public sealed class SecurityTests
     [Fact]
     public void TheKeyIsNeverInToString()
     {
-        var options = new EnsembleWeatherOptions { ApiKey = Key };
-        using var client = new EnsembleWeatherClient(options);
+        var options = new OureaClientOptions { ApiKey = Key };
+        using var client = new OureaClient(options);
 
         Assert.DoesNotContain(Key, client.ToString(), StringComparison.Ordinal);
         Assert.DoesNotContain(Key, options.ToString(), StringComparison.Ordinal);
@@ -85,7 +85,7 @@ public sealed class SecurityTests
                 ("Link", "<https://docs.oureawx.com/changelog>; rel=\"deprecation\""))));
         using ServiceProvider provider = services.BuildServiceProvider();
 
-        await provider.GetRequiredService<EnsembleWeatherClient>().GetAvailableRunsAsync();
+        await provider.GetRequiredService<OureaClient>().GetAvailableRunsAsync();
 
         Assert.NotEmpty(logs.Messages);
         Assert.All(logs.Messages, m => Assert.DoesNotContain(Key, m, StringComparison.Ordinal));
@@ -105,7 +105,7 @@ public sealed class SecurityTests
             new CannedResponse(302, [new("Location", "https://api.oureawx.com/api/v1/locations/or/mt-hood-meadows")], []),
             MockHandler.Json(200, File.ReadAllText(Path.Combine(RepoPaths.Vectors, "bodies", "forecast-metric.json"))),
         ]);
-        using EnsembleWeatherClient client = Client(handler);
+        using OureaClient client = Client(handler);
 
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
 
@@ -118,9 +118,9 @@ public sealed class SecurityTests
     public async Task RedirectsAreBoundedAtFive()
     {
         var handler = new MockHandler(responder: _ => new CannedResponse(302, [new("Location", "/api/v1/attribution")], []));
-        using EnsembleWeatherClient client = Client(handler);
+        using OureaClient client = Client(handler);
 
-        await Assert.ThrowsAsync<EnsembleWeatherException>(() => client.GetAttributionAsync());
+        await Assert.ThrowsAsync<OureaException>(() => client.GetAttributionAsync());
         Assert.Equal(6, handler.Requests.Count);
     }
 
@@ -131,9 +131,9 @@ public sealed class SecurityTests
         {
             Content = new StreamContent(new EndlessStream()),
         });
-        using EnsembleWeatherClient client = Client(handler);
+        using OureaClient client = Client(handler);
 
-        EnsembleWeatherException ex = await Assert.ThrowsAsync<EnsembleWeatherException>(() => client.GetAttributionAsync());
+        OureaException ex = await Assert.ThrowsAsync<OureaException>(() => client.GetAttributionAsync());
 
         Assert.Contains("byte bound", ex.Message, StringComparison.Ordinal);
     }
@@ -148,9 +148,9 @@ public sealed class SecurityTests
             content.Headers.ContentLength = ApiPipeline.MaxResponseBytes + 1;
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = content };
         });
-        using EnsembleWeatherClient client = Client(handler);
+        using OureaClient client = Client(handler);
 
-        await Assert.ThrowsAsync<EnsembleWeatherException>(() => client.GetAttributionAsync());
+        await Assert.ThrowsAsync<OureaException>(() => client.GetAttributionAsync());
         Assert.Equal(0, stream.BytesRead);
     }
 
@@ -160,7 +160,7 @@ public sealed class SecurityTests
         // A "$type" (or any metadata) field is just an unknown field: models are fixed, source-generated types.
         const string body = """{"$type":"System.IO.FileInfo, System.IO.FileSystem","$id":"1","providers":[]}""";
         var handler = new MockHandler([MockHandler.Json(200, body)]);
-        using EnsembleWeatherClient client = Client(handler);
+        using OureaClient client = Client(handler);
 
         AttributionRegistry registry = await client.GetAttributionAsync();
 

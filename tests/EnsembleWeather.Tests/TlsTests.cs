@@ -16,7 +16,7 @@ namespace EnsembleWeather.Tests;
 
 /// <summary>
 /// TLS (SDK-STANDARD "Security"): certificate validation is never optional; only the revocation lookup is, through
-/// <see cref="EnsembleWeatherOptions.CheckCertificateRevocation"/>.
+/// <see cref="OureaClientOptions.CheckCertificateRevocation"/>.
 /// </summary>
 public sealed class TlsTests
 {
@@ -24,13 +24,13 @@ public sealed class TlsTests
     public void NoOptionSuggestsTlsCanBeDisabled()
     {
         string[] forbidden = ["tls", "ssl", "insecure", "verify", "verification", "validat", "skip", "disable", "ignore", "trust", "callback", "handler"];
-        foreach (PropertyInfo property in typeof(EnsembleWeatherOptions).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        foreach (PropertyInfo property in typeof(OureaClientOptions).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             Assert.DoesNotContain(forbidden, f => property.Name.Contains(f, StringComparison.OrdinalIgnoreCase));
             if (property.Name.Contains("certificate", StringComparison.OrdinalIgnoreCase))
             {
                 // The one certificate setting is about revocation only, and is a positive "check" switch.
-                Assert.Equal(nameof(EnsembleWeatherOptions.CheckCertificateRevocation), property.Name);
+                Assert.Equal(nameof(OureaClientOptions.CheckCertificateRevocation), property.Name);
                 Assert.Equal(typeof(bool), property.PropertyType);
             }
         }
@@ -39,9 +39,9 @@ public sealed class TlsTests
     [Fact]
     public void RevocationCheckingIsOnByDefault()
     {
-        Assert.True(new EnsembleWeatherOptions().CheckCertificateRevocation);
+        Assert.True(new OureaClientOptions().CheckCertificateRevocation);
 
-        SocketsHttpHandler handler = HandlerOf(new EnsembleWeatherOptions { Environment = _ => null });
+        SocketsHttpHandler handler = HandlerOf(new OureaClientOptions { Environment = _ => null });
 
         Assert.Equal(X509RevocationMode.Online, handler.SslOptions.CertificateRevocationCheckMode);
         Assert.Null(handler.SslOptions.RemoteCertificateValidationCallback);
@@ -51,8 +51,8 @@ public sealed class TlsTests
     [Fact]
     public void TheOptionTurnsOffOnlyTheRevocationCheck()
     {
-        SocketsHttpHandler on = HandlerOf(new EnsembleWeatherOptions { Environment = _ => null });
-        SocketsHttpHandler off = HandlerOf(new EnsembleWeatherOptions { Environment = _ => null, CheckCertificateRevocation = false });
+        SocketsHttpHandler on = HandlerOf(new OureaClientOptions { Environment = _ => null });
+        SocketsHttpHandler off = HandlerOf(new OureaClientOptions { Environment = _ => null, CheckCertificateRevocation = false });
 
         Assert.Equal(X509RevocationMode.NoCheck, off.SslOptions.CertificateRevocationCheckMode);
         Assert.Null(off.SslOptions.RemoteCertificateValidationCallback); // validation stays the platform's
@@ -71,7 +71,7 @@ public sealed class TlsTests
         using ServiceProvider provider = services.BuildServiceProvider();
 
         HttpMessageHandler handler = provider.GetRequiredService<IHttpMessageHandlerFactory>()
-            .CreateHandler(EnsembleWeatherServiceCollectionExtensions.HttpClientName);
+            .CreateHandler(OureaServiceCollectionExtensions.HttpClientName);
         while (handler is DelegatingHandler delegating)
         {
             handler = delegating.InnerHandler!;
@@ -97,7 +97,7 @@ public sealed class TlsTests
         Task server = ServeOnceAsync(listener, certificate);
 #pragma warning restore CA2025
 
-        using var client = new EnsembleWeatherClient(new EnsembleWeatherOptions
+        using var client = new OureaClient(new OureaClientOptions
         {
             BaseUrl = new Uri($"https://127.0.0.1:{port}"),
             CheckCertificateRevocation = checkRevocation,
@@ -111,10 +111,10 @@ public sealed class TlsTests
         await server;
     }
 
-    private static SocketsHttpHandler HandlerOf(EnsembleWeatherOptions options)
+    private static SocketsHttpHandler HandlerOf(OureaClientOptions options)
     {
-        using var client = new EnsembleWeatherClient(options);
-        var http = (HttpClient)typeof(EnsembleWeatherClient).GetField("_http", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(client)!;
+        using var client = new OureaClient(options);
+        var http = (HttpClient)typeof(OureaClient).GetField("_http", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(client)!;
         return (SocketsHttpHandler)typeof(HttpMessageInvoker).GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(http)!;
     }
 
