@@ -2,7 +2,7 @@
 // computed by the server. Summing hourly percentiles would give a wrong total, so the SDK never does.
 using EnsembleWeather;
 
-using var client = new EnsembleWeatherClient();
+using var client = new OureaClient();
 
 var options = new ForecastOptions();
 options.WindowTotals.Add(WindowTotalTerm.Precipitation(ForecastWindow.Hours(48)));
@@ -15,11 +15,11 @@ foreach (WindowTotal total in forecast.WindowTotals)
     string unit = forecast.UnitLabels.Amount;
     if (total.Quantiles?.GetRange(10, 90) is QuantileRange range)
     {
-        Console.WriteLine($"{total.Variable}, hours {total.WindowStartHours}-{total.WindowEndHours}: most likely " +
+        Console.WriteLine($"{total.Variable}, hours {total.StartHours}-{total.EndHours}: most likely " +
             $"{total.Quantiles.Median} {unit}, at least {range.Low} {unit}, could reach {range.High} {unit} ({total.Members} members)");
     }
     else
     {
-        Console.WriteLine($"{total.Variable}, hours {total.WindowStartHours}-{total.WindowEndHours}: unanswered ({total.NullReason})");
+        Console.WriteLine($"{total.Variable}, hours {total.StartHours}-{total.EndHours}: unanswered ({total.NullReason})");
     }
 }

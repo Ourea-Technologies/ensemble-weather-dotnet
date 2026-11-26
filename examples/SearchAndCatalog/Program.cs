@@ -2,7 +2,7 @@
 // open route, sent without the API key so every caller shares one edge-cache entry.
 using EnsembleWeather;
 
-using var client = new EnsembleWeatherClient();
+using var client = new OureaClient();
 
 SearchLocationsResponse hits = await client.SearchLocationsAsync("hood meadows", new SearchOptions { Limit = 5 });
 foreach (SearchHit hit in hits.Items)
