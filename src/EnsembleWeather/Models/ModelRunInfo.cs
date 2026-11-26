@@ -34,5 +34,5 @@ public sealed class ModelRunInfo
     /// model that contributed nothing is absent.
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<ModelEntry> Models { get; init; } = [];
+    public IReadOnlyList<ModelEntry> Models { get => field ?? []; init; } = [];
 }

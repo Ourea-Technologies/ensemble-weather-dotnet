@@ -89,10 +89,10 @@ public class CatalogStation
     public string? Network { get; init; }
 
     /// <summary>
-    /// The station id in its source network.
+    /// (JSON <c>source_station_id</c>) The station id in its source network.
     /// </summary>
     [JsonPropertyName("source_station_id")]
-    public string? SourceStationId { get; init; }
+    public string? SourceId { get; init; }
 
     /// <summary>
     /// Elevation above mean sea level, metres.
@@ -113,10 +113,10 @@ public class CatalogStation
     public IReadOnlyList<string>? SensorCapabilities { get; init; }
 
     /// <summary>
-    /// The live-feed status, snake_case: <c>active</c>, <c>intermittent</c>, <c>inactive</c>, <c>decommissioned</c> or <c>unknown</c>.
+    /// (JSON <c>station_status</c>) The live-feed status, snake_case: <c>active</c>, <c>intermittent</c>, <c>inactive</c>, <c>decommissioned</c> or <c>unknown</c>.
     /// </summary>
     [JsonPropertyName("station_status")]
-    public string? StationStatus { get; init; }
+    public string? Status { get; init; }
 
     /// <summary>
     /// When the station last reported.
@@ -151,10 +151,10 @@ public class CatalogStation
     public int? UpdateFrequencyMinutes { get; init; }
 
     /// <summary>
-    /// The station's page.
+    /// (JSON <c>station_url</c>) The station's page.
     /// </summary>
     [JsonPropertyName("station_url")]
-    public string? StationUrl { get; init; }
+    public string? Url { get; init; }
 
     /// <summary>
     /// The station's data page.

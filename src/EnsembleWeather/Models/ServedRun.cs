@@ -21,5 +21,5 @@ public sealed class ServedRun
     /// Each contributing model and its own cycle (<c>{id, cycle}</c>), as <c>model_run.models</c>.
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<ModelEntry> Models { get; init; } = [];
+    public IReadOnlyList<ModelEntry> Models { get => field ?? []; init; } = [];
 }

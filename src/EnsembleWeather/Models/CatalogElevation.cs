@@ -16,10 +16,10 @@ public sealed class CatalogElevation
     public string Label { get; init; } = string.Empty;
 
     /// <summary>
-    /// Elevation, metres.
+    /// (JSON <c>elevation_m</c>) Elevation, metres.
     /// </summary>
     [JsonPropertyName("elevation_m")]
-    public double ElevationMeters { get; init; }
+    public double HeightMeters { get; init; }
 
     /// <summary>
     /// A latitude override for this elevation.
@@ -38,4 +38,11 @@ public sealed class CatalogElevation
     /// </summary>
     [JsonPropertyName("is_default")]
     public bool IsDefault { get; init; }
+
+    /// <summary>
+    /// What the place is called, for display. Absent where the catalog has no name for the point (show
+    /// <c>label</c>).
+    /// </summary>
+    [JsonPropertyName("display_name")]
+    public string? DisplayName { get; init; }
 }

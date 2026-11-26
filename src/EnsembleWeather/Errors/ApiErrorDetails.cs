@@ -9,12 +9,13 @@ namespace EnsembleWeather;
 /// <summary>What an error response said, before it becomes an exception of its category.</summary>
 internal sealed class ApiErrorDetails
 {
-    private static readonly Dictionary<string, Func<ApiErrorDetails, EnsembleWeatherException>> ByCode =
+    private static readonly Dictionary<string, Func<ApiErrorDetails, OureaException>> ByCode =
         new(StringComparer.Ordinal)
         {
             ["INVALID_API_KEY"] = d => new AuthenticationFailedException(d),
             ["UNAUTHORIZED"] = d => new AuthenticationFailedException(d),
             ["PRO_REQUIRED"] = d => new PermissionDeniedException(d),
+            ["PLUS_REQUIRED"] = d => new PermissionDeniedException(d),
             ["LOCATION_NOT_FOUND"] = d => new ResourceNotFoundException(d),
             ["NOT_FOUND"] = d => new ResourceNotFoundException(d),
             ["BAD_REQUEST"] = d => new InvalidRequestException(d),
@@ -49,9 +50,9 @@ internal sealed class ApiErrorDetails
     public RateLimitState? RateLimit { get; init; }
 
     /// <summary>Maps the error to its category: by code first, by status when the code is unknown.</summary>
-    public EnsembleWeatherException ToException()
+    public OureaException ToException()
     {
-        if (ErrorCode is not null && ByCode.TryGetValue(ErrorCode, out Func<ApiErrorDetails, EnsembleWeatherException>? create))
+        if (ErrorCode is not null && ByCode.TryGetValue(ErrorCode, out Func<ApiErrorDetails, OureaException>? create))
         {
             return create(this);
         }
@@ -64,7 +65,7 @@ internal sealed class ApiErrorDetails
             404 or 410 => new ResourceNotFoundException(this),
             429 => new RateLimitExceededException(this),
             >= 500 and <= 599 => new ServiceUnavailableException(this),
-            _ => new EnsembleWeatherException(this),
+            _ => new OureaException(this),
         };
     }
 

@@ -11,7 +11,7 @@ namespace EnsembleWeather;
 /// </summary>
 public sealed class ForecastOptions
 {
-    /// <summary>Gets or sets the unit system; <see langword="null"/> for the client's <see cref="EnsembleWeatherOptions.Units"/>.</summary>
+    /// <summary>Gets or sets the unit system; <see langword="null"/> for the client's <see cref="OureaClientOptions.Units"/>.</summary>
     public UnitSystem? Units { get; set; }
 
     /// <summary>
@@ -30,10 +30,12 @@ public sealed class ForecastOptions
     public bool? Models { get; set; }
 
     /// <summary>
-    /// Gets or sets whether to include individual member values (Free: the plume view; Pro: every variable). The
-    /// API's default is <see langword="false"/>.
+    /// Gets or sets which individual member values to include: <see cref="ForecastMembers.On"/> (or
+    /// <see langword="true"/>) for each hour's members, <see cref="ForecastMembers.Plume"/> for the plume view
+    /// (<see cref="ForecastData.Plume"/>). The API's default is <see cref="ForecastMembers.Off"/>. The tier decides
+    /// the member set (<see cref="ForecastResponse.MembersView"/>).
     /// </summary>
-    public bool? Members { get; set; }
+    public ForecastMembers? Members { get; set; }
 
     /// <summary>
     /// Gets the named elevations to forecast too (ski areas; location forecasts only): <c>all</c>, or names from

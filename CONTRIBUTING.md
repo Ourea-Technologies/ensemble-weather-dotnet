@@ -8,7 +8,7 @@ spec disagree, the spec wins; a change to behaviour starts as a change to the sp
 
 ## Setup
 
-- .NET SDK 10 (see `global.json`) plus the .NET 8 runtime (the tests run on both).
+- .NET SDK 10.0.404 exactly (`global.json`, `rollForward: disable`; CI pins the same: the SDK decides the implicit `Microsoft.NET.ILLink.Tasks` version in the lock files) plus the .NET 8 runtime (the tests run on both).
 - Python 3 for the small repository scripts.
 
 ```sh
@@ -23,7 +23,7 @@ Everything CI runs, in order; each must pass before a commit:
 ```sh
 dotnet format EnsembleWeather.sln --verify-no-changes   # format + code style
 dotnet build EnsembleWeather.sln -c Release             # analyzers (latest-recommended + all security rules), warnings as errors, nullable
-dotnet test EnsembleWeather.sln -c Release              # unit tests + all 43 shared vectors + spec drift, on net8.0 and net10.0
+dotnet test EnsembleWeather.sln -c Release              # unit tests + all 58 shared vectors + spec drift, on net8.0 and net10.0
 scripts/run-examples                                    # every example, against the local mock API
 scripts/check-dependencies                              # every runtime dependency is justified below
 scripts/audit-dependencies                              # no known-vulnerable package, direct or transitive
@@ -48,7 +48,7 @@ To pin a newer spec: `scripts/sync-spec <ref>`, then make the vectors pass.
   (the library is trimming and Native AOT compatible on .NET 8+).
 
 - TLS: certificate validation is never optional (BEHAVIOR.md and SDK-STANDARD "Security"). The one TLS-related
-  setting is `EnsembleWeatherOptions.CheckCertificateRevocation` (default `true`), which controls only the CRL/OCSP
+  setting is `OureaClientOptions.CheckCertificateRevocation` (default `true`), which controls only the CRL/OCSP
   revocation lookup for users whose proxies block it; `TlsTests` pins that, including a real handshake against a
   self-signed certificate with the option on and off. Do not add a validation callback or any setting whose name
   suggests TLS can be disabled. The `CA5399` suppressions where the option is applied are deliberate and

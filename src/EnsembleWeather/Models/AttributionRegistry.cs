@@ -14,5 +14,5 @@ public sealed class AttributionRegistry : ApiResult
     /// The data providers.
     /// </summary>
     [JsonPropertyName("providers")]
-    public IReadOnlyList<AttributionProvider> Providers { get; init; } = [];
+    public IReadOnlyList<AttributionProvider> Providers { get => field ?? []; init; } = [];
 }

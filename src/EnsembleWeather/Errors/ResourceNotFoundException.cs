@@ -7,7 +7,7 @@ namespace EnsembleWeather;
 /// <summary>
 /// The location or resource does not exist (<c>LOCATION_NOT_FOUND</c>, <c>NOT_FOUND</c>, or HTTP 404/410).
 /// </summary>
-public sealed class ResourceNotFoundException : EnsembleWeatherException
+public sealed class ResourceNotFoundException : OureaException
 {
     /// <summary>Initializes a new instance.</summary>
     public ResourceNotFoundException()

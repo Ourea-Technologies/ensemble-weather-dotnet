@@ -2,7 +2,7 @@
 // Coordinates need a Pro key; without one the API answers PRO_REQUIRED first, which is caught too.
 using EnsembleWeather;
 
-using var client = new EnsembleWeatherClient();
+using var client = new OureaClient();
 
 try
 {
@@ -20,7 +20,7 @@ catch (RateLimitExceededException ex)
 {
     Console.WriteLine($"Rate limited; retry after {ex.RetryAfter?.TotalSeconds} s.");
 }
-catch (EnsembleWeatherException ex)
+catch (OureaException ex)
 {
     Console.WriteLine($"Ourea API error {ex.ErrorCode} (HTTP {ex.StatusCode}, request {ex.RequestId}): {ex.Message}");
 }

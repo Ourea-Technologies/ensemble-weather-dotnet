@@ -30,10 +30,10 @@ public sealed class SensorObservation
     public string Source { get; init; } = string.Empty;
 
     /// <summary>
-    /// When the observation was taken.
+    /// (JSON <c>observation_time</c>) When the observation was taken.
     /// </summary>
     [JsonPropertyName("observation_time")]
-    public DateTimeOffset ObservationTime { get; init; }
+    public DateTimeOffset ObservedAt { get; init; }
 
     /// <summary>
     /// °C, °F (imperial) or K (kelvin).
@@ -160,4 +160,19 @@ public sealed class SensorObservation
     /// </summary>
     [JsonPropertyName("pavement_condition")]
     public string? PavementCondition { get; init; }
+
+    /// <summary>
+    /// Straight-line surface distance from the location to the sensor, in km (at most 25), as
+    /// <c>nearest_sensors[].distance_km</c>.
+    /// </summary>
+    [JsonPropertyName("distance_km")]
+    public double DistanceKm { get; init; }
+
+    /// <summary>
+    /// The sensor's registry elevation minus the location's, in the caller's length units (m metric, ft imperial),
+    /// as <c>nearest_sensors[].elevation_diff</c>. Positive if the sensor sits above the location. Omitted when the
+    /// station has no registry elevation.
+    /// </summary>
+    [JsonPropertyName("elevation_diff")]
+    public double? ElevationDiff { get; init; }
 }

@@ -128,12 +128,12 @@ public sealed class TransportTests
 {
     private static readonly string Forecast = File.ReadAllText(Path.Combine(RepoPaths.Vectors, "bodies", "forecast-metric.json"));
 
-    private static (EnsembleWeatherClient Client, RecordingTimeProvider Clock) Client(HttpMessageHandler handler, Action<EnsembleWeatherOptions>? configure = null)
+    private static (OureaClient Client, RecordingTimeProvider Clock) Client(HttpMessageHandler handler, Action<OureaClientOptions>? configure = null)
     {
         var clock = new RecordingTimeProvider();
-        var options = new EnsembleWeatherOptions { TimeProvider = clock, Jitter = () => 1, Environment = _ => null };
+        var options = new OureaClientOptions { TimeProvider = clock, Jitter = () => 1, Environment = _ => null };
         configure?.Invoke(options);
-        return (new EnsembleWeatherClient(new HttpClient(handler), options), clock);
+        return (new OureaClient(new HttpClient(handler), options), clock);
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public sealed class TransportTests
     {
         int calls = 0;
         var handler = new MockHandler(responder: _ => ++calls < 3 ? throw new HttpRequestException("reset") : MockHandler.Json(200, Forecast));
-        (EnsembleWeatherClient client, RecordingTimeProvider clock) = Client(handler);
+        (OureaClient client, RecordingTimeProvider clock) = Client(handler);
 
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
 
@@ -158,7 +158,7 @@ public sealed class TransportTests
             calls++;
             throw new HttpRequestException("tls", new System.Security.Authentication.AuthenticationException("bad certificate"));
         });
-        (EnsembleWeatherClient client, _) = Client(handler);
+        (OureaClient client, _) = Client(handler);
 
         await Assert.ThrowsAsync<ServiceConnectionException>(() => client.GetLocationForecastAsync("or/mt-hood-meadows"));
         Assert.Equal(1, calls);
@@ -172,7 +172,7 @@ public sealed class TransportTests
             MockHandler.Json(503, """{"error":"FORECAST_UNAVAILABLE","message":"x"}""", ("Retry-After", "Sun, 15 Nov 2026 00:00:07 GMT")),
             MockHandler.Json(200, Forecast),
         ]);
-        (EnsembleWeatherClient client, RecordingTimeProvider clock) = Client(handler);
+        (OureaClient client, RecordingTimeProvider clock) = Client(handler);
 
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
 
@@ -187,7 +187,7 @@ public sealed class TransportTests
             MockHandler.Json(504, """{"error":"TIMEOUT","message":"x"}""", ("Retry-After", "5")),
             MockHandler.Json(200, Forecast),
         ]);
-        (EnsembleWeatherClient client, RecordingTimeProvider clock) = Client(handler);
+        (OureaClient client, RecordingTimeProvider clock) = Client(handler);
 
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
 
@@ -205,7 +205,7 @@ public sealed class TransportTests
                                  "distance_km":4.25,"elevation_m":1635.6}}
             """;
         var handler = new MockHandler([MockHandler.Json(403, body, ("X-Request-Id", "header-id"))]);
-        (EnsembleWeatherClient client, _) = Client(handler);
+        (OureaClient client, _) = Client(handler);
 
         PermissionDeniedException ex = await Assert.ThrowsAsync<PermissionDeniedException>(
             () => client.GetPointForecastAsync(45.3, -121.7));
@@ -227,7 +227,7 @@ public sealed class TransportTests
     public async Task WithdrawnCodesKeepTheirStringAndMapByStatus(string code, int status)
     {
         var handler = new MockHandler([MockHandler.Json(status, $$"""{"error":"{{code}}","message":"x"}""")]);
-        (EnsembleWeatherClient client, _) = Client(handler);
+        (OureaClient client, _) = Client(handler);
 
         InvalidRequestException ex = await Assert.ThrowsAsync<InvalidRequestException>(
             () => client.GetLocationForecastAsync("or/mt-hood-meadows"));
@@ -239,7 +239,7 @@ public sealed class TransportTests
     public async Task AuthUnavailableIsAServiceError()
     {
         var handler = new MockHandler(responder: _ => MockHandler.Json(503, """{"error":"AUTH_UNAVAILABLE","message":"x"}""", ("Retry-After", "1")));
-        (EnsembleWeatherClient client, _) = Client(handler);
+        (OureaClient client, _) = Client(handler);
 
         await Assert.ThrowsAsync<ServiceUnavailableException>(() => client.GetLocationForecastAsync("or/mt-hood-meadows"));
     }
@@ -248,7 +248,7 @@ public sealed class TransportTests
     public async Task BackoffIsCappedAtEightSeconds()
     {
         var handler = new MockHandler(responder: _ => MockHandler.Json(502, "{}"));
-        (EnsembleWeatherClient client, RecordingTimeProvider clock) = Client(handler, o => o.MaxRetries = 6);
+        (OureaClient client, RecordingTimeProvider clock) = Client(handler, o => o.MaxRetries = 6);
 
         await Assert.ThrowsAsync<ServiceUnavailableException>(() => client.GetLocationForecastAsync("or/mt-hood-meadows"));
 
@@ -259,7 +259,7 @@ public sealed class TransportTests
     public async Task RateLimitStateIsOnTheResultAndTheClient()
     {
         var handler = new MockHandler([MockHandler.Json(200, Forecast, ("RateLimit-Limit", "60"), ("RateLimit-Remaining", "12"), ("RateLimit-Reset", "30"), ("RateLimit-Policy", "60;w=60"), ("X-Request-Id", "req-1"))]);
-        (EnsembleWeatherClient client, _) = Client(handler);
+        (OureaClient client, _) = Client(handler);
 
         ForecastResponse forecast = await client.GetLocationForecastAsync("or/mt-hood-meadows");
 
@@ -273,7 +273,7 @@ public sealed class TransportTests
     public async Task AFreshMaxAgeEntryIsServedWithoutARequest()
     {
         var handler = new MockHandler([MockHandler.Json(200, Forecast, ("Cache-Control", "max-age=60"), ("ETag", "\"e\""))]);
-        (EnsembleWeatherClient client, _) = Client(handler);
+        (OureaClient client, _) = Client(handler);
 
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
@@ -285,7 +285,7 @@ public sealed class TransportTests
     public async Task TheUserAgentNamesTheSdkAndTheApplication()
     {
         var handler = new MockHandler([MockHandler.Json(200, Forecast)]);
-        (EnsembleWeatherClient client, _) = Client(handler, o => o.ApplicationId = "my-app/1.2");
+        (OureaClient client, _) = Client(handler, o => o.ApplicationId = "my-app/1.2");
 
         await client.GetLocationForecastAsync("or/mt-hood-meadows");
 
@@ -295,7 +295,7 @@ public sealed class TransportTests
     [Fact]
     public void TheSdkVersionMatchesThePackage()
     {
-        string? informational = typeof(EnsembleWeatherClient).Assembly
+        string? informational = typeof(OureaClient).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
         Assert.StartsWith(SdkInfo.Version, informational, StringComparison.Ordinal);
     }
@@ -304,7 +304,7 @@ public sealed class TransportTests
     public async Task TheBaseUrlComesFromTheEnvironmentWhenNotSet()
     {
         var handler = new MockHandler([MockHandler.Json(200, Forecast)]);
-        using var client = new EnsembleWeatherClient(new HttpClient(handler), new EnsembleWeatherOptions
+        using var client = new OureaClient(new HttpClient(handler), new OureaClientOptions
         {
             Environment = k => k == "OUREA_BASE_URL" ? "http://127.0.0.1:5099" : null,
         });
@@ -370,8 +370,8 @@ public sealed class DependencyInjectionTests
         }).ConfigurePrimaryHttpMessageHandler(() => handler);
         using ServiceProvider provider = services.BuildServiceProvider();
 
-        EnsembleWeatherClient first = provider.GetRequiredService<EnsembleWeatherClient>();
-        EnsembleWeatherClient second = provider.GetRequiredService<EnsembleWeatherClient>();
+        OureaClient first = provider.GetRequiredService<OureaClient>();
+        OureaClient second = provider.GetRequiredService<OureaClient>();
         await first.GetAttributionAsync();
         await second.GetAttributionAsync();
 
@@ -387,7 +387,7 @@ public sealed class DependencyInjectionTests
         using ServiceProvider provider = services.BuildServiceProvider();
         var factory = provider.GetRequiredService<IHttpMessageHandlerFactory>();
 
-        HttpMessageHandler handler = factory.CreateHandler(EnsembleWeatherServiceCollectionExtensions.HttpClientName);
+        HttpMessageHandler handler = factory.CreateHandler(OureaServiceCollectionExtensions.HttpClientName);
         while (handler is DelegatingHandler delegating)
         {
             handler = delegating.InnerHandler!;

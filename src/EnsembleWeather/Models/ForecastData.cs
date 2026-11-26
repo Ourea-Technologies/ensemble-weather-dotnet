@@ -10,6 +10,7 @@ namespace EnsembleWeather;
 /// </summary>
 public sealed class ForecastData
 {
+
     /// <summary>
     /// The last served hour, in hours from the FIRST served one (the current hour by default, the run's init with
     /// <c>include_past=true</c> or a pinned <c>run</c>) -- the request's <c>max_hours</c> clamped to the tier, less
@@ -38,13 +39,13 @@ public sealed class ForecastData
     /// and from <c>elevation_forecasts[].hourly</c>.
     /// </summary>
     [JsonPropertyName("timeseries")]
-    public IReadOnlyList<TimeSeriesPoint> Timeseries { get; init; } = [];
+    public IReadOnlyList<TimeSeriesPoint> Timeseries { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The daily summaries.
     /// </summary>
     [JsonPropertyName("daily")]
-    public IReadOnlyList<DailyForecast> Daily { get; init; } = [];
+    public IReadOnlyList<DailyForecast> Daily { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Rolling snow-accumulation summary for common UI windows. Always forward-looking (next N hours / days), summed
@@ -56,4 +57,18 @@ public sealed class ForecastData
     /// </summary>
     [JsonPropertyName("snow_outlook")]
     public SnowOutlook? SnowOutlook { get; init; }
+
+    /// <summary>
+    /// Rolling LIQUID totals over <c>snow_outlook</c>'s windows (24 h, 48 h, 72 h, 7 days), with their ranges.
+    /// Present exactly when <c>snow_outlook</c> is.
+    /// </summary>
+    [JsonPropertyName("precipitation_outlook")]
+    public PrecipOutlook? PrecipitationOutlook { get; init; }
+
+    /// <summary>
+    /// Present only with <c>members=plume</c>, which serves it INSTEAD of <c>timeseries</c>, <c>daily</c>,
+    /// <c>snow_outlook</c> and <c>precipitation_outlook</c>.
+    /// </summary>
+    [JsonPropertyName("plume")]
+    public MemberPlume? Plume { get; init; }
 }

@@ -16,4 +16,22 @@ public sealed class SearchOptions
 
     /// <summary>Gets or sets the most hits wanted (1..100). The API's default is 20.</summary>
     public int? Limit { get; set; }
+
+    /// <summary>
+    /// Gets or sets a metric to sort by; <see langword="null"/> for relevance (the API's default). With a metric,
+    /// each hit carries <see cref="SearchHit.Explore"/>.
+    /// </summary>
+    public ExploreMetric? Sort { get; set; }
+
+    /// <summary>Gets or sets the order of a metric sort. The API's default is <see cref="SortOrder.Descending"/>.</summary>
+    public SortOrder? Order { get; set; }
+
+    /// <summary>Gets or sets a point: only hits within <see cref="RadiusKm"/> of it.</summary>
+    public GeoPoint? Near { get; set; }
+
+    /// <summary>Gets or sets the radius around <see cref="Near"/>, km (up to 1000). The API's default is 100.</summary>
+    public double? RadiusKm { get; set; }
+
+    /// <summary>Gets or sets the unit system of <see cref="SearchHit.Explore"/> values; <see langword="null"/> for the client's.</summary>
+    public UnitSystem? Units { get; set; }
 }

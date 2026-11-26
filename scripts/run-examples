@@ -11,7 +11,7 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 port="${PORT:-5099}"
 config="${CONFIGURATION:-Release}"
-examples=(Quickstart PointForecast ChanceOfSnow StormTotal SearchAndCatalog CurrentAndAlerts ErrorHandling Units)
+examples=(Quickstart PointForecast ChanceOfSnow StormTotal SearchAndCatalog CurrentAndAlerts ErrorHandling Units SnowReport)
 
 dotnet build "$root/tools/EnsembleWeather.MockServer" -c "$config" --nologo -v quiet -clp:ErrorsOnly
 for name in "${examples[@]}"; do

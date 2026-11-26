@@ -146,25 +146,25 @@ public sealed class CatalogLocationDetail : ApiResult
     /// The named elevations.
     /// </summary>
     [JsonPropertyName("elevations")]
-    public IReadOnlyList<CatalogElevation> Elevations { get; init; } = [];
+    public IReadOnlyList<CatalogElevation> Elevations { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Photos.
     /// </summary>
     [JsonPropertyName("photos")]
-    public IReadOnlyList<CatalogPhoto> Photos { get; init; } = [];
+    public IReadOnlyList<CatalogPhoto> Photos { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Webcams.
     /// </summary>
     [JsonPropertyName("webcams")]
-    public IReadOnlyList<CatalogWebcam> Webcams { get; init; } = [];
+    public IReadOnlyList<CatalogWebcam> Webcams { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Nearby observation stations.
     /// </summary>
     [JsonPropertyName("nearby_stations")]
-    public IReadOnlyList<CatalogNearbyStation> NearbyStations { get; init; } = [];
+    public IReadOnlyList<CatalogNearbyStation> NearbyStations { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The resolved page template (<c>include=template</c>).
@@ -176,5 +176,5 @@ public sealed class CatalogLocationDetail : ApiResult
     /// Published content entries (<c>include=content</c>).
     /// </summary>
     [JsonPropertyName("content")]
-    public IReadOnlyList<CatalogResolvedEntry> Content { get; init; } = [];
+    public IReadOnlyList<CatalogResolvedEntry> Content { get => field ?? []; init; } = [];
 }

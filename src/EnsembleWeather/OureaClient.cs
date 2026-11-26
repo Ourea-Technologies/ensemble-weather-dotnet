@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -25,18 +26,20 @@ namespace EnsembleWeather;
 /// <para>
 /// Every request is sent in canonical form (defaults omitted, parameters sorted, RFC 3986 encoding) so equal
 /// requests share one edge-cache entry. Connection failures, <c>429</c>, <c>502</c>, <c>503</c> and <c>504</c> are
-/// retried (<see cref="EnsembleWeatherOptions.MaxRetries"/>); errors are thrown as subclasses of
-/// <see cref="EnsembleWeatherException"/>.
+/// retried (<see cref="OureaClientOptions.MaxRetries"/>); errors are thrown as subclasses of
+/// <see cref="OureaException"/>.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
-/// using var client = new EnsembleWeatherClient();
+/// using var client = new OureaClient();
 /// ForecastResponse forecast = await client.GetLocationForecastAsync("or/mt-hood-meadows");
 /// </code>
 /// </example>
-public sealed class EnsembleWeatherClient : IDisposable
+public sealed class OureaClient : IDisposable
 {
+    private static readonly string[] DailyOnly = ["daily"];
+
     private readonly HttpClient _http;
     private readonly bool _ownsHttp;
     private readonly ApiPipeline _pipeline;
@@ -46,15 +49,15 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// Initializes a client with the default options: the API key from <c>OUREA_API_KEY</c> if set (else anonymous),
     /// metric units, the in-memory cache.
     /// </summary>
-    public EnsembleWeatherClient()
-        : this(new EnsembleWeatherOptions())
+    public OureaClient()
+        : this(new OureaClientOptions())
     {
     }
 
     /// <summary>Initializes a client with an API key and otherwise default options.</summary>
     /// <param name="apiKey">The API key; <see langword="null"/> to read <c>OUREA_API_KEY</c> (or call anonymously).</param>
-    public EnsembleWeatherClient(string? apiKey)
-        : this(new EnsembleWeatherOptions { ApiKey = apiKey })
+    public OureaClient(string? apiKey)
+        : this(new OureaClientOptions { ApiKey = apiKey })
     {
     }
 
@@ -62,7 +65,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">The options.</param>
     /// <exception cref="ArgumentNullException"><paramref name="options"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">An option is invalid.</exception>
-    public EnsembleWeatherClient(EnsembleWeatherOptions options)
+    public OureaClient(OureaClientOptions options)
         : this(CreateHttpClient(options ?? throw new ArgumentNullException(nameof(options))), options, ownsHttpClient: true)
     {
     }
@@ -74,19 +77,19 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="httpClient">
     /// The HTTP client. Its handler must not follow redirects itself (<c>AllowAutoRedirect = false</c>): the SDK
     /// follows them, and drops the API key on a redirect to another host, which an auto-redirecting handler would not.
-    /// Its <see cref="HttpClient.Timeout"/> should be infinite or longer than <see cref="EnsembleWeatherOptions.Timeout"/>.
+    /// Its <see cref="HttpClient.Timeout"/> should be infinite or longer than <see cref="OureaClientOptions.Timeout"/>.
     /// </param>
     /// <param name="options">The options; <see langword="null"/> for the defaults.</param>
     /// <exception cref="ArgumentNullException"><paramref name="httpClient"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">An option is invalid.</exception>
-    public EnsembleWeatherClient(HttpClient httpClient, EnsembleWeatherOptions? options = null)
-        : this(httpClient ?? throw new ArgumentNullException(nameof(httpClient)), options ?? new EnsembleWeatherOptions(), ownsHttpClient: false)
+    public OureaClient(HttpClient httpClient, OureaClientOptions? options = null)
+        : this(httpClient ?? throw new ArgumentNullException(nameof(httpClient)), options ?? new OureaClientOptions(), ownsHttpClient: false)
     {
     }
 
-    private EnsembleWeatherClient(HttpClient httpClient, EnsembleWeatherOptions options, bool ownsHttpClient)
+    private OureaClient(HttpClient httpClient, OureaClientOptions options, bool ownsHttpClient)
     {
-        EnsembleWeatherOptions snapshot = options.Clone();
+        OureaClientOptions snapshot = options.Clone();
         _http = httpClient;
         _ownsHttp = ownsHttpClient;
         _units = snapshot.Units;
@@ -114,7 +117,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The forecast.</returns>
     /// <exception cref="ArgumentException">The location or an option is invalid (nothing was sent).</exception>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<ForecastResponse> GetLocationForecastAsync(
         string location, ForecastOptions? options = null, CancellationToken cancellationToken = default)
         => GetLocationForecastAsync(LocationId.Parse(location), options, cancellationToken);
@@ -125,7 +128,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The forecast.</returns>
     /// <exception cref="ArgumentException">An option is invalid (nothing was sent).</exception>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<ForecastResponse> GetLocationForecastAsync(
         LocationId location, ForecastOptions? options = null, CancellationToken cancellationToken = default)
     {
@@ -146,7 +149,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The forecast, with <see cref="ForecastResponse.Point"/> saying where it was computed.</returns>
     /// <exception cref="ArgumentException">An option is invalid (nothing was sent).</exception>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<ForecastResponse> GetPointForecastAsync(
         double latitude,
         double longitude,
@@ -174,7 +177,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Options; <see langword="null"/> for none.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The current conditions.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CurrentConditionsResponse> GetCurrentConditionsAsync(
         string location, CurrentConditionsOptions? options = null, CancellationToken cancellationToken = default)
         => GetCurrentConditionsAsync(LocationId.Parse(location), options, cancellationToken);
@@ -184,7 +187,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Options; <see langword="null"/> for none.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The current conditions.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CurrentConditionsResponse> GetCurrentConditionsAsync(
         LocationId location, CurrentConditionsOptions? options = null, CancellationToken cancellationToken = default)
         => CurrentAsync(new ApiRequest("getCurrentConditions", LocationPath(location) + "/current"), options, cancellationToken);
@@ -196,7 +199,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Options; <see langword="null"/> for none.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The current conditions.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CurrentConditionsResponse> GetPointCurrentAsync(
         double latitude,
         double longitude,
@@ -215,7 +218,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="location">The location, for example <c>"or/mt-hood-meadows"</c>.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The alerts (possibly none).</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<AlertsResponse> GetLocationAlertsAsync(string location, CancellationToken cancellationToken = default)
         => GetLocationAlertsAsync(LocationId.Parse(location), cancellationToken);
 
@@ -223,7 +226,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="location">The location.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The alerts (possibly none).</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<AlertsResponse> GetLocationAlertsAsync(LocationId location, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
             new ApiRequest("getLocationAlerts", LocationPath(location) + "/alerts"),
@@ -235,7 +238,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="longitude">Longitude, decimal degrees, west negative.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The alerts (possibly none).</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<AlertsResponse> GetPointAlertsAsync(
         double latitude, double longitude, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
@@ -248,7 +251,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Options; <see langword="null"/> for the API's defaults (3 within 50 km).</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The location and its neighbours, nearest first.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<NearbyLocationsResponse> GetNearbyLocationsAsync(
         string location, NearbyOptions? options = null, CancellationToken cancellationToken = default)
         => GetNearbyLocationsAsync(LocationId.Parse(location), options, cancellationToken);
@@ -258,7 +261,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Options; <see langword="null"/> for the API's defaults (3 within 50 km).</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The location and its neighbours, nearest first.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<NearbyLocationsResponse> GetNearbyLocationsAsync(
         LocationId location, NearbyOptions? options = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
@@ -272,7 +275,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Options; <see langword="null"/> for the API's defaults (3 within 50 km).</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The nearest locations, nearest first.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<NearbyPointResponse> GetPointNearbyAsync(
         double latitude, double longitude, NearbyOptions? options = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
@@ -284,14 +287,14 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     /// <summary>
     /// Searches locations by name (<c>searchLocations</c>). Sent without the API key (an open route) unless
-    /// <see cref="EnsembleWeatherOptions.SendApiKeyOnOpenRoutes"/> is set.
+    /// <see cref="OureaClientOptions.SendApiKeyOnOpenRoutes"/> is set.
     /// </summary>
     /// <param name="query">The text, at least 2 characters, for example <c>"hood meadows"</c>.</param>
-    /// <param name="options">Hard filters and the hit limit; <see langword="null"/> for none.</param>
+    /// <param name="options">Hard filters, the hit limit and a metric sort; <see langword="null"/> for none.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>Ranked hits, best first. Key results by <see cref="SearchHit.Key"/>: slugs are unique per state only.</returns>
-    /// <exception cref="ArgumentException"><paramref name="query"/> is null or empty.</exception>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="ArgumentException"><paramref name="query"/> is null or empty, or an option is invalid.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<SearchLocationsResponse> SearchLocationsAsync(
         string query, SearchOptions? options = null, CancellationToken cancellationToken = default)
     {
@@ -305,7 +308,12 @@ public sealed class EnsembleWeatherClient : IDisposable
             .Add("state", options?.State)
             .Add("county", options?.County)
             .Add("type", options?.Type?.Value)
-            .Add("limit", options?.Limit, 20);
+            .Add("limit", options?.Limit, 20)
+            .Add("sort", options?.Sort?.Value, "relevance")
+            .Add("order", Order(options?.Order, nameof(options)), "desc")
+            .AddEncoded("near", options?.Near is GeoPoint near ? WireRules.FormatNear(near, nameof(options)) : null)
+            .Add("radius_km", options?.RadiusKm, 100)
+            .AddUnits(options?.Units ?? _units);
         return _pipeline.SendAsync(request, EnsembleWeatherJsonContext.Default.SearchLocationsResponse, cancellationToken);
     }
 
@@ -313,7 +321,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Filters, page size and cursor; <see langword="null"/> for the first page.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The page; <see cref="LocationsResponse.NextCursor"/> is <see langword="null"/> on the last.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<LocationsResponse> GetAllLocationsPageAsync(
         LocationListOptions? options = null, CancellationToken cancellationToken = default)
         => LocationsPageAsync(new ApiRequest("getAllLocations", "/api/v1/locations"), options, options?.Cursor, cancellationToken);
@@ -327,7 +335,7 @@ public sealed class EnsembleWeatherClient : IDisposable
         => Paginate(
             options?.Cursor,
             (cursor, ct) => LocationsPageAsync(new ApiRequest("getAllLocations", "/api/v1/locations"), options, cursor, ct),
-            page => (page.Locations, page.NextCursor),
+            page => (page.Items, page.NextCursor),
             cancellationToken);
 
     /// <summary>Gets one page of a state's forecast locations (<c>getLocations</c>).</summary>
@@ -335,7 +343,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Filters, page size and cursor; <see langword="null"/> for the first page.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The page; <see cref="LocationsResponse.NextCursor"/> is <see langword="null"/> on the last.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<LocationsResponse> GetLocationsPageAsync(
         string state, LocationListOptions? options = null, CancellationToken cancellationToken = default)
         => LocationsPageAsync(StateRequest(state), options, options?.Cursor, cancellationToken);
@@ -352,7 +360,7 @@ public sealed class EnsembleWeatherClient : IDisposable
         return Paginate(
             options?.Cursor,
             (cursor, ct) => LocationsPageAsync(StateRequest(state), options, cursor, ct),
-            page => (page.Locations, page.NextCursor),
+            page => (page.Items, page.NextCursor),
             cancellationToken);
     }
 
@@ -365,7 +373,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Filters, page size and cursor; <see langword="null"/> for the first page.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The page; <see cref="CatalogLocationPage.NextCursor"/> is <see langword="null"/> on the last.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CatalogLocationPage> GetCatalogLocationsPageAsync(
         CatalogLocationListOptions? options = null, CancellationToken cancellationToken = default)
         => CatalogLocationsPageAsync(options, options?.Cursor, cancellationToken);
@@ -384,13 +392,13 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     /// <summary>
     /// Gets a catalog location's detail by slug (<c>getCatalogLocation</c>). Sent without the API key (an open
-    /// route) unless <see cref="EnsembleWeatherOptions.SendApiKeyOnOpenRoutes"/> is set.
+    /// route) unless <see cref="OureaClientOptions.SendApiKeyOnOpenRoutes"/> is set.
     /// </summary>
     /// <param name="slug">The slug, for example <c>mt-hood-meadows</c>.</param>
     /// <param name="options">Opt-in extras; <see langword="null"/> for none.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The detail.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CatalogLocationDetail> GetCatalogLocationAsync(
         string slug, CatalogDetailOptions? options = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
@@ -404,7 +412,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="options">Filters, page size and cursor; <see langword="null"/> for the first page.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The page; <see cref="CatalogStationPage.NextCursor"/> is <see langword="null"/> on the last.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CatalogStationPage> GetCatalogStationsPageAsync(
         CatalogStationListOptions? options = null, CancellationToken cancellationToken = default)
         => CatalogStationsPageAsync(options, options?.Cursor, cancellationToken);
@@ -423,18 +431,206 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     /// <summary>
     /// Gets a catalog station's detail by slug (<c>getCatalogStation</c>). Sent without the API key (an open route)
-    /// unless <see cref="EnsembleWeatherOptions.SendApiKeyOnOpenRoutes"/> is set.
+    /// unless <see cref="OureaClientOptions.SendApiKeyOnOpenRoutes"/> is set.
     /// </summary>
     /// <param name="slug">The slug, for example <c>mt-hood-test-site-snotel</c>.</param>
     /// <param name="options">Opt-in extras; <see langword="null"/> for none.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The detail.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<CatalogStationDetail> GetCatalogStationAsync(
         string slug, CatalogDetailOptions? options = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
             CatalogDetail("getCatalogStation", "/api/v1/catalog/stations/", slug, options),
             EnsembleWeatherJsonContext.Default.CatalogStationDetail,
+            cancellationToken);
+
+    // ---- Explore ----------------------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Gets one page of places ranked by a metric (<c>explore</c>): the most snow in 5 days, the deepest base, the
+    /// season's precipitation against normal, ...
+    /// </summary>
+    /// <param name="metric">What to rank by, for example <see cref="ExploreMetric.Snow5d"/>.</param>
+    /// <param name="options">Filters, page size and cursor; <see langword="null"/> for the first page of everything.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The page; <see cref="ExploreResponse.NextCursor"/> is <see langword="null"/> on the last.</returns>
+    /// <exception cref="ArgumentException">An option is invalid (nothing was sent).</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<ExploreResponse> ExplorePageAsync(
+        ExploreMetric metric, ExploreOptions? options = null, CancellationToken cancellationToken = default)
+        => _pipeline.SendAsync(
+            ExploreRequest(metric, options, options?.Cursor),
+            EnsembleWeatherJsonContext.Default.ExploreResponse,
+            cancellationToken);
+
+    /// <summary>Lists every ranked place, following the cursor page by page (<c>explore</c>).</summary>
+    /// <param name="metric">What to rank by, for example <see cref="ExploreMetric.Snow5d"/>.</param>
+    /// <param name="options">Filters, page size and starting cursor; <see langword="null"/> for everything.</param>
+    /// <param name="cancellationToken">Cancels the enumeration.</param>
+    /// <returns>The ranked places, lazily, in rank order.</returns>
+    /// <exception cref="ArgumentException">An option is invalid (nothing was sent).</exception>
+    public IAsyncEnumerable<ExploreItem> ExploreAsync(
+        ExploreMetric metric, ExploreOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        ExploreRequest(metric, options, options?.Cursor);
+        return Paginate(
+            options?.Cursor,
+            (cursor, ct) => _pipeline.SendAsync(ExploreRequest(metric, options, cursor), EnsembleWeatherJsonContext.Default.ExploreResponse, ct),
+            page => (page.Items, page.NextCursor),
+            cancellationToken);
+    }
+
+    // ---- Season, snow trend, snowpack -------------------------------------------------------------------------
+
+    /// <summary>Gets a location's observed season-to-date precipitation and snowfall (<c>getLocationSeason</c>).</summary>
+    /// <param name="location">The location, for example <c>"or/mt-hood-meadows"</c>.</param>
+    /// <param name="options">The water year, the daily record and units; <see langword="null"/> for the current season.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The season.</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SeasonResponse> GetSeasonAsync(
+        string location, SeasonOptions? options = null, CancellationToken cancellationToken = default)
+        => GetSeasonAsync(LocationId.Parse(location), options, cancellationToken);
+
+    /// <summary>Gets a location's observed season-to-date precipitation and snowfall (<c>getLocationSeason</c>).</summary>
+    /// <param name="location">The location.</param>
+    /// <param name="options">The water year, the daily record and units; <see langword="null"/> for the current season.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The season.</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SeasonResponse> GetSeasonAsync(
+        LocationId location, SeasonOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var request = new ApiRequest("getLocationSeason", LocationPath(location) + "/season")
+            .Add("water_year", options?.WaterYear)
+            .AddList("include", options?.IncludeDaily == true ? DailyOnly : Array.Empty<string>())
+            .AddUnits(options?.Units ?? _units);
+        return _pipeline.SendAsync(request, EnsembleWeatherJsonContext.Default.SeasonResponse, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets each recent run's daily snowfall at a location, as a grid (<c>getLocationSnowTrend</c>): read down a
+    /// column to see a storm firm up or fade as the runs come in. Plus or Pro; with a Pro key the body also carries
+    /// one grid per model.
+    /// </summary>
+    /// <param name="location">The location, for example <c>"or/mt-hood-meadows"</c>.</param>
+    /// <param name="options">The named elevation and units; <see langword="null"/> for the primary point.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The snow trend.</returns>
+    /// <exception cref="PermissionDeniedException">The caller is anonymous or Free (<c>PLUS_REQUIRED</c>).</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SnowTrendResponse> GetSnowTrendAsync(
+        string location, SnowTrendOptions? options = null, CancellationToken cancellationToken = default)
+        => GetSnowTrendAsync(LocationId.Parse(location), options, cancellationToken);
+
+    /// <summary>Gets each recent run's daily snowfall at a location, as a grid (<c>getLocationSnowTrend</c>). Plus or Pro.</summary>
+    /// <param name="location">The location.</param>
+    /// <param name="options">The named elevation and units; <see langword="null"/> for the primary point.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The snow trend.</returns>
+    /// <exception cref="PermissionDeniedException">The caller is anonymous or Free (<c>PLUS_REQUIRED</c>).</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SnowTrendResponse> GetSnowTrendAsync(
+        LocationId location, SnowTrendOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var request = new ApiRequest("getLocationSnowTrend", LocationPath(location) + "/snow-trend")
+            .Add("elevation", options?.Elevation)
+            .AddUnits(options?.Units ?? _units);
+        return _pipeline.SendAsync(request, EnsembleWeatherJsonContext.Default.SnowTrendResponse, cancellationToken);
+    }
+
+    /// <summary>Gets the snowpack forecast of a location's spots (<c>getLocationSnowpack</c>, beta).</summary>
+    /// <param name="location">The location, for example <c>"or/mt-hood-meadows"</c>.</param>
+    /// <param name="units">The unit system; <see langword="null"/> for the client's.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The snowpack forecast (<see cref="SnowpackResponse.Beta"/> is <see langword="true"/>).</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SnowpackResponse> GetSnowpackAsync(
+        string location, UnitSystem? units = null, CancellationToken cancellationToken = default)
+        => GetSnowpackAsync(LocationId.Parse(location), units, cancellationToken);
+
+    /// <summary>Gets the snowpack forecast of a location's spots (<c>getLocationSnowpack</c>, beta).</summary>
+    /// <param name="location">The location.</param>
+    /// <param name="units">The unit system; <see langword="null"/> for the client's.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The snowpack forecast (<see cref="SnowpackResponse.Beta"/> is <see langword="true"/>).</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SnowpackResponse> GetSnowpackAsync(
+        LocationId location, UnitSystem? units = null, CancellationToken cancellationToken = default)
+        => _pipeline.SendAsync(
+            new ApiRequest("getLocationSnowpack", LocationPath(location) + "/snowpack").AddUnits(units ?? _units),
+            EnsembleWeatherJsonContext.Default.SnowpackResponse,
+            cancellationToken);
+
+    /// <summary>Gets the snow-depth plume of a location (<c>getLocationSnowpackPlume</c>, beta).</summary>
+    /// <param name="location">The location, for example <c>"or/mt-hood-meadows"</c>.</param>
+    /// <param name="units">The unit system; <see langword="null"/> for the client's.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The plume (<see cref="SnowpackPlumeResponse.Beta"/> is <see langword="true"/>).</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SnowpackPlumeResponse> GetSnowpackPlumeAsync(
+        string location, UnitSystem? units = null, CancellationToken cancellationToken = default)
+        => GetSnowpackPlumeAsync(LocationId.Parse(location), units, cancellationToken);
+
+    /// <summary>Gets the snow-depth plume of a location (<c>getLocationSnowpackPlume</c>, beta).</summary>
+    /// <param name="location">The location.</param>
+    /// <param name="units">The unit system; <see langword="null"/> for the client's.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The plume (<see cref="SnowpackPlumeResponse.Beta"/> is <see langword="true"/>).</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<SnowpackPlumeResponse> GetSnowpackPlumeAsync(
+        LocationId location, UnitSystem? units = null, CancellationToken cancellationToken = default)
+        => _pipeline.SendAsync(
+            new ApiRequest("getLocationSnowpackPlume", LocationPath(location) + "/snowpack/plume").AddUnits(units ?? _units),
+            EnsembleWeatherJsonContext.Default.SnowpackPlumeResponse,
+            cancellationToken);
+
+    // ---- Map layers and the blend's composition ---------------------------------------------------------------
+
+    /// <summary>
+    /// Gets the outlines of the active NWS winter and wind alerts, as a GeoJSON FeatureCollection
+    /// (<c>getAlertOutlines</c>). Every key is the wire's and the geometry is untouched, so it can go straight to a
+    /// map library.
+    /// </summary>
+    /// <param name="options">The classes and a bounding box; <see langword="null"/> for every active outline.</param>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The outlines.</returns>
+    /// <exception cref="ArgumentException">The bounding box is invalid (nothing was sent).</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<AlertOutlineCollection> GetAlertOutlinesAsync(
+        AlertOutlineOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var request = new ApiRequest("getAlertOutlines", "/api/v1/alerts/outlines")
+            .AddList("class", options?.Classes.Select(c => c.Value) ?? Enumerable.Empty<string>())
+            .AddEncoded("bbox", options?.BoundingBox is BoundingBox box ? WireRules.FormatBox(box, nameof(options)) : null);
+        return _pipeline.SendAsync(request, EnsembleWeatherJsonContext.Default.AlertOutlineCollection, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets every avalanche center's forecast zones with today's published danger rating, as a GeoJSON
+    /// FeatureCollection (<c>getAvalancheZones</c>). Every key is the wire's and the geometry is untouched.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The zones.</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<AvalancheZoneCollection> GetAvalancheZonesAsync(CancellationToken cancellationToken = default)
+        => _pipeline.SendAsync(
+            new ApiRequest("getAvalancheZones", "/api/v1/avalanche/zones"),
+            EnsembleWeatherJsonContext.Default.AvalancheZoneCollection,
+            cancellationToken);
+
+    /// <summary>
+    /// Gets the blend's served models and members (<c>getComposition</c>). Sent without the API key (an open route)
+    /// unless <see cref="OureaClientOptions.SendApiKeyOnOpenRoutes"/> is set.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the call.</param>
+    /// <returns>The composition.</returns>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
+    public Task<CompositionResponse> GetCompositionAsync(CancellationToken cancellationToken = default)
+        => _pipeline.SendAsync(
+            new ApiRequest("getComposition", "/api/v1/composition", openRoute: true),
+            EnsembleWeatherJsonContext.Default.CompositionResponse,
             cancellationToken);
 
     // ---- Runs, attribution ------------------------------------------------------------------------------------
@@ -447,7 +643,7 @@ public sealed class EnsembleWeatherClient : IDisposable
     /// <param name="cursor">The previous page's <see cref="AvailableRunsResponse.NextCursor"/>; <see langword="null"/> for the first page.</param>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The runs, newest first; <see cref="AvailableRunsResponse.NextCursor"/> is <see langword="null"/> on the last page.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<AvailableRunsResponse> GetAvailableRunsAsync(
         int? limit = null, string? cursor = null, CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
@@ -457,11 +653,11 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     /// <summary>
     /// Gets every data source, its licence and required notices (<c>getAttribution</c>). Sent without the API key
-    /// (an open route) unless <see cref="EnsembleWeatherOptions.SendApiKeyOnOpenRoutes"/> is set.
+    /// (an open route) unless <see cref="OureaClientOptions.SendApiKeyOnOpenRoutes"/> is set.
     /// </summary>
     /// <param name="cancellationToken">Cancels the call.</param>
     /// <returns>The attribution registry.</returns>
-    /// <exception cref="EnsembleWeatherException">The API or the connection failed.</exception>
+    /// <exception cref="OureaException">The API or the connection failed.</exception>
     public Task<AttributionRegistry> GetAttributionAsync(CancellationToken cancellationToken = default)
         => _pipeline.SendAsync(
             new ApiRequest("getAttribution", "/api/v1/attribution", openRoute: true),
@@ -479,7 +675,7 @@ public sealed class EnsembleWeatherClient : IDisposable
 
     // ---- Internals --------------------------------------------------------------------------------------------
 
-    private static HttpClient CreateHttpClient(EnsembleWeatherOptions options)
+    private static HttpClient CreateHttpClient(OureaClientOptions options)
     {
         // TLS validation is always the platform's and nothing here can turn it off. Only the revocation lookup
         // (an extra network fetch of CRL/OCSP data) can be skipped, through CheckCertificateRevocation.
@@ -547,7 +743,7 @@ public sealed class EnsembleWeatherClient : IDisposable
             .Add("max_hours", options.MaxHours, 24)
             .Add("include_past", options.IncludePast, false)
             .Add("models", options.Models, false)
-            .Add("members", options.Members, false)
+            .Add("members", options.Members?.Value, ForecastMembers.Off.Value)
             .Add("daily", options.Daily, true)
             .Add("max_days", options.MaxDays)
             .Add("hourly", options.Hourly, true)
@@ -632,6 +828,43 @@ public sealed class EnsembleWeatherClient : IDisposable
         return _pipeline.SendAsync(request, EnsembleWeatherJsonContext.Default.CatalogStationPage, cancellationToken);
     }
 
+    private ApiRequest ExploreRequest(ExploreMetric metric, ExploreOptions? options, string? cursor)
+    {
+        if (string.IsNullOrEmpty(metric.Value))
+        {
+            throw new ArgumentException("explore needs a metric.", nameof(metric));
+        }
+
+        string? points = options?.Points switch
+        {
+            null => null,
+            ExplorePoints.Primary => "primary",
+            ExplorePoints.All => "all",
+            _ => throw new ArgumentException($"Unknown points value {options?.Points}.", nameof(options)),
+        };
+        return new ApiRequest("explore", "/api/v1/explore")
+            .Add("metric", metric.Value)
+            .Add("order", Order(options?.Order, nameof(options)), "desc")
+            .Add("type", options?.Type?.Value)
+            .Add("state", string.IsNullOrEmpty(options?.State) ? null : new LocationId(options!.State!, "-").CanonicalState)
+            .AddEncoded("near", options?.Near is GeoPoint near ? WireRules.FormatNear(near, nameof(options)) : null)
+            .Add("radius_km", options?.RadiusKm, 100)
+            .Add("elevation_min", options?.ElevationMin)
+            .Add("elevation_max", options?.ElevationMax)
+            .Add("points", points, "primary")
+            .Add("limit", options?.Limit, 25)
+            .Add("cursor", cursor)
+            .AddUnits(options?.Units ?? _units);
+    }
+
+    private static string? Order(SortOrder? order, string parameterName) => order switch
+    {
+        null => null,
+        SortOrder.Descending => "desc",
+        SortOrder.Ascending => "asc",
+        _ => throw new ArgumentException($"Unknown sort order {order}.", parameterName),
+    };
+
     private static ApiRequest CatalogDetail(string operation, string prefix, string slug, CatalogDetailOptions? options)
     {
         if (string.IsNullOrEmpty(slug))
@@ -668,7 +901,7 @@ public sealed class EnsembleWeatherClient : IDisposable
 
             if (!seen.Add(next!))
             {
-                throw new EnsembleWeatherException($"The Ourea API returned the cursor '{next}' twice; stopping to avoid a loop.");
+                throw new OureaException($"The Ourea API returned the cursor '{next}' twice; stopping to avoid a loop.");
             }
 
             cursor = next;

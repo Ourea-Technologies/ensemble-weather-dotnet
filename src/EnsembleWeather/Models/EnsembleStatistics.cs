@@ -126,4 +126,16 @@ public sealed class EnsembleStatistics
     /// </summary>
     [JsonPropertyName("relative_humidity")]
     public Quantiles? RelativeHumidity { get; init; }
+
+    /// <summary>
+    /// The snow level on the NWS scale (m MSL, or ft with <c>units=imperial</c>): the height of the 0.5 C wet-bulb,
+    /// where falling snow starts to mix with rain. The one to show as "snow level" and to compare with an NWS
+    /// forecast. It is <c>snow_level</c> raised by a fixed 275 m (901 ft): 366 m from the melting layer's bottom up
+    /// to the 0 C wet-bulb at the moist lapse rate (5.5 C/km), less 91 m from there to 0.5 C. Every quantile is
+    /// raised alike; one at <c>0</c> (snow to sea level) stays <c>0</c>. Display only: amounts,
+    /// <c>precipitation_type</c> and probabilities are placed by <c>snow_level</c>. Omitted when <c>snow_level</c>
+    /// is <c>null</c>.
+    /// </summary>
+    [JsonPropertyName("snow_level_wet_bulb")]
+    public Quantiles? SnowLevelWetBulb { get; init; }
 }

@@ -29,7 +29,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - name: Quickstart (anonymous, as a new user runs it)
         run: env -u OUREA_API_KEY -u OUREA_BASE_URL dotnet run --project examples/Quickstart -c Release
       - name: Contract run (every example, with the read-only key)
@@ -37,7 +37,7 @@ jobs:
           OUREA_API_KEY: ${{ secrets.OUREA_CI_API_KEY }}
         run: |
           if [ -z "$OUREA_API_KEY" ]; then echo "OUREA_CI_API_KEY is not set; skipping the keyed run."; exit 0; fi
-          for name in Quickstart PointForecast ChanceOfSnow StormTotal SearchAndCatalog CurrentAndAlerts ErrorHandling Units; do
+          for name in Quickstart PointForecast ChanceOfSnow StormTotal SearchAndCatalog CurrentAndAlerts ErrorHandling Units SnowReport; do
             echo "=== $name"
             dotnet run --project "examples/$name" -c Release
           done

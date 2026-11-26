@@ -28,10 +28,10 @@ public sealed class ElevationForecast
     public string Name { get; init; } = string.Empty;
 
     /// <summary>
-    /// The elevation, in the request's length unit.
+    /// (JSON <c>elevation</c>) The elevation, in the request's length unit.
     /// </summary>
     [JsonPropertyName("elevation")]
-    public double Elevation { get; init; }
+    public double Height { get; init; }
 
     /// <summary>
     /// Where this elevation was forecast — its own coordinates when the catalog has them, else the location's.
@@ -54,17 +54,52 @@ public sealed class ElevationForecast
     /// <c>full</c>). Same gap rule: key on <c>valid_time</c>. Omitted with <c>hourly=false</c>.
     /// </summary>
     [JsonPropertyName("hourly")]
-    public IReadOnlyList<TimeSeriesPoint> Hourly { get; init; } = [];
+    public IReadOnlyList<TimeSeriesPoint> Hourly { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Daily summaries at this elevation — the same daily build as <c>forecast.daily</c> (omitted when empty)
     /// </summary>
     [JsonPropertyName("daily")]
-    public IReadOnlyList<DailyForecast> Daily { get; init; } = [];
+    public IReadOnlyList<DailyForecast> Daily { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Rolling snow totals at this elevation, as <c>forecast.snow_outlook</c> (omitted when there are no dailies)
     /// </summary>
     [JsonPropertyName("snow_outlook")]
     public SnowOutlook? SnowOutlook { get; init; }
+
+    /// <summary>
+    /// What the place is called, as <c>location.elevations[].display_name</c>; absent where the catalog has no name
+    /// for it.
+    /// </summary>
+    [JsonPropertyName("display_name")]
+    public string? DisplayName { get; init; }
+
+    /// <summary>
+    /// A named spot's own nearby observation sensors, ranked around ITS point and elevation as the location's
+    /// <c>nearest_sensors</c> are around the location's. Omitted for an elevation band without its own coordinates,
+    /// and wherever the location's own list is omitted (<c>nowcast=false</c>, <c>members=plume</c>).
+    /// </summary>
+    [JsonPropertyName("nearest_sensors")]
+    public IReadOnlyList<NearestSensor> NearestSensors { get => field ?? []; init; } = [];
+
+    /// <summary>
+    /// -- rolling liquid totals at this elevation, as <c>forecast.precipitation_outlook</c>.
+    /// </summary>
+    [JsonPropertyName("precipitation_outlook")]
+    public PrecipOutlook? PrecipitationOutlook { get; init; }
+
+    /// <summary>
+    /// This elevation's members in columns, as <c>forecast.plume</c> -- present only with <c>members=plume</c>,
+    /// instead of <c>hourly</c>, <c>daily</c>, <c>snow_outlook</c> and <c>precipitation_outlook</c>.
+    /// </summary>
+    [JsonPropertyName("plume")]
+    public MemberPlume? Plume { get; init; }
+
+    /// <summary>
+    /// The snow on the ground at this elevation, as the response's own <c>snow_on_ground</c>; absent where no
+    /// snowpack column runs for it.
+    /// </summary>
+    [JsonPropertyName("snow_on_ground")]
+    public SnowOnGround? SnowOnGround { get; init; }
 }

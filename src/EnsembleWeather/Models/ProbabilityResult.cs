@@ -66,11 +66,11 @@ public sealed class ProbabilityResult
     public DateTimeOffset? To { get; init; }
 
     /// <summary>
-    /// The share of members meeting the term, 0..1 (0.001); <see langword="null"/> (never 0) when it cannot be
+    /// (JSON <c>probability</c>) The share of members meeting the term, 0..1 (0.001); <see langword="null"/> (never 0) when it cannot be
     /// answered: <see cref="NullReason"/> says why.
     /// </summary>
     [JsonPropertyName("probability")]
-    public double? Probability { get; init; }
+    public double? Value { get; init; }
 
     /// <summary>
     /// Members that voted: for <c>total</c>, the members whose values cover the whole window; for
@@ -80,7 +80,7 @@ public sealed class ProbabilityResult
     public int Members { get; init; }
 
     /// <summary>
-    /// Why <see cref="Probability"/> is <see langword="null"/>; <see langword="null"/> when it is not.
+    /// Why <see cref="Value"/> is <see langword="null"/>; <see langword="null"/> when it is not.
     /// </summary>
     [JsonPropertyName("null_reason")]
     public NullReason? NullReason { get; init; }

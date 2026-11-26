@@ -7,7 +7,7 @@ namespace EnsembleWeather;
 /// <summary>
 /// The server refused the request as malformed (<c>BAD_REQUEST</c>, <c>INVALID_COORDINATES</c>, <c>INVALID_ELEVATION</c>, <c>ELEVATION_REQUIRED</c>, or HTTP 400).
 /// </summary>
-public sealed class InvalidRequestException : EnsembleWeatherException
+public sealed class InvalidRequestException : OureaException
 {
     /// <summary>Initializes a new instance.</summary>
     public InvalidRequestException()

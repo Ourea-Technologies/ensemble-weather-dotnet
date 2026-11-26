@@ -17,8 +17,8 @@ public sealed class ModelMembers
     public string Id { get; init; } = string.Empty;
 
     /// <summary>
-    /// The number of ensemble members that contributed.
+    /// (JSON <c>members</c>) The number of ensemble members that contributed.
     /// </summary>
     [JsonPropertyName("members")]
-    public IReadOnlyList<MemberForecast> Members { get; init; } = [];
+    public IReadOnlyList<MemberForecast> Items { get => field ?? []; init; } = [];
 }

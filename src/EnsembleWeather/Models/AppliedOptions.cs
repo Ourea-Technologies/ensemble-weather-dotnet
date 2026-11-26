@@ -28,5 +28,5 @@ public sealed class AppliedOptions
     /// The requested options the server changed, in this order. Empty when it changed none.
     /// </summary>
     [JsonPropertyName("clamped")]
-    public IReadOnlyList<string> Clamped { get; init; } = [];
+    public IReadOnlyList<string> Clamped { get => field ?? []; init; } = [];
 }

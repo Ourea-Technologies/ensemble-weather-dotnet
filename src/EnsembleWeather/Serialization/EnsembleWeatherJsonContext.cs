@@ -24,6 +24,14 @@ namespace EnsembleWeather.Serialization;
 [JsonSerializable(typeof(CatalogStationDetail))]
 [JsonSerializable(typeof(AvailableRunsResponse))]
 [JsonSerializable(typeof(AttributionRegistry))]
+[JsonSerializable(typeof(ExploreResponse))]
+[JsonSerializable(typeof(CompositionResponse))]
+[JsonSerializable(typeof(SeasonResponse))]
+[JsonSerializable(typeof(SnowTrendResponse))]
+[JsonSerializable(typeof(SnowpackResponse))]
+[JsonSerializable(typeof(SnowpackPlumeResponse))]
+[JsonSerializable(typeof(AlertOutlineCollection))]
+[JsonSerializable(typeof(AvalancheZoneCollection))]
 [JsonSerializable(typeof(ErrorBody))]
 internal sealed partial class EnsembleWeatherJsonContext : JsonSerializerContext
 {

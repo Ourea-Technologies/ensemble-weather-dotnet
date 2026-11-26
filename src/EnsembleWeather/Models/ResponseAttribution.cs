@@ -20,7 +20,7 @@ public sealed class ResponseAttribution
     /// Source ids from <c>GET /api/v1/attribution</c>, in registry order.
     /// </summary>
     [JsonPropertyName("sources")]
-    public IReadOnlyList<string> Sources { get; init; } = [];
+    public IReadOnlyList<string> Sources { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The credit line to carry with any redistributed output.

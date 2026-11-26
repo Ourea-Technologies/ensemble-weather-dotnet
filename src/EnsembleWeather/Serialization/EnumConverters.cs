@@ -121,11 +121,11 @@ internal sealed class UnitSystemConverter : WireStringConverter<UnitSystem>
     protected override string GetValue(UnitSystem value) => value.Value;
 }
 
-internal sealed class WeatherConditionConverter : WireStringConverter<WeatherCondition>
+internal sealed class ConditionConverter : WireStringConverter<Condition>
 {
-    protected override WeatherCondition Create(string value) => new(value);
+    protected override Condition Create(string value) => new(value);
 
-    protected override string GetValue(WeatherCondition value) => value.Value;
+    protected override string GetValue(Condition value) => value.Value;
 }
 
 internal sealed class WindStatusConverter : WireStringConverter<WindStatus>
@@ -147,4 +147,32 @@ internal sealed class WindowTotalAggregationConverter : WireStringConverter<Wind
     protected override WindowTotalAggregation Create(string value) => new(value);
 
     protected override string GetValue(WindowTotalAggregation value) => value.Value;
+}
+
+internal sealed class AlertClassConverter : WireStringConverter<AlertClass>
+{
+    protected override AlertClass Create(string value) => new(value);
+
+    protected override string GetValue(AlertClass value) => value.Value;
+}
+
+internal sealed class ExploreMetricConverter : WireStringConverter<ExploreMetric>
+{
+    protected override ExploreMetric Create(string value) => new(value);
+
+    protected override string GetValue(ExploreMetric value) => value.Value;
+}
+
+internal sealed class PassStatusLevelConverter : WireStringConverter<PassStatusLevel>
+{
+    protected override PassStatusLevel Create(string value) => new(value);
+
+    protected override string GetValue(PassStatusLevel value) => value.Value;
+}
+
+internal sealed class SnowCharacterConverter : WireStringConverter<SnowCharacter>
+{
+    protected override SnowCharacter Create(string value) => new(value);
+
+    protected override string GetValue(SnowCharacter value) => value.Value;
 }

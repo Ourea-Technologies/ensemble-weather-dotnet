@@ -50,4 +50,11 @@ public sealed class SnowOutlook
     /// </summary>
     [JsonPropertyName("quantiles")]
     public SnowOutlookQuantiles? Quantiles { get; init; }
+
+    /// <summary>
+    /// Sum of the hourly snowfall means over the first 72 h (the favorites' "next 3 days"); <c>null</c> when not
+    /// covered.
+    /// </summary>
+    [JsonPropertyName("next_72h")]
+    public double? Next72Hours { get; init; }
 }

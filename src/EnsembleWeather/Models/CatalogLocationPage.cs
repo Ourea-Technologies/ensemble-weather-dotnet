@@ -14,7 +14,7 @@ public sealed class CatalogLocationPage : ApiResult
     /// The items on this page.
     /// </summary>
     [JsonPropertyName("items")]
-    public IReadOnlyList<CatalogLocation> Items { get; init; } = [];
+    public IReadOnlyList<CatalogLocation> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Pass as <c>?cursor=</c> for the next page; null at the end.

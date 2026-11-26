@@ -24,16 +24,16 @@ public sealed class WindowTotal
     public ForecastVariable Variable { get; init; }
 
     /// <summary>
-    /// The window start, in hours from the first served hour.
+    /// (JSON <c>window_start_hours</c>) The window start, in hours from the first served hour.
     /// </summary>
     [JsonPropertyName("window_start_hours")]
-    public int WindowStartHours { get; init; }
+    public int StartHours { get; init; }
 
     /// <summary>
-    /// The window end, in hours from the first served hour.
+    /// (JSON <c>window_end_hours</c>) The window end, in hours from the first served hour.
     /// </summary>
     [JsonPropertyName("window_end_hours")]
-    public int WindowEndHours { get; init; }
+    public int EndHours { get; init; }
 
     /// <summary>
     /// The window's first instant.
@@ -72,4 +72,20 @@ public sealed class WindowTotal
     /// </summary>
     [JsonPropertyName("null_reason")]
     public NullReason? NullReason { get; init; }
+
+    /// <summary>
+    /// -- how <c>quantiles</c> was computed; <c>null</c> exactly when <c>quantiles</c> is. <c>members</c>: each
+    /// member's own aggregate over the window, then quantiles across the members. <c>ensemble_moments</c>: a
+    /// <c>wind_speed</c> <c>max</c> that fewer than two hourly members cover (today every window), ESTIMATED from
+    /// NOAA REFS's hourly 10 m wind mean and spread (it ships no members), assuming each member keeps its rank
+    /// through the window: each hour's mean and spread are first calibrated against station winds (a shift, and a
+    /// scale from a floor, REFS's spread and the speed itself, per lead range 1-24 h / 25-60 h), then each quantile
+    /// is the largest <c>location + z * scale</c> over the window's hours, the mean that rule integrated. A
+    /// statistical estimate from ensemble summaries, not a maximum over member traces. Held-out METAR verification
+    /// (24 h windows, leads 1-48): p10-p90 coverage 0.81 against the observed hourly sustained wind's maximum
+    /// (0.75-0.77 raw), median p50 within 0.02 m/s. REFS reaches 60 h from its cycle: a window past it is
+    /// <c>null</c> with <c>too_few_members</c>.
+    /// </summary>
+    [JsonPropertyName("method")]
+    public string? Method { get; init; }
 }

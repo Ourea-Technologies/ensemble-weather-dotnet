@@ -11,7 +11,7 @@ namespace EnsembleWeather;
 /// <c>name</c> = slug / <c>display_name</c>, search's <c>types[]</c>, and the <c>elevation</c>/<c>elevation_m</c>
 /// spellings.
 /// </summary>
-public sealed class LocationReference
+public class LocationReference
 {
     /// <summary>
     /// The location's key: its catalog slug. With <c>state</c>, the URL <c>/api/v1/locations/{state}/{slug}</c>; what

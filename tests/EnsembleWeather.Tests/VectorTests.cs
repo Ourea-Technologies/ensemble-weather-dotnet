@@ -24,7 +24,7 @@ namespace EnsembleWeather.Tests;
 public sealed class VectorTests
 {
     /// <summary>The number of vectors in the pinned spec; a change is deliberate and reviewed.</summary>
-    private const int ExpectedVectorCount = 43;
+    private const int ExpectedVectorCount = 58;
 
     public static TheoryData<string> Vectors()
     {
@@ -56,7 +56,7 @@ public sealed class VectorTests
         bool sharesCache = Calls(vector).Any(call => call.TryGetProperty("with_api_key", out _));
         IResponseCache? sharedCache = sharesCache ? new MemoryResponseCache() : null;
 
-        EnsembleWeatherOptions Options(string? apiKey)
+        OureaClientOptions Options(string? apiKey)
         {
             var env = new Dictionary<string, string>();
             if (client.ValueKind == JsonValueKind.Object && client.TryGetProperty("env", out JsonElement e))
@@ -67,7 +67,7 @@ public sealed class VectorTests
                 }
             }
 
-            var options = new EnsembleWeatherOptions
+            var options = new OureaClientOptions
             {
                 ApiKey = apiKey,
                 TimeProvider = clock,
@@ -107,20 +107,20 @@ public sealed class VectorTests
             ? k.GetString()
             : null;
         using var http = new HttpClient(handler);
-        var sdk = new EnsembleWeatherClient(http, Options(defaultKey));
+        var sdk = new OureaClient(http, Options(defaultKey));
 
         var results = new List<object?>();
         Exception? error = null;
         foreach (JsonElement call in Calls(vector))
         {
-            EnsembleWeatherClient target = call.TryGetProperty("with_api_key", out JsonElement other)
-                ? new EnsembleWeatherClient(http, Options(other.GetString()))
+            OureaClient target = call.TryGetProperty("with_api_key", out JsonElement other)
+                ? new OureaClient(http, Options(other.GetString()))
                 : sdk;
             try
             {
                 results.Add(await Invoke(target, call));
             }
-            catch (Exception ex) when (ex is EnsembleWeatherException or ArgumentException)
+            catch (Exception ex) when (ex is OureaException or ArgumentException)
             {
                 error = ex;
                 results.Add(null);
@@ -205,10 +205,50 @@ public sealed class VectorTests
 
     // ---- The per-language mapping: semantic args -> this SDK's API ------------------------------------------------
 
-    private static async Task<object?> Invoke(EnsembleWeatherClient client, JsonElement call)
+    /// <summary>The semantic args each operation's mapping reads; any other arg fails the vector (nothing is skipped).</summary>
+    private static readonly Dictionary<string, string[]> KnownArgs = new()
+    {
+        ["getLocationForecast"] = ["location", "state", "slug", "units", "max_hours", "include_past", "models", "members", "daily", "max_days", "hourly", "nowcast", "prob", "totals", "elevations", "sources", "exclude_sources", "include", "diagnostics", "feels_like"],
+        ["getPointForecast"] = ["lat", "lon", "elevation_m", "units", "max_hours", "include_past", "models", "members", "daily", "max_days", "hourly", "nowcast", "prob", "totals", "sources", "exclude_sources", "include", "diagnostics", "feels_like"],
+        ["getCurrentConditions"] = ["location", "state", "slug"],
+        ["getCurrentByCoordinates"] = ["lat", "lon", "elevation_m"],
+        ["getLocationAlerts"] = ["location", "state", "slug"],
+        ["getAlertsByCoordinates"] = ["lat", "lon"],
+        ["getNearbyLocations"] = ["location", "state", "slug", "limit", "radius_km"],
+        ["getNearbyByCoordinates"] = ["lat", "lon", "limit", "radius_km"],
+        ["searchLocations"] = ["q", "state", "county", "limit", "sort", "order", "near", "radius_km", "units"],
+        ["getAllLocations"] = ["limit", "cursor", "iterate"],
+        ["getLocations"] = ["state", "limit", "cursor", "iterate"],
+        ["listCatalogLocations"] = ["cursor", "limit", "admin1", "iterate"],
+        ["getCatalogLocation"] = ["slug", "include"],
+        ["listCatalogStations"] = ["cursor", "limit", "iterate"],
+        ["getCatalogStation"] = ["slug", "include"],
+        ["getAvailableRuns"] = ["limit", "cursor"],
+        ["getAttribution"] = [],
+        ["explore"] = ["metric", "order", "type", "state", "near", "radius_km", "elevation_min", "elevation_max", "points", "limit", "cursor", "units", "iterate"],
+        ["getComposition"] = [],
+        ["getLocationSeason"] = ["location", "state", "slug", "water_year", "include", "units"],
+        ["getLocationSnowTrend"] = ["location", "state", "slug", "elevation", "units"],
+        ["getLocationSnowpack"] = ["location", "state", "slug", "units"],
+        ["getLocationSnowpackPlume"] = ["location", "state", "slug", "units"],
+        ["getAlertOutlines"] = ["classes", "bbox"],
+        ["getAvalancheZones"] = [],
+    };
+
+    private static async Task<object?> Invoke(OureaClient client, JsonElement call)
     {
         string operation = call.GetProperty("operation").GetString()!;
         JsonElement a = call.GetProperty("args");
+        if (!KnownArgs.TryGetValue(operation, out string[]? known))
+        {
+            throw new InvalidOperationException($"The vectors runner has no mapping for '{operation}'.");
+        }
+
+        foreach (JsonProperty arg in a.EnumerateObject())
+        {
+            Assert.True(Array.IndexOf(known, arg.Name) >= 0, $"The vectors runner does not map arg '{arg.Name}' of {operation}.");
+        }
+
         bool iterate = Bool(a, "iterate") == true;
         switch (operation)
         {
@@ -229,7 +269,17 @@ public sealed class VectorTests
             case "getNearbyByCoordinates":
                 return await client.GetPointNearbyAsync(Num(a, "lat")!.Value, Num(a, "lon")!.Value, Nearby(a));
             case "searchLocations":
-                return await client.SearchLocationsAsync(Str(a, "q")!, new SearchOptions { State = Str(a, "state"), County = Str(a, "county"), Limit = Int(a, "limit") });
+                return await client.SearchLocationsAsync(Str(a, "q")!, new SearchOptions
+                {
+                    State = Str(a, "state"),
+                    County = Str(a, "county"),
+                    Limit = Int(a, "limit"),
+                    Sort = Str(a, "sort") is string sort ? new ExploreMetric(sort) : null,
+                    Order = Order(a),
+                    Near = Near(a),
+                    RadiusKm = Num(a, "radius_km"),
+                    Units = Units(a),
+                });
             case "getAllLocations":
                 return iterate ? await Collect(client.GetAllLocationsAsync(LocationList(a))) : await client.GetAllLocationsPageAsync(LocationList(a));
             case "getLocations":
@@ -238,16 +288,67 @@ public sealed class VectorTests
                 var catalog = new CatalogLocationListOptions { Cursor = Str(a, "cursor"), Limit = Int(a, "limit"), Admin1 = Str(a, "admin1") };
                 return iterate ? await Collect(client.GetCatalogLocationsAsync(catalog)) : await client.GetCatalogLocationsPageAsync(catalog);
             case "getCatalogLocation":
-                return await client.GetCatalogLocationAsync(Str(a, "slug")!);
+                return await client.GetCatalogLocationAsync(Str(a, "slug")!, CatalogDetail(a));
             case "listCatalogStations":
                 var stations = new CatalogStationListOptions { Cursor = Str(a, "cursor"), Limit = Int(a, "limit") };
                 return iterate ? await Collect(client.GetCatalogStationsAsync(stations)) : await client.GetCatalogStationsPageAsync(stations);
             case "getCatalogStation":
-                return await client.GetCatalogStationAsync(Str(a, "slug")!);
+                return await client.GetCatalogStationAsync(Str(a, "slug")!, CatalogDetail(a));
             case "getAvailableRuns":
                 return await client.GetAvailableRunsAsync(Int(a, "limit"), Str(a, "cursor"));
             case "getAttribution":
                 return await client.GetAttributionAsync();
+            case "explore":
+                var explore = new ExploreOptions
+                {
+                    Order = Order(a),
+                    Type = Str(a, "type") is string type ? new LocationType(type) : null,
+                    State = Str(a, "state"),
+                    Near = Near(a),
+                    RadiusKm = Num(a, "radius_km"),
+                    ElevationMin = Num(a, "elevation_min"),
+                    ElevationMax = Num(a, "elevation_max"),
+                    Points = Str(a, "points") switch
+                    {
+                        null => null,
+                        "primary" => ExplorePoints.Primary,
+                        "all" => ExplorePoints.All,
+                        string other => throw new InvalidOperationException($"Unknown points '{other}'."),
+                    },
+                    Limit = Int(a, "limit"),
+                    Cursor = Str(a, "cursor"),
+                    Units = Units(a),
+                };
+                var metric = new ExploreMetric(Str(a, "metric")!);
+                return iterate ? await Collect(client.ExploreAsync(metric, explore)) : await client.ExplorePageAsync(metric, explore);
+            case "getComposition":
+                return await client.GetCompositionAsync();
+            case "getLocationSeason":
+                var include = Strings(a, "include");
+                Assert.All(include, i => Assert.Equal("daily", i));
+                return await client.GetSeasonAsync(Location(a), new SeasonOptions { WaterYear = Int(a, "water_year"), IncludeDaily = include.Count > 0, Units = Units(a) });
+            case "getLocationSnowTrend":
+                return await client.GetSnowTrendAsync(Location(a), new SnowTrendOptions { Elevation = Str(a, "elevation"), Units = Units(a) });
+            case "getLocationSnowpack":
+                return await client.GetSnowpackAsync(Location(a), Units(a));
+            case "getLocationSnowpackPlume":
+                return await client.GetSnowpackPlumeAsync(Location(a), Units(a));
+            case "getAlertOutlines":
+                var outlines = new AlertOutlineOptions();
+                foreach (string c in Strings(a, "classes"))
+                {
+                    outlines.Classes.Add(new AlertClass(c));
+                }
+
+                if (a.TryGetProperty("bbox", out JsonElement box))
+                {
+                    outlines.BoundingBox = new BoundingBox(
+                        box.GetProperty("west").GetDouble(), box.GetProperty("south").GetDouble(), box.GetProperty("east").GetDouble(), box.GetProperty("north").GetDouble());
+                }
+
+                return await client.GetAlertOutlinesAsync(outlines);
+            case "getAvalancheZones":
+                return await client.GetAvalancheZonesAsync();
             default:
                 throw new InvalidOperationException($"The vectors runner has no mapping for '{operation}'.");
         }
@@ -271,16 +372,22 @@ public sealed class VectorTests
     {
         var o = new ForecastOptions
         {
-            Units = Str(a, "units") is string u ? new UnitSystem(u) : null,
+            Units = Units(a),
             MaxHours = Int(a, "max_hours"),
             IncludePast = Bool(a, "include_past"),
             Models = Bool(a, "models"),
-            Members = Bool(a, "members"),
+            Members = a.TryGetProperty("members", out JsonElement m) ? (m.ValueKind == JsonValueKind.String ? ForecastMembers.Parse(m.GetString()!) : m.GetBoolean()) : null,
             Daily = Bool(a, "daily"),
             MaxDays = Int(a, "max_days"),
             Hourly = Bool(a, "hourly"),
             Nowcast = Bool(a, "nowcast"),
         };
+        AddAll(o.Elevations, Strings(a, "elevations"));
+        AddAll(o.Sources, Strings(a, "sources"));
+        AddAll(o.ExcludeSources, Strings(a, "exclude_sources"));
+        AddAll(o.Include, Strings(a, "include"));
+        AddAll(o.Diagnostics, Strings(a, "diagnostics"));
+        AddAll(o.FeelsLike, Strings(a, "feels_like"));
         if (a.TryGetProperty("prob", out JsonElement prob))
         {
             foreach (JsonElement t in prob.EnumerateArray())
@@ -303,6 +410,45 @@ public sealed class VectorTests
         }
 
         return o;
+    }
+
+    private static void AddAll(IList<string> target, IEnumerable<string> values)
+    {
+        foreach (string v in values)
+        {
+            target.Add(v);
+        }
+    }
+
+    /// <summary>A list arg, or one string (<c>"elevations": "all"</c>), as strings.</summary>
+    private static List<string> Strings(JsonElement a, string name)
+    {
+        if (!a.TryGetProperty(name, out JsonElement v))
+        {
+            return [];
+        }
+
+        return v.ValueKind == JsonValueKind.Array ? [.. v.EnumerateArray().Select(i => i.GetString()!)] : [v.GetString()!];
+    }
+
+    private static UnitSystem? Units(JsonElement a) => Str(a, "units") is string u ? new UnitSystem(u) : null;
+
+    private static SortOrder? Order(JsonElement a) => Str(a, "order") switch
+    {
+        null => null,
+        "desc" => SortOrder.Descending,
+        "asc" => SortOrder.Ascending,
+        string other => throw new InvalidOperationException($"Unknown order '{other}'."),
+    };
+
+    private static GeoPoint? Near(JsonElement a)
+        => a.TryGetProperty("near", out JsonElement n) ? new GeoPoint(n.GetProperty("lat").GetDouble(), n.GetProperty("lon").GetDouble()) : null;
+
+    private static CatalogDetailOptions CatalogDetail(JsonElement a)
+    {
+        var options = new CatalogDetailOptions();
+        AddAll(options.Include, Strings(a, "include"));
+        return options;
     }
 
     private static NearbyOptions Nearby(JsonElement a) => new() { Limit = Int(a, "limit"), RadiusKm = Num(a, "radius_km") };
@@ -435,7 +581,7 @@ public sealed class VectorTests
     {
         Assert.NotNull(actual);
         Assert.Equal(expected.GetProperty("category").GetString(), Category(actual));
-        var api = actual as EnsembleWeatherException;
+        var api = actual as OureaException;
         if (expected.TryGetProperty("code", out JsonElement code))
         {
             Assert.Equal(code.ValueKind == JsonValueKind.Null ? null : code.GetString(), api?.ErrorCode);
@@ -519,15 +665,31 @@ public sealed class VectorTests
         return current;
     }
 
-    /// <summary>Reads a property by its JSON name, the one per-language mapping of the result paths.</summary>
-    internal static object? Get(object target, string jsonName)
+    /// <summary>
+    /// Reads a property by its SDK name (BEHAVIOR.md 3.0: the wire name, or the rename table's SDK name), the one
+    /// per-language mapping of the result paths: <c>start_hours</c> is <c>StartHours</c>, <c>height_m</c> is
+    /// <c>HeightMeters</c> (.NET spells units out). A field whose .NET name spells out more than its wire name
+    /// (<c>lat</c> is <c>Latitude</c>) and which the table does not rename is found by its JSON name.
+    /// </summary>
+    internal static object? Get(object target, string sdkName)
     {
-        PropertyInfo? property = target.GetType().GetProperties()
-            .FirstOrDefault(p => p.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name == jsonName);
+        PropertyInfo[] properties = target.GetType().GetProperties();
+        string pascal = string.Concat(sdkName.Split('_').Select(w => w.Length == 0 ? w : char.ToUpperInvariant(w[0]) + w[1..]));
+        string[] spellings = pascal.EndsWith('M') ? [pascal, pascal[..^1] + "Meters"] : [pascal];
+        PropertyInfo? property = properties.FirstOrDefault(p => spellings.Any(n => string.Equals(p.Name, n, StringComparison.OrdinalIgnoreCase)))
+            ?? properties.FirstOrDefault(p => p.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name == sdkName
+                && !RenamedWireNames.Contains(p.Name + ":" + sdkName));
         return property is null
-            ? throw new InvalidOperationException($"{target.GetType().Name} has no property for '{jsonName}'.")
+            ? throw new InvalidOperationException($"{target.GetType().Name} has no property for '{sdkName}'.")
             : property.GetValue(target);
     }
+
+    /// <summary>
+    /// "Property:wire" for every renamed field, so a result path that names the wire name of a renamed field fails.
+    /// </summary>
+    private static readonly HashSet<string> RenamedWireNames = SpecDriftTests.RenameTable()
+        .Select(r => SpecDriftTests.DotNetName(r.SdkName) + ":" + r.Wire)
+        .ToHashSet(StringComparer.Ordinal);
 
     private static void AssertValue(JsonElement expected, object? actual, string path)
     {
@@ -542,6 +704,12 @@ public sealed class VectorTests
                 break;
             case JsonValueKind.True or JsonValueKind.False:
                 Assert.Equal(expected.GetBoolean(), actual);
+                break;
+            case JsonValueKind.String when actual is DateTimeOffset instant:
+                Assert.Equal(DateTimeOffset.Parse(expected.GetString()!, CultureInfo.InvariantCulture), instant);
+                break;
+            case JsonValueKind.String when actual is DateTime date:
+                Assert.Equal(expected.GetString(), date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
                 break;
             case JsonValueKind.String:
                 Assert.Equal(expected.GetString(), actual?.ToString());

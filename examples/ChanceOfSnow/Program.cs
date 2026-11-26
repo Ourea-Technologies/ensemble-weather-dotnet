@@ -3,7 +3,7 @@
 // The server computes every probability from the full ensemble; the SDK never derives one.
 using EnsembleWeather;
 
-using var client = new EnsembleWeatherClient();
+using var client = new OureaClient();
 
 var options = new ForecastOptions { Units = UnitSystem.Imperial };
 options.Probabilities.Add(ProbabilityTerm.AtLeast(ForecastVariable.Snowfall, Threshold.Inches(6), ForecastWindow.Hours(24)));
@@ -15,7 +15,7 @@ ForecastResponse forecast = await client.GetLocationForecastAsync("or/mt-hood-me
 
 foreach (ProbabilityResult p in forecast.Probabilities)
 {
-    string chance = p.Probability is double value ? $"{value:P0}" : $"unanswered ({p.NullReason})";
+    string chance = p.Value is double value ? $"{value:P0}" : $"unanswered ({p.NullReason})";
     Console.WriteLine($"P({p.Variable} {p.Operator} {p.Threshold}) over hours {p.WindowStartHours}-{p.WindowEndHours} " +
         $"({p.From:MMM d HH:mm}Z to {p.To:MMM d HH:mm}Z, {p.Aggregation}): {chance} of {p.Members} members");
 }

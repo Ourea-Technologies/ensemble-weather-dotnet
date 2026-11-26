@@ -23,7 +23,7 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// lane deliberately — the cacheable forecast body never carries alerts.
     /// </summary>
     [JsonPropertyName("alerts")]
-    public IReadOnlyList<ActiveAlert> Alerts { get; init; } = [];
+    public IReadOnlyList<ActiveAlert> Alerts { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Timestamp of the alerts snapshot backing this response (refreshed ~60s; staleness beyond a few minutes means
@@ -47,14 +47,14 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// <c>sensor_count</c> nor credited in <c>attribution</c>.
     /// </summary>
     [JsonPropertyName("sensors")]
-    public IReadOnlyList<SensorObservation> Sensors { get; init; } = [];
+    public IReadOnlyList<SensorObservation> Sensors { get => field ?? []; init; } = [];
 
     /// <summary>
-    /// "Right now" flattened: the <c>nowcast_hours</c> hour nearest the request time, read field by field (see the
+    /// (JSON <c>current</c>) "Right now" flattened: the <c>nowcast_hours</c> hour nearest the request time, read field by field (see the
     /// schema). Null when no cycle is servable or no band hour lies within an hour of now.
     /// </summary>
     [JsonPropertyName("current")]
-    public CurrentConditions? Current { get; init; }
+    public CurrentConditions? Now { get; init; }
 
     /// <summary>
     /// When this overlay was assembled (the request time); the <c>nowcast_hours</c> window is relative to it.
@@ -95,5 +95,21 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// without that source and names it here. Omitted when every source was read.
     /// </summary>
     [JsonPropertyName("nowcast_unavailable")]
-    public IReadOnlyList<NowcastSource> NowcastUnavailable { get; init; } = [];
+    public IReadOnlyList<NowcastSource> NowcastUnavailable { get => field ?? []; init; } = [];
+
+    /// <summary>
+    /// The place summary, written by the server from served values only, so every client shows the same words. On
+    /// this fresh overlay (not the cached forecast body) because it reads the active alerts and the wall clock
+    /// ("around 4 PM"). Omitted when no cycle is servable. Additive.
+    /// </summary>
+    [JsonPropertyName("summary")]
+    public PlaceSummary? Summary { get; init; }
+
+    /// <summary>
+    /// The mountain pass forecast at the pass's own point and elevation. Present only for a <c>mountain_pass</c>
+    /// location, and omitted when no cycle is servable. On this overlay, beside <c>summary</c>, because its windows
+    /// and sentences are read against the wall clock. Additive.
+    /// </summary>
+    [JsonPropertyName("pass")]
+    public PassForecast? Pass { get; init; }
 }
