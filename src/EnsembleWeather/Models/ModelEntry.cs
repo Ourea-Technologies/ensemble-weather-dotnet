@@ -39,7 +39,7 @@ public sealed class ModelEntry
     /// fewer than five.
     /// </summary>
     [JsonPropertyName("display_members")]
-    public IReadOnlyList<int> DisplayMembers { get; init; } = [];
+    public IReadOnlyList<int> DisplayMembers { get => field ?? []; init; } = [];
 
     /// <summary>
     /// How the <c>display_members</c>' <c>snowfall</c> and <c>cumulative_snowfall</c> are made, present exactly

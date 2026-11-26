@@ -48,7 +48,7 @@ public sealed class MemberPlume
     /// for Free and anonymous callers (<c>members_view: pool</c>), who are served <c>members</c> instead.
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<ModelColumns> Models { get; init; } = [];
+    public IReadOnlyList<ModelColumns> Models { get => field ?? []; init; } = [];
 
     /// <summary>
     /// (JSON <c>members</c>) The members as ONE unlabelled pool, for a caller without the plume's paid detail (Free and anonymous;

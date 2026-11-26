@@ -31,5 +31,5 @@ public sealed class ForecastLocation : LocationReference
     /// (Cap'n Proto: <c>LocationInfo.elevations</c>, empty there.)
     /// </summary>
     [JsonPropertyName("elevations")]
-    public IReadOnlyList<ElevationSummary> Elevations { get; init; } = [];
+    public IReadOnlyList<ElevationSummary> Elevations { get => field ?? []; init; } = [];
 }

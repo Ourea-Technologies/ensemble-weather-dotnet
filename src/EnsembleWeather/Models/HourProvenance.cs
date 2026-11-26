@@ -23,14 +23,14 @@ public sealed class HourProvenance
     /// lead-time bin.
     /// </summary>
     [JsonPropertyName("ngr")]
-    public IReadOnlyList<string> Ngr { get; init; } = [];
+    public IReadOnlyList<string> Ngr { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables served through the <c>inflate_around_mean</c> fallback because no fitted model was available for
     /// that lead-time bin. The widening is a configured constant, not a calibration.
     /// </summary>
     [JsonPropertyName("fallback")]
-    public IReadOnlyList<string> Fallback { get; init; } = [];
+    public IReadOnlyList<string> Fallback { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables at a point no fitted station reaches (none within 75 km), served from the fits of climatologically
@@ -39,7 +39,7 @@ public sealed class HourProvenance
     /// this point. Added 2026-10-09; only variables whose borrowed fit beat the fallback on held-out stations borrow.
     /// </summary>
     [JsonPropertyName("borrowed")]
-    public IReadOnlyList<string> Borrowed { get; init; } = [];
+    public IReadOnlyList<string> Borrowed { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose percentile ladder was rebuilt as <c>N(mean, min_serve_sigma)</c> by the serve-time spread
@@ -47,14 +47,14 @@ public sealed class HourProvenance
     /// width. Treat the mean as usable and the uncertainty around it as not.
     /// </summary>
     [JsonPropertyName("spread_floored")]
-    public IReadOnlyList<string> SpreadFloored { get; init; } = [];
+    public IReadOnlyList<string> SpreadFloored { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose low tail was truncated by the zero floor. The truncation biases the conditional mean upward;
     /// it is a backstop, not a neutral operation.
     /// </summary>
     [JsonPropertyName("floor_clamped")]
-    public IReadOnlyList<string> FloorClamped { get; init; } = [];
+    public IReadOnlyList<string> FloorClamped { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Accumulation variables whose value at this hour is an even share of a wider accumulation, not an independently
@@ -65,7 +65,7 @@ public sealed class HourProvenance
     /// <c>accumulation_interval_hours</c>, which tagged the widened total instead of splitting it.)
     /// </summary>
     [JsonPropertyName("bucket_split")]
-    public IReadOnlyList<string> BucketSplit { get; init; } = [];
+    public IReadOnlyList<string> BucketSplit { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose blend included a contributor that supplied a two-parameter predictive distribution (a location
@@ -73,7 +73,7 @@ public sealed class HourProvenance
     /// member files at all, so RRFS contributes a measured Gaussian rather than a draw of members.
     /// </summary>
     [JsonPropertyName("distribution_parameters")]
-    public IReadOnlyList<string> DistributionParameters { get; init; } = [];
+    public IReadOnlyList<string> DistributionParameters { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose spread was not measured by ANY contributor at this hour and was interpolated from the
@@ -83,7 +83,7 @@ public sealed class HourProvenance
     /// own mean.
     /// </summary>
     [JsonPropertyName("spread_interpolated")]
-    public IReadOnlyList<string> SpreadInterpolated { get; init; } = [];
+    public IReadOnlyList<string> SpreadInterpolated { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose pool at this hour contains at least one contributor that did NOT publish at this lead. Its
@@ -92,21 +92,21 @@ public sealed class HourProvenance
     /// therefore its spread — is the same set of contributors at every lead.
     /// </summary>
     [JsonPropertyName("interpolated_contributor")]
-    public IReadOnlyList<string> InterpolatedContributor { get; init; } = [];
+    public IReadOnlyList<string> InterpolatedContributor { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose served <c>probability</c> was computed from a distribution recovered by METHOD OF MOMENTS from
     /// the hour's mean and standard deviation, rather than from the exact parameters the calibration fit produced.
     /// </summary>
     [JsonPropertyName("moment_matched_family")]
-    public IReadOnlyList<string> MomentMatchedFamily { get; init; } = [];
+    public IReadOnlyList<string> MomentMatchedFamily { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables carried from the location's primary elevation to this point's elevation by the hour's OWN upper-air
     /// lapse rate (the profile bracketed the layer). Only an <c>elevation_forecasts[].hourly</c> hour can carry it.
     /// </summary>
     [JsonPropertyName("lapse_profile")]
-    public IReadOnlyList<string> LapseProfile { get; init; } = [];
+    public IReadOnlyList<string> LapseProfile { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables carried from the location's primary elevation to this point's elevation by a CLIMATOLOGICAL lapse
@@ -115,7 +115,7 @@ public sealed class HourProvenance
     /// upper-air humidity is ingested). Only an <c>elevation_forecasts[].hourly</c> hour can carry it.
     /// </summary>
     [JsonPropertyName("lapse_climatology")]
-    public IReadOnlyList<string> LapseClimatology { get; init; } = [];
+    public IReadOnlyList<string> LapseClimatology { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables carried from the location's primary elevation to this point's elevation by the local PRISM
@@ -128,7 +128,7 @@ public sealed class HourProvenance
     /// primary's. Only an <c>elevation_forecasts[].hourly</c> hour can carry it.
     /// </summary>
     [JsonPropertyName("lapse_prism")]
-    public IReadOnlyList<string> LapsePrism { get; init; } = [];
+    public IReadOnlyList<string> LapsePrism { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose calibration fit was accepted and served, but whose fitted spread fell BELOW the serve-time
@@ -136,7 +136,7 @@ public sealed class HourProvenance
     /// the band's, not the fit's. A coverage or PIT statistic computed over such hours describes the band.
     /// </summary>
     [JsonPropertyName("spread_clamped_low")]
-    public IReadOnlyList<string> SpreadClampedLow { get; init; } = [];
+    public IReadOnlyList<string> SpreadClampedLow { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose calibration fit was accepted and served, but whose fitted spread rose ABOVE the serve-time
@@ -144,7 +144,7 @@ public sealed class HourProvenance
     /// band's, not the fit's. A coverage or PIT statistic computed over such hours describes the band.
     /// </summary>
     [JsonPropertyName("spread_clamped_high")]
-    public IReadOnlyList<string> SpreadClampedHigh { get; init; } = [];
+    public IReadOnlyList<string> SpreadClampedHigh { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Variables whose pool at this hour included a contributor that publishes a 10 m wind but no gust (the AI
@@ -154,5 +154,5 @@ public sealed class HourProvenance
     /// carries the wind's provenance and this list is empty on every hour that serves a wind.
     /// </summary>
     [JsonPropertyName("gust_dressed")]
-    public IReadOnlyList<string> GustDressed { get; init; } = [];
+    public IReadOnlyList<string> GustDressed { get => field ?? []; init; } = [];
 }

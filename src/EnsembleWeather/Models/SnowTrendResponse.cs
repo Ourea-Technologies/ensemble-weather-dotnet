@@ -41,12 +41,12 @@ public sealed class SnowTrendResponse : ApiResult
     /// </summary>
     [JsonPropertyName("dates")]
     [JsonConverter(typeof(Serialization.CalendarDateListConverter))]
-    public IReadOnlyList<DateTime> Dates { get; init; } = [];
+    public IReadOnlyList<DateTime> Dates { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>ourea</c> first; with the <c>model_data</c> entitlement then <c>aifs</c>, <c>aigefs</c>, <c>gefs</c>,
     /// <c>ifs_ens</c> and <c>rrfs</c>. A client must tolerate a source it does not know.
     /// </summary>
     [JsonPropertyName("grids")]
-    public IReadOnlyList<SnowTrendGrid> Grids { get; init; } = [];
+    public IReadOnlyList<SnowTrendGrid> Grids { get => field ?? []; init; } = [];
 }

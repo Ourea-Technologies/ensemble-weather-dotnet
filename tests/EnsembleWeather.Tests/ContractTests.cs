@@ -232,6 +232,47 @@ public sealed class ContractTests
         }
     }
 
+    /// <summary>
+    /// A list the server omits (the snowpack plume's <c>models</c> for an anonymous caller, <c>timeseries</c> with
+    /// <c>members=plume</c>) reads as empty, never <see langword="null"/>, on every model; only a list the spec makes
+    /// nullable is declared nullable.
+    /// </summary>
+    [Fact]
+    public void AnOmittedListReadsAsEmptyOnEveryModel()
+    {
+        var checkedTypes = 0;
+        foreach (Type type in typeof(OureaClient).Assembly.GetExportedTypes().Where(t => t.IsClass && !t.IsAbstract && t.GetConstructor(Type.EmptyTypes) is not null))
+        {
+            System.Text.Json.Serialization.Metadata.JsonTypeInfo? info;
+            try
+            {
+                info = EnsembleWeatherJsonContext.Default.GetTypeInfo(type);
+            }
+            catch (InvalidOperationException)
+            {
+                continue;
+            }
+
+            if (info is null || info.Kind != System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object)
+            {
+                continue;
+            }
+
+            object model = JsonSerializer.Deserialize("{}", info)!;
+            var nullability = new System.Reflection.NullabilityInfoContext();
+            foreach (var property in type.GetProperties().Where(p => p.PropertyType.IsGenericType
+                && p.PropertyType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>)
+                && nullability.Create(p).ReadState != System.Reflection.NullabilityState.Nullable))
+            {
+                Assert.True(property.GetValue(model) is not null, $"{type.Name}.{property.Name} is null when omitted");
+            }
+
+            checkedTypes++;
+        }
+
+        Assert.True(checkedTypes > 100, $"only {checkedTypes} model types were checked");
+    }
+
     [Fact]
     public async Task CompositionIsSentWithoutTheKey()
     {

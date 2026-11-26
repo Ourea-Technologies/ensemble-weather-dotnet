@@ -33,5 +33,5 @@ public sealed class CatalogTemplateSummary
     /// The template sections.
     /// </summary>
     [JsonPropertyName("spec")]
-    public IReadOnlyList<CatalogTemplateSection> Sections { get; init; } = [];
+    public IReadOnlyList<CatalogTemplateSection> Sections { get => field ?? []; init; } = [];
 }

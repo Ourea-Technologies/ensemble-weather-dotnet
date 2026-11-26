@@ -17,47 +17,47 @@ public sealed class BandColumns
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("mean")]
-    public IReadOnlyList<double?> Mean { get; init; } = [];
+    public IReadOnlyList<double?> Mean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("min")]
-    public IReadOnlyList<double?> Min { get; init; } = [];
+    public IReadOnlyList<double?> Min { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("p10")]
-    public IReadOnlyList<double?> P10 { get; init; } = [];
+    public IReadOnlyList<double?> P10 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("p25")]
-    public IReadOnlyList<double?> P25 { get; init; } = [];
+    public IReadOnlyList<double?> P25 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("p50")]
-    public IReadOnlyList<double?> P50 { get; init; } = [];
+    public IReadOnlyList<double?> P50 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("p75")]
-    public IReadOnlyList<double?> P75 { get; init; } = [];
+    public IReadOnlyList<double?> P75 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("p90")]
-    public IReadOnlyList<double?> P90 { get; init; } = [];
+    public IReadOnlyList<double?> P90 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("max")]
-    public IReadOnlyList<double?> Max { get; init; } = [];
+    public IReadOnlyList<double?> Max { get => field ?? []; init; } = [];
 }

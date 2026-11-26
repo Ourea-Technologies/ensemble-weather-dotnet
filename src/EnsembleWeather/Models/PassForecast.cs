@@ -59,13 +59,13 @@ public sealed class PassForecast
     /// ruling, is open).
     /// </summary>
     [JsonPropertyName("snow_windows")]
-    public IReadOnlyList<PassSnowWindow> SnowWindows { get; init; } = [];
+    public IReadOnlyList<PassSnowWindow> SnowWindows { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The next 48 hours at the pass, from <c>from</c>, one per hour.
     /// </summary>
     [JsonPropertyName("hours")]
-    public IReadOnlyList<PassHour> Hours { get; init; } = [];
+    public IReadOnlyList<PassHour> Hours { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The quietest and the busiest stretch of weather at the pass in the next <c>horizon_hours</c>, by one fixed
@@ -96,7 +96,7 @@ public sealed class PassForecast
     /// status. A reading the observation QC flagged is omitted. Omitted when no road station qualifies.
     /// </summary>
     [JsonPropertyName("road_sensors")]
-    public IReadOnlyList<PassRoadSensor> RoadSensors { get; init; } = [];
+    public IReadOnlyList<PassRoadSensor> RoadSensors { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The DOT's own cameras at the pass, in the order the pass's curation lists them. The client loads
@@ -104,5 +104,5 @@ public sealed class PassForecast
     /// <c>attribution</c>. Omitted where the pass maps to no camera.
     /// </summary>
     [JsonPropertyName("cameras")]
-    public IReadOnlyList<PassCamera> Cameras { get; init; } = [];
+    public IReadOnlyList<PassCamera> Cameras { get => field ?? []; init; } = [];
 }

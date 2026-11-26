@@ -72,7 +72,7 @@ public sealed class SeasonResponse : ApiResult
     /// Only with <c>include=daily</c>. One row per observed local day, oldest first.
     /// </summary>
     [JsonPropertyName("daily")]
-    public IReadOnlyList<SeasonDay> Daily { get; init; } = [];
+    public IReadOnlyList<SeasonDay> Daily { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The data sources THIS response drew on, and what their licences ask us to say. <c>sources</c> names exactly

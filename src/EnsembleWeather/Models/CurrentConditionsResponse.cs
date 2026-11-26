@@ -23,7 +23,7 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// lane deliberately — the cacheable forecast body never carries alerts.
     /// </summary>
     [JsonPropertyName("alerts")]
-    public IReadOnlyList<ActiveAlert> Alerts { get; init; } = [];
+    public IReadOnlyList<ActiveAlert> Alerts { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Timestamp of the alerts snapshot backing this response (refreshed ~60s; staleness beyond a few minutes means
@@ -47,7 +47,7 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// <c>sensor_count</c> nor credited in <c>attribution</c>.
     /// </summary>
     [JsonPropertyName("sensors")]
-    public IReadOnlyList<SensorObservation> Sensors { get; init; } = [];
+    public IReadOnlyList<SensorObservation> Sensors { get => field ?? []; init; } = [];
 
     /// <summary>
     /// (JSON <c>current</c>) "Right now" flattened: the <c>nowcast_hours</c> hour nearest the request time, read field by field (see the
@@ -95,7 +95,7 @@ public sealed class CurrentConditionsResponse : ApiResult
     /// without that source and names it here. Omitted when every source was read.
     /// </summary>
     [JsonPropertyName("nowcast_unavailable")]
-    public IReadOnlyList<NowcastSource> NowcastUnavailable { get; init; } = [];
+    public IReadOnlyList<NowcastSource> NowcastUnavailable { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The place summary, written by the server from served values only, so every client shows the same words. On

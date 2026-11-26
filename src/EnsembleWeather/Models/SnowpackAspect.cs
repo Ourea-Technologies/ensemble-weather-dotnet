@@ -44,11 +44,11 @@ public sealed class SnowpackAspect
     /// One entry every six hours, at the spot's own <c>steps[].valid_time</c>.
     /// </summary>
     [JsonPropertyName("steps")]
-    public IReadOnlyList<SnowpackStep> Steps { get; init; } = [];
+    public IReadOnlyList<SnowpackStep> Steps { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Buried layers on the slope at <c>depth.start_time</c>, at most three. Descriptive only.
     /// </summary>
     [JsonPropertyName("layers")]
-    public IReadOnlyList<SnowpackLayer> Layers { get; init; } = [];
+    public IReadOnlyList<SnowpackLayer> Layers { get => field ?? []; init; } = [];
 }

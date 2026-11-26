@@ -20,13 +20,13 @@ public sealed class SnowpackPlumeModel
     /// The model's own member numbers, in the order of <c>depth</c>.
     /// </summary>
     [JsonPropertyName("member_ids")]
-    public IReadOnlyList<int> MemberIds { get; init; } = [];
+    public IReadOnlyList<int> MemberIds { get => field ?? []; init; } = [];
 
     /// <summary>
     /// One series per member, from <c>depth.start_time</c> every <c>depth.interval_hours</c>.
     /// </summary>
     [JsonPropertyName("depth")]
-    public IReadOnlyList<IReadOnlyList<double>> Depth { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double>> Depth { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The equal-weight mean of this model's members' <c>depth</c> at each of the model's own steps (from
@@ -34,7 +34,7 @@ public sealed class SnowpackPlumeModel
     /// members' series), in the response's units. Never null.
     /// </summary>
     [JsonPropertyName("depth_mean")]
-    public IReadOnlyList<double> DepthMean { get; init; } = [];
+    public IReadOnlyList<double> DepthMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Members not run because the ground starts bare and they bring no snow; their series is 0 throughout.

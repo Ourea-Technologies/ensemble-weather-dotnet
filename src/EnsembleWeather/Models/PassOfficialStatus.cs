@@ -70,5 +70,5 @@ public sealed class PassOfficialStatus
     /// order. <c>level</c> is the most restrictive of theirs.
     /// </summary>
     [JsonPropertyName("segments")]
-    public IReadOnlyList<PassStatusSegment> Segments { get; init; } = [];
+    public IReadOnlyList<PassStatusSegment> Segments { get => field ?? []; init; } = [];
 }

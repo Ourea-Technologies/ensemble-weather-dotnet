@@ -34,17 +34,17 @@ public sealed class SnowpackDepth
     /// The 10th percentile.
     /// </summary>
     [JsonPropertyName("p10")]
-    public IReadOnlyList<double> P10 { get; init; } = [];
+    public IReadOnlyList<double> P10 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The 50th percentile (the median).
     /// </summary>
     [JsonPropertyName("p50")]
-    public IReadOnlyList<double> P50 { get; init; } = [];
+    public IReadOnlyList<double> P50 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The 90th percentile.
     /// </summary>
     [JsonPropertyName("p90")]
-    public IReadOnlyList<double> P90 { get; init; } = [];
+    public IReadOnlyList<double> P90 { get => field ?? []; init; } = [];
 }

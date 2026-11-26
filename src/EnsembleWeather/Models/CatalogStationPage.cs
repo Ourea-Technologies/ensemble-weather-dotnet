@@ -14,7 +14,7 @@ public sealed class CatalogStationPage : ApiResult
     /// The items on this page.
     /// </summary>
     [JsonPropertyName("items")]
-    public IReadOnlyList<CatalogStation> Items { get; init; } = [];
+    public IReadOnlyList<CatalogStation> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The cursor for the next page, or <see langword="null"/> on the last page.

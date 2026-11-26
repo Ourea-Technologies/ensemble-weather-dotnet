@@ -20,5 +20,5 @@ public sealed class ModelMembers
     /// (JSON <c>members</c>) The number of ensemble members that contributed.
     /// </summary>
     [JsonPropertyName("members")]
-    public IReadOnlyList<MemberForecast> Items { get; init; } = [];
+    public IReadOnlyList<MemberForecast> Items { get => field ?? []; init; } = [];
 }

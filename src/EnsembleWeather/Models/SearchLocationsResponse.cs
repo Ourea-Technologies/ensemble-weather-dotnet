@@ -14,7 +14,7 @@ public sealed class SearchLocationsResponse : ApiResult
     /// The items on this page.
     /// </summary>
     [JsonPropertyName("items")]
-    public IReadOnlyList<SearchHit> Items { get; init; } = [];
+    public IReadOnlyList<SearchHit> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The number of items in this response.

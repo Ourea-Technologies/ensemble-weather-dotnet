@@ -83,7 +83,7 @@ public sealed class ForecastResponse : ApiResult
     /// (JSON <c>elevation_forecasts</c>) Forecasts at the location's other named elevations (ski areas), when requested.
     /// </summary>
     [JsonPropertyName("elevation_forecasts")]
-    public IReadOnlyList<ElevationForecast> Elevations { get; init; } = [];
+    public IReadOnlyList<ElevationForecast> Elevations { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Whether the live nowcast layer is baked in. <c>true</c> = merged legacy shape (uncacheable). <c>false</c> =
@@ -100,7 +100,7 @@ public sealed class ForecastResponse : ApiResult
     /// without that source and names it here. Omitted when every source was read, and on <c>nowcast=false</c>.
     /// </summary>
     [JsonPropertyName("nowcast_unavailable")]
-    public IReadOnlyList<NowcastSource> NowcastUnavailable { get; init; } = [];
+    public IReadOnlyList<NowcastSource> NowcastUnavailable { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Which member view <c>forecast.timeseries[*].members</c> (and <c>elevation_forecasts[*].hourly[*].members</c>)
@@ -127,7 +127,7 @@ public sealed class ForecastResponse : ApiResult
     /// within 50 km / 3 hours.
     /// </summary>
     [JsonPropertyName("nearest_sensors")]
-    public IReadOnlyList<NearestSensor> NearestSensors { get; init; } = [];
+    public IReadOnlyList<NearestSensor> NearestSensors { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Where a coordinate forecast was computed (coordinate forecasts only).

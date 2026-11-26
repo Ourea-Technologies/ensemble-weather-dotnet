@@ -27,7 +27,7 @@ public sealed class LocationsResponse : ApiResult
     /// (JSON <c>locations</c>) The locations, nearest first where a distance applies.
     /// </summary>
     [JsonPropertyName("locations")]
-    public IReadOnlyList<LocationSummary> Items { get; init; } = [];
+    public IReadOnlyList<LocationSummary> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Present only on a paged response (<c>limit</c> given) that has more rows after it. Pass it back as

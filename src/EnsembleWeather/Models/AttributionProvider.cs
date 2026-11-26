@@ -57,11 +57,11 @@ public sealed class AttributionProvider
     /// Statements the terms require shown in full, beyond <c>credit</c>.
     /// </summary>
     [JsonPropertyName("notices")]
-    public IReadOnlyList<string> Notices { get; init; } = [];
+    public IReadOnlyList<string> Notices { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The data sources.
     /// </summary>
     [JsonPropertyName("sources")]
-    public IReadOnlyList<AttributionSource> Sources { get; init; } = [];
+    public IReadOnlyList<AttributionSource> Sources { get => field ?? []; init; } = [];
 }

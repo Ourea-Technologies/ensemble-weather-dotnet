@@ -22,7 +22,7 @@ public sealed class CompositionResponse : ApiResult
     /// count is not known).
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<ModelEntry> Models { get; init; } = [];
+    public IReadOnlyList<ModelEntry> Models { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Entries in <c>models</c>.

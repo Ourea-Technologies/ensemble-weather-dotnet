@@ -21,7 +21,7 @@ public sealed class PlumeBands
     /// The valid times, one per column.
     /// </summary>
     [JsonPropertyName("valid_time")]
-    public IReadOnlyList<DateTimeOffset> ValidTime { get; init; } = [];
+    public IReadOnlyList<DateTimeOffset> ValidTime { get => field ?? []; init; } = [];
 
     /// <summary>
     /// One band's statistics (Hyndman-Fan type 7 over the served member values), each an array aligned to

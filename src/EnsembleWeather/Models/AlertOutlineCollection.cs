@@ -24,7 +24,7 @@ public sealed class AlertOutlineCollection : ApiResult
     /// One Feature per alert, ordered by <c>properties.id</c>.
     /// </summary>
     [JsonPropertyName("features")]
-    public IReadOnlyList<AlertOutlineFeature> Features { get; init; } = [];
+    public IReadOnlyList<AlertOutlineFeature> Features { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The data sources THIS response drew on, and what their licences ask us to say. <c>sources</c> names exactly

@@ -70,19 +70,19 @@ public sealed class SnowpackSpot
     /// Hourly snow water equivalent (mm or in), parallel to <c>depth.p50</c>.
     /// </summary>
     [JsonPropertyName("swe")]
-    public IReadOnlyList<double> SnowWaterEquivalent { get; init; } = [];
+    public IReadOnlyList<double> SnowWaterEquivalent { get => field ?? []; init; } = [];
 
     /// <summary>
     /// One entry every six hours.
     /// </summary>
     [JsonPropertyName("steps")]
-    public IReadOnlyList<SnowpackStep> Steps { get; init; } = [];
+    public IReadOnlyList<SnowpackStep> Steps { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Buried layers at <c>depth.start_time</c>, at most three. Descriptive only.
     /// </summary>
     [JsonPropertyName("layers")]
-    public IReadOnlyList<SnowpackLayer> Layers { get; init; } = [];
+    public IReadOnlyList<SnowpackLayer> Layers { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The snow on a 38° slope at the spot facing each way, in the order north, east, south, west. Present only
@@ -90,5 +90,5 @@ public sealed class SnowpackSpot
     /// the 150 beta resorts. The fields above are always flat ground. Descriptive only.
     /// </summary>
     [JsonPropertyName("aspects")]
-    public IReadOnlyList<SnowpackAspect> Aspects { get; init; } = [];
+    public IReadOnlyList<SnowpackAspect> Aspects { get => field ?? []; init; } = [];
 }

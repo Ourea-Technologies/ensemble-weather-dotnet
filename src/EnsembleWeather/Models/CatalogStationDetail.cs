@@ -202,13 +202,13 @@ public sealed class CatalogStationDetail : ApiResult
     /// Photos.
     /// </summary>
     [JsonPropertyName("photos")]
-    public IReadOnlyList<CatalogPhoto> Photos { get; init; } = [];
+    public IReadOnlyList<CatalogPhoto> Photos { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Webcams.
     /// </summary>
     [JsonPropertyName("webcams")]
-    public IReadOnlyList<CatalogWebcam> Webcams { get; init; } = [];
+    public IReadOnlyList<CatalogWebcam> Webcams { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The linked primary location, when any.
@@ -226,7 +226,7 @@ public sealed class CatalogStationDetail : ApiResult
     /// Published content entries (<c>include=content</c>).
     /// </summary>
     [JsonPropertyName("content")]
-    public IReadOnlyList<CatalogResolvedEntry> Content { get; init; } = [];
+    public IReadOnlyList<CatalogResolvedEntry> Content { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Whether search engines should index this station's page. True for a published station or one the CMS has

@@ -84,7 +84,7 @@ public sealed class ActiveAlert
     /// The ids of the messages this one replaces. Omitted when there are none.
     /// </summary>
     [JsonPropertyName("references")]
-    public IReadOnlyList<string> References { get; init; } = [];
+    public IReadOnlyList<string> References { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The issuing office, as NWS names it.

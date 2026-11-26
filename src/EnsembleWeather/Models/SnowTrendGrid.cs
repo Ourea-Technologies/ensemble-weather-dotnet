@@ -20,5 +20,5 @@ public sealed class SnowTrendGrid
     /// Oldest first; the last is the newest. Empty when none is recorded yet.
     /// </summary>
     [JsonPropertyName("runs")]
-    public IReadOnlyList<SnowTrendRun> Runs { get; init; } = [];
+    public IReadOnlyList<SnowTrendRun> Runs { get => field ?? []; init; } = [];
 }

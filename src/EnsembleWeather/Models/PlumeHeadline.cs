@@ -19,32 +19,32 @@ public sealed class PlumeHeadline
     /// The valid times, one per column.
     /// </summary>
     [JsonPropertyName("valid_time")]
-    public IReadOnlyList<DateTimeOffset> ValidTime { get; init; } = [];
+    public IReadOnlyList<DateTimeOffset> ValidTime { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("temperature")]
-    public IReadOnlyList<double?> Temperature { get; init; } = [];
+    public IReadOnlyList<double?> Temperature { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("snow_level")]
-    public IReadOnlyList<double?> SnowLevel { get; init; } = [];
+    public IReadOnlyList<double?> SnowLevel { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The blend's snow level on the NWS scale (<c>ensemble.snow_level_wet_bulb.mean</c>, the height of the 0.5 C
     /// wet-bulb); <c>snow_level</c> is the rain line. <c>null</c> exactly where <c>snow_level</c> is.
     /// </summary>
     [JsonPropertyName("snow_level_wet_bulb")]
-    public IReadOnlyList<double?> SnowLevelWetBulb { get; init; } = [];
+    public IReadOnlyList<double?> SnowLevelWetBulb { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Numbers aligned to the enclosing block's <c>valid_time</c>; <c>null</c> = no value there.
     /// </summary>
     [JsonPropertyName("cumulative_precipitation")]
-    public IReadOnlyList<double?> CumulativePrecipitation { get; init; } = [];
+    public IReadOnlyList<double?> CumulativePrecipitation { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The hourly series' <c>cumulative_snowfall</c>: the running sum of the day cards' snowfall
@@ -53,7 +53,7 @@ public sealed class PlumeHeadline
     /// the day's mean, so this is the running mean total. The "Ourea forecast" line and its "Total by" readout.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall")]
-    public IReadOnlyList<double?> CumulativeSnowfall { get; init; } = [];
+    public IReadOnlyList<double?> CumulativeSnowfall { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The headline's running snowfall at a fixed 10:1 snow-to-liquid ratio, in the snowfall units (in / mm), at
@@ -65,7 +65,7 @@ public sealed class PlumeHeadline
     /// comparison. <c>null</c> where the hour serves no snowfall.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_10to1")]
-    public IReadOnlyList<double?> CumulativeSnowfall10To1 { get; init; } = [];
+    public IReadOnlyList<double?> CumulativeSnowfall10To1 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The forecast's hourly wind speed, the hourly series' <c>ensemble.wind_speed.mean</c>, in the wind unit (mph
@@ -74,7 +74,7 @@ public sealed class PlumeHeadline
     /// and <c>bands.wind_speed</c> are withheld).
     /// </summary>
     [JsonPropertyName("wind_speed")]
-    public IReadOnlyList<double?> WindSpeed { get; init; } = [];
+    public IReadOnlyList<double?> WindSpeed { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The forecast's snowfall in the 6 hours ending at each 00/06/12/18Z hour, in the snowfall units (in / mm) at
@@ -89,5 +89,5 @@ public sealed class PlumeHeadline
     /// it). The same 00/06/12/18Z steps <c>bands.snowfall_6h</c> is served on.
     /// </summary>
     [JsonPropertyName("snowfall_6h")]
-    public IReadOnlyList<double?> Snowfall6Hours { get; init; } = [];
+    public IReadOnlyList<double?> Snowfall6Hours { get => field ?? []; init; } = [];
 }

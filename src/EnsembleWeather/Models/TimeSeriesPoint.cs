@@ -101,7 +101,7 @@ public sealed class TimeSeriesPoint
     /// Per-model statistics at this hour (Pro, <c>models=true</c>).
     /// </summary>
     [JsonPropertyName("model_means")]
-    public IReadOnlyList<ModelStatistics> ModelMeans { get; init; } = [];
+    public IReadOnlyList<ModelStatistics> ModelMeans { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Per-member ensemble values, one <c>{id, members}</c> per model with members at this hour, in
@@ -110,7 +110,7 @@ public sealed class TimeSeriesPoint
     /// members at every 6th hour, rrfs at every hour to 84 h.
     /// </summary>
     [JsonPropertyName("members")]
-    public IReadOnlyList<ModelMembers> Members { get; init; } = [];
+    public IReadOnlyList<ModelMembers> Members { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The distribution of the members' running totals at this synoptic hour.

@@ -54,13 +54,13 @@ public sealed class ElevationForecast
     /// <c>full</c>). Same gap rule: key on <c>valid_time</c>. Omitted with <c>hourly=false</c>.
     /// </summary>
     [JsonPropertyName("hourly")]
-    public IReadOnlyList<TimeSeriesPoint> Hourly { get; init; } = [];
+    public IReadOnlyList<TimeSeriesPoint> Hourly { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Daily summaries at this elevation — the same daily build as <c>forecast.daily</c> (omitted when empty)
     /// </summary>
     [JsonPropertyName("daily")]
-    public IReadOnlyList<DailyForecast> Daily { get; init; } = [];
+    public IReadOnlyList<DailyForecast> Daily { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Rolling snow totals at this elevation, as <c>forecast.snow_outlook</c> (omitted when there are no dailies)
@@ -81,7 +81,7 @@ public sealed class ElevationForecast
     /// and wherever the location's own list is omitted (<c>nowcast=false</c>, <c>members=plume</c>).
     /// </summary>
     [JsonPropertyName("nearest_sensors")]
-    public IReadOnlyList<NearestSensor> NearestSensors { get; init; } = [];
+    public IReadOnlyList<NearestSensor> NearestSensors { get => field ?? []; init; } = [];
 
     /// <summary>
     /// -- rolling liquid totals at this elevation, as <c>forecast.precipitation_outlook</c>.

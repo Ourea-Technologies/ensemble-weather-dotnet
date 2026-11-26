@@ -53,7 +53,7 @@ public sealed class SnowpackPlumeResponse : ApiResult
     /// absent for Free and anonymous callers, who are served <c>member_depths</c>.
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<SnowpackPlumeModel> Models { get; init; } = [];
+    public IReadOnlyList<SnowpackPlumeModel> Models { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Every member's depth as ONE unlabelled pool, for Free and anonymous callers (absent for Plus and Pro, who
@@ -64,7 +64,7 @@ public sealed class SnowpackPlumeResponse : ApiResult
     /// <c>depth.members</c> is the number of series.
     /// </summary>
     [JsonPropertyName("member_depths")]
-    public IReadOnlyList<IReadOnlyList<double>> MemberDepths { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double>> MemberDepths { get => field ?? []; init; } = [];
 
     /// <summary>
     /// What the bands are, in a sentence a client may show beside them.

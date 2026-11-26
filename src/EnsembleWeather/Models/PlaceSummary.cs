@@ -35,14 +35,14 @@ public sealed class PlaceSummary
     /// </summary>
     [JsonPropertyName("long")]
     [SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "The wire name (long, as opposed to short); renamed only to avoid a stutter.")]
-    public IReadOnlyList<string> Long { get; init; } = [];
+    public IReadOnlyList<string> Long { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The event behind each sentence of <c>long</c>, in the same order (<c>events[i]</c> wrote <c>long[i]</c>), so
     /// a client can style a sentence (an alert chip, a snow icon) without parsing text.
     /// </summary>
     [JsonPropertyName("events")]
-    public IReadOnlyList<SummaryEvent> Events { get; init; } = [];
+    public IReadOnlyList<SummaryEvent> Events { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The served elevation the sentences describe: its display name where the catalog has one, else its name.

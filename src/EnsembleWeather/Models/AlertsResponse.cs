@@ -33,7 +33,7 @@ public sealed class AlertsResponse : ApiResult
     /// (JSON <c>alerts</c>) The active alerts.
     /// </summary>
     [JsonPropertyName("alerts")]
-    public IReadOnlyList<ActiveAlert> Items { get; init; } = [];
+    public IReadOnlyList<ActiveAlert> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The data sources this response drew on and the credit they require.

@@ -10,9 +10,6 @@ namespace EnsembleWeather;
 /// </summary>
 public sealed class ForecastData
 {
-    // Absent with members=plume, hourly=false or daily=false: read as empty, never null.
-    private readonly IReadOnlyList<TimeSeriesPoint>? _timeseries;
-    private readonly IReadOnlyList<DailyForecast>? _daily;
 
     /// <summary>
     /// The last served hour, in hours from the FIRST served one (the current hour by default, the run's init with
@@ -42,13 +39,13 @@ public sealed class ForecastData
     /// and from <c>elevation_forecasts[].hourly</c>.
     /// </summary>
     [JsonPropertyName("timeseries")]
-    public IReadOnlyList<TimeSeriesPoint> Timeseries { get => _timeseries ?? []; init => _timeseries = value; }
+    public IReadOnlyList<TimeSeriesPoint> Timeseries { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The daily summaries.
     /// </summary>
     [JsonPropertyName("daily")]
-    public IReadOnlyList<DailyForecast> Daily { get => _daily ?? []; init => _daily = value; }
+    public IReadOnlyList<DailyForecast> Daily { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Rolling snow-accumulation summary for common UI windows. Always forward-looking (next N hours / days), summed

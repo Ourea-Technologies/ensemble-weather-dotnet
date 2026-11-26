@@ -20,7 +20,7 @@ public sealed class AvailableRunsResponse : ApiResult
     /// (JSON <c>runs</c>) Init times at least two models completed, newest first.
     /// </summary>
     [JsonPropertyName("runs")]
-    public IReadOnlyList<AvailableRun> Items { get; init; } = [];
+    public IReadOnlyList<AvailableRun> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The number of items in this response.

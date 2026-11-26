@@ -30,5 +30,5 @@ public sealed class SnowTrendRun
     /// One entry per <c>dates</c> entry, in order; <c>null</c> where the run has no value.
     /// </summary>
     [JsonPropertyName("days")]
-    public IReadOnlyList<SnowTrendDay?> Days { get; init; } = [];
+    public IReadOnlyList<SnowTrendDay?> Days { get => field ?? []; init; } = [];
 }

@@ -25,7 +25,7 @@ public sealed class AvalancheZoneCollection : ApiResult
     /// there is served.
     /// </summary>
     [JsonPropertyName("features")]
-    public IReadOnlyList<AvalancheZoneFeature> Features { get; init; } = [];
+    public IReadOnlyList<AvalancheZoneFeature> Features { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The data sources THIS response drew on, and what their licences ask us to say. <c>sources</c> names exactly

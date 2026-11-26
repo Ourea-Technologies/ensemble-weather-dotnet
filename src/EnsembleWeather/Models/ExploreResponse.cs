@@ -41,7 +41,7 @@ public sealed class ExploreResponse : ApiResult
     /// The rows.
     /// </summary>
     [JsonPropertyName("items")]
-    public IReadOnlyList<ExploreItem> Items { get; init; } = [];
+    public IReadOnlyList<ExploreItem> Items { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Items on this page.

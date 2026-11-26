@@ -45,7 +45,7 @@ public sealed class SnowpackResponse : ApiResult
     /// The location's own point first, then its named elevations in their display order.
     /// </summary>
     [JsonPropertyName("spots")]
-    public IReadOnlyList<SnowpackSpot> Spots { get; init; } = [];
+    public IReadOnlyList<SnowpackSpot> Spots { get => field ?? []; init; } = [];
 
     /// <summary>
     /// What the snowpack codes mean: code -> text.

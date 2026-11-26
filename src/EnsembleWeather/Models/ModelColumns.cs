@@ -27,7 +27,7 @@ public sealed class ModelColumns
     /// The valid times, one per column.
     /// </summary>
     [JsonPropertyName("valid_time")]
-    public IReadOnlyList<DateTimeOffset> ValidTime { get; init; } = [];
+    public IReadOnlyList<DateTimeOffset> ValidTime { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The members, ascending (<c>MemberForecast.member_id</c>). Rrfs includes its display-only members
@@ -36,63 +36,63 @@ public sealed class ModelColumns
     /// <c>headline</c> do not include them.
     /// </summary>
     [JsonPropertyName("member_ids")]
-    public IReadOnlyList<int> MemberIds { get; init; } = [];
+    public IReadOnlyList<int> MemberIds { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: one array per member (<c>member_ids</c> order) over the model's <c>valid_time</c>;
     /// <c>null</c> = no value at that step.
     /// </summary>
     [JsonPropertyName("temperature")]
-    public IReadOnlyList<IReadOnlyList<double?>> Temperature { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> Temperature { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: one array per member (<c>member_ids</c> order) over the model's <c>valid_time</c>;
     /// <c>null</c> = no value at that step.
     /// </summary>
     [JsonPropertyName("precipitation")]
-    public IReadOnlyList<IReadOnlyList<double?>> Precipitation { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> Precipitation { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: the hours each <c>precipitation</c> value covers; <c>null</c> where it is absent or
     /// its span unknown.
     /// </summary>
     [JsonPropertyName("precipitation_hours")]
-    public IReadOnlyList<IReadOnlyList<int?>> PrecipitationHours { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<int?>> PrecipitationHours { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: one array per member (<c>member_ids</c> order) over the model's <c>valid_time</c>;
     /// <c>null</c> = no value at that step.
     /// </summary>
     [JsonPropertyName("cumulative_precipitation")]
-    public IReadOnlyList<IReadOnlyList<double?>> CumulativePrecipitation { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> CumulativePrecipitation { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: one array per member (<c>member_ids</c> order) over the model's <c>valid_time</c>;
     /// <c>null</c> = no value at that step.
     /// </summary>
     [JsonPropertyName("snow_level")]
-    public IReadOnlyList<IReadOnlyList<double?>> SnowLevel { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> SnowLevel { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[Member][step]</c>, each member's <c>MemberForecast.snow_level_wet_bulb</c> (the snow level on the NWS
     /// scale); <c>null</c> exactly where its <c>snow_level</c> is.
     /// </summary>
     [JsonPropertyName("snow_level_wet_bulb")]
-    public IReadOnlyList<IReadOnlyList<double?>> SnowLevelWetBulb { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> SnowLevelWetBulb { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: one array per member (<c>member_ids</c> order) over the model's <c>valid_time</c>;
     /// <c>null</c> = no value at that step.
     /// </summary>
     [JsonPropertyName("snowfall")]
-    public IReadOnlyList<IReadOnlyList<double?>> Snowfall { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> Snowfall { get => field ?? []; init; } = [];
 
     /// <summary>
     /// <c>[member][step]</c>: one array per member (<c>member_ids</c> order) over the model's <c>valid_time</c>;
     /// <c>null</c> = no value at that step.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall")]
-    public IReadOnlyList<IReadOnlyList<double?>> CumulativeSnowfall { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> CumulativeSnowfall { get => field ?? []; init; } = [];
 
     /// <summary>
     /// One value per <c>valid_time</c> step (not per member): the median of the model's members'
@@ -102,14 +102,14 @@ public sealed class ModelColumns
     /// member carries one.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_p50")]
-    public IReadOnlyList<double?> CumulativeSnowfallP50 { get; init; } = [];
+    public IReadOnlyList<double?> CumulativeSnowfallP50 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// As <c>cumulative_snowfall_p50</c>, over the members' running snowfall at 10:1 (see
     /// <c>PlumeBands.cumulative_snowfall_10to1</c>).
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_10to1_p50")]
-    public IReadOnlyList<double?> CumulativeSnowfall10To1P50 { get; init; } = [];
+    public IReadOnlyList<double?> CumulativeSnowfall10To1P50 { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The model's mean lines. Each <c>&lt;column&gt;_mean</c> is one value per <c>valid_time</c> step (not per
@@ -120,32 +120,32 @@ public sealed class ModelColumns
     /// <c>temperature</c>.
     /// </summary>
     [JsonPropertyName("temperature_mean")]
-    public IReadOnlyList<double?> TemperatureMean { get; init; } = [];
+    public IReadOnlyList<double?> TemperatureMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>precipitation</c> (see <c>temperature_mean</c>). Like the column, a total over the
     /// <c>precipitation_hours</c> ending at the step: six hours for the global ensembles, one for RRFS.
     /// </summary>
     [JsonPropertyName("precipitation_mean")]
-    public IReadOnlyList<double?> PrecipitationMean { get; init; } = [];
+    public IReadOnlyList<double?> PrecipitationMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>cumulative_precipitation</c> (see <c>temperature_mean</c>).
     /// </summary>
     [JsonPropertyName("cumulative_precipitation_mean")]
-    public IReadOnlyList<double?> CumulativePrecipitationMean { get; init; } = [];
+    public IReadOnlyList<double?> CumulativePrecipitationMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>snow_level</c> (see <c>temperature_mean</c>).
     /// </summary>
     [JsonPropertyName("snow_level_mean")]
-    public IReadOnlyList<double?> SnowLevelMean { get; init; } = [];
+    public IReadOnlyList<double?> SnowLevelMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>snow_level_wet_bulb</c> (see <c>temperature_mean</c>).
     /// </summary>
     [JsonPropertyName("snow_level_wet_bulb_mean")]
-    public IReadOnlyList<double?> SnowLevelWetBulbMean { get; init; } = [];
+    public IReadOnlyList<double?> SnowLevelWetBulbMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>snowfall</c> (see <c>temperature_mean</c>). Like the column, a total over the
@@ -153,21 +153,21 @@ public sealed class ModelColumns
     /// for RRFS.
     /// </summary>
     [JsonPropertyName("snowfall_mean")]
-    public IReadOnlyList<double?> SnowfallMean { get; init; } = [];
+    public IReadOnlyList<double?> SnowfallMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>cumulative_snowfall</c> (see <c>temperature_mean</c>), beside its median
     /// <c>cumulative_snowfall_p50</c>.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_mean")]
-    public IReadOnlyList<double?> CumulativeSnowfallMean { get; init; } = [];
+    public IReadOnlyList<double?> CumulativeSnowfallMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of the members' running snowfall at 10:1, beside <c>cumulative_snowfall_10to1_p50</c> (the members'
     /// 10:1 column itself is not served).
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_10to1_mean")]
-    public IReadOnlyList<double?> CumulativeSnowfall10To1Mean { get; init; } = [];
+    public IReadOnlyList<double?> CumulativeSnowfall10To1Mean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// The mean of <c>wind_speed</c> (see <c>temperature_mean</c>). Pro (<c>members_view: full</c>) only, as
@@ -176,7 +176,7 @@ public sealed class ModelColumns
     /// <c>bands.slr</c>).
     /// </summary>
     [JsonPropertyName("wind_speed_mean")]
-    public IReadOnlyList<double?> WindSpeedMean { get; init; } = [];
+    public IReadOnlyList<double?> WindSpeedMean { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Which of this model's <c>member_ids</c> are in <c>bands.cumulative_precipitation</c>, ascending. The
@@ -191,36 +191,36 @@ public sealed class ModelColumns
     /// whatever their model.
     /// </summary>
     [JsonPropertyName("cumulative_precipitation_band_member_ids")]
-    public IReadOnlyList<int> CumulativePrecipitationBandMemberIds { get; init; } = [];
+    public IReadOnlyList<int> CumulativePrecipitationBandMemberIds { get => field ?? []; init; } = [];
 
     /// <summary>
     /// As <c>cumulative_precipitation_band_member_ids</c>, for <c>bands.cumulative_snowfall</c>.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_band_member_ids")]
-    public IReadOnlyList<int> CumulativeSnowfallBandMemberIds { get; init; } = [];
+    public IReadOnlyList<int> CumulativeSnowfallBandMemberIds { get => field ?? []; init; } = [];
 
     /// <summary>
     /// As <c>cumulative_precipitation_band_member_ids</c>, for <c>bands.cumulative_snowfall_10to1</c>.
     /// </summary>
     [JsonPropertyName("cumulative_snowfall_10to1_band_member_ids")]
-    public IReadOnlyList<int> CumulativeSnowfall10To1BandMemberIds { get; init; } = [];
+    public IReadOnlyList<int> CumulativeSnowfall10To1BandMemberIds { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Pro (<c>members_view: full</c>) only; absent in the plume view.
     /// </summary>
     [JsonPropertyName("wind_speed")]
-    public IReadOnlyList<IReadOnlyList<double?>> WindSpeed { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> WindSpeed { get => field ?? []; init; } = [];
 
     /// <summary>
     /// Pro only; absent in the plume view.
     /// </summary>
     [JsonPropertyName("wind_direction")]
-    public IReadOnlyList<IReadOnlyList<double?>> WindDirection { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> WindDirection { get => field ?? []; init; } = [];
 
     /// <summary>
     /// In both views. As <c>MemberForecast.slr</c>: the ratio from the member's column at every step, whether or
     /// not it snows there.
     /// </summary>
     [JsonPropertyName("slr")]
-    public IReadOnlyList<IReadOnlyList<double?>> SnowToLiquidRatio { get; init; } = [];
+    public IReadOnlyList<IReadOnlyList<double?>> SnowToLiquidRatio { get => field ?? []; init; } = [];
 }
