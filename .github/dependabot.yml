@@ -11,3 +11,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+  # The SDK is pinned exactly (global.json and every setup-dotnet step), because the SDK decides the implicit
+  # Microsoft.NET.ILLink.Tasks version in the lock files. A bump here also needs `dotnet restore --force-evaluate`.
+  - package-ecosystem: dotnet-sdk
+    directory: /
+    schedule:
+      interval: weekly

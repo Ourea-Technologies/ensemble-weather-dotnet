@@ -8,7 +8,7 @@ spec disagree, the spec wins; a change to behaviour starts as a change to the sp
 
 ## Setup
 
-- .NET SDK 10 (see `global.json`) plus the .NET 8 runtime (the tests run on both).
+- .NET SDK 10.0.404 exactly (`global.json`, `rollForward: disable`; CI pins the same: the SDK decides the implicit `Microsoft.NET.ILLink.Tasks` version in the lock files) plus the .NET 8 runtime (the tests run on both).
 - Python 3 for the small repository scripts.
 
 ```sh
@@ -23,7 +23,7 @@ Everything CI runs, in order; each must pass before a commit:
 ```sh
 dotnet format EnsembleWeather.sln --verify-no-changes   # format + code style
 dotnet build EnsembleWeather.sln -c Release             # analyzers (latest-recommended + all security rules), warnings as errors, nullable
-dotnet test EnsembleWeather.sln -c Release              # unit tests + all 43 shared vectors + spec drift, on net8.0 and net10.0
+dotnet test EnsembleWeather.sln -c Release              # unit tests + all 58 shared vectors + spec drift, on net8.0 and net10.0
 scripts/run-examples                                    # every example, against the local mock API
 scripts/check-dependencies                              # every runtime dependency is justified below
 scripts/audit-dependencies                              # no known-vulnerable package, direct or transitive

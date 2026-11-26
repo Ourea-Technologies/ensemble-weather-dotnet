@@ -29,7 +29,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - name: Quickstart (anonymous, as a new user runs it)
         run: env -u OUREA_API_KEY -u OUREA_BASE_URL dotnet run --project examples/Quickstart -c Release
       - name: Contract run (every example, with the read-only key)

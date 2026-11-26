@@ -28,7 +28,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - name: dotnet list package --vulnerable --include-transitive
         run: scripts/audit-dependencies
 
@@ -43,7 +43,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       # Directory.Build.props already sets AnalysisLevelSecurity=latest-all (every CA2xxx/CA3xxx/CA5xxx rule) with
       # TreatWarningsAsErrors; the properties are passed again so a local change cannot switch them off here.
       - name: Build with every security rule as an error

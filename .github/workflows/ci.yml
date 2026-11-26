@@ -29,7 +29,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - run: dotnet restore EnsembleWeather.sln --locked-mode
       - name: Format check
         run: dotnet format EnsembleWeather.sln --verify-no-changes --no-restore
@@ -55,7 +55,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - run: dotnet restore EnsembleWeather.sln --locked-mode
       - name: Unit tests, all shared vectors, spec drift
         run: >-
@@ -78,7 +78,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - run: dotnet restore EnsembleWeather.sln --locked-mode
       - run: scripts/run-examples
 
@@ -93,7 +93,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            10.0.x
+            10.0.404
       - run: dotnet restore EnsembleWeather.sln --locked-mode
       - run: dotnet tool restore
       - name: API reference (DocFX, warnings as errors)
