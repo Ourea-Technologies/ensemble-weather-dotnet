@@ -12,14 +12,14 @@ namespace EnsembleWeather;
 public sealed class MemberForecast
 {
     /// <summary>
-    /// The member's position on its model's ensemble axis, from 0: stable across the hours of a response and across
+    /// (JSON <c>member_id</c>) The member's position on its model's ensemble axis, from 0: stable across the hours of a response and across
     /// cycles, and numbered per model (a member is <c>(model, member_id)</c>). 0 is the control for <c>aifs</c> (cf),
     /// <c>aigefs</c> (mem000) and <c>gefs</c> (gec00); <c>ifs_ens</c> has no control in ECMWF open data, so its 0..49
     /// are perturbed members 1..50; <c>rrfs</c> is the one deterministic run, 0. Serializes as a JSON number (changed
     /// from string in 0.30.x — ALLOC-5).
     /// </summary>
     [JsonPropertyName("member_id")]
-    public int MemberId { get; init; }
+    public int Id { get; init; }
 
     /// <summary>
     /// <c>null</c> when this member published nothing at this hour. Became nullable in 0.480.0 — previously a
@@ -108,4 +108,13 @@ public sealed class MemberForecast
     /// </summary>
     [JsonPropertyName("cumulative_snowfall")]
     public double? CumulativeSnowfall { get; init; }
+
+    /// <summary>
+    /// This member's snow level on the NWS scale (the height of the 0.5 C wet-bulb; see
+    /// <c>EnsembleStats.snow_level_wet_bulb</c>): its <c>snow_level</c> raised by the same fixed 275 m (901 ft), a
+    /// level at <c>0</c> (snow to sea level) left at <c>0</c>. In both member views. Display only: the member's
+    /// <c>snowfall</c> is placed by <c>snow_level</c>. Omitted when <c>snow_level</c> is <c>null</c>.
+    /// </summary>
+    [JsonPropertyName("snow_level_wet_bulb")]
+    public double? SnowLevelWetBulb { get; init; }
 }

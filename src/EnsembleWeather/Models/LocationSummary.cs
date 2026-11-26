@@ -80,5 +80,5 @@ public class LocationSummary
     /// <c>default</c>. Every other entry omits <c>default</c>. Omitted when empty.
     /// </summary>
     [JsonPropertyName("elevations")]
-    public IReadOnlyList<LocationElevation> Elevations { get; init; } = [];
+    public IReadOnlyList<ElevationSummary> Elevations { get; init; } = [];
 }

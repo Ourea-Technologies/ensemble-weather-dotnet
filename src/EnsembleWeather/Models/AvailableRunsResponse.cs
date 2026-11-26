@@ -17,10 +17,10 @@ public sealed class AvailableRunsResponse : ApiResult
     public ServedRun? Served { get; init; }
 
     /// <summary>
-    /// Init times at least two models completed, newest first.
+    /// (JSON <c>runs</c>) Init times at least two models completed, newest first.
     /// </summary>
     [JsonPropertyName("runs")]
-    public IReadOnlyList<AvailableRun> Runs { get; init; } = [];
+    public IReadOnlyList<AvailableRun> Items { get; init; } = [];
 
     /// <summary>
     /// The number of items in this response.

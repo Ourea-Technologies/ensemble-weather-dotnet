@@ -72,4 +72,11 @@ public sealed class SearchHit
     /// </summary>
     [JsonPropertyName("county")]
     public string County { get; init; } = string.Empty;
+
+    /// <summary>
+    /// With <c>sort=&lt;metric&gt;</c> only, the place's value as <c>GET /api/v1/explore</c> ranks it (its own
+    /// point); <c>null</c> where it has none. Absent otherwise.
+    /// </summary>
+    [JsonPropertyName("explore")]
+    public ExploreValue? Explore { get; init; }
 }

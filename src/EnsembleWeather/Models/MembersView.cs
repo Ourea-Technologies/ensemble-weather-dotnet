@@ -16,7 +16,7 @@ namespace EnsembleWeather;
 [JsonConverter(typeof(Serialization.MembersViewConverter))]
 public readonly struct MembersView : IEquatable<MembersView>
 {
-    private static readonly string[] Known = ["full", "plume"];
+    private static readonly string[] Known = ["full", "plume", "pool"];
     private readonly string? _value;
 
     /// <summary>Initializes a value from its wire string.</summary>
@@ -32,6 +32,9 @@ public readonly struct MembersView : IEquatable<MembersView>
 
     /// <summary><c>plume</c>.</summary>
     public static MembersView Plume { get; } = new("plume");
+
+    /// <summary><c>pool</c>.</summary>
+    public static MembersView Pool { get; } = new("pool");
 
     /// <summary>Gets the wire string, exactly as the API sent it.</summary>
     public string Value => _value ?? string.Empty;

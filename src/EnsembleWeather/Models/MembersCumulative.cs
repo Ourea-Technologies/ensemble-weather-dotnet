@@ -21,11 +21,11 @@ public sealed class MembersCumulative
     /// Precipitation.
     /// </summary>
     [JsonPropertyName("precipitation")]
-    public Quantiles? Precipitation { get; init; }
+    public MemberQuantiles? Precipitation { get; init; }
 
     /// <summary>
     /// Snowfall.
     /// </summary>
     [JsonPropertyName("snowfall")]
-    public Quantiles? Snowfall { get; init; }
+    public MemberQuantiles? Snowfall { get; init; }
 }

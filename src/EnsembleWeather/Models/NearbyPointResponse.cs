@@ -35,8 +35,8 @@ public sealed class NearbyPointResponse : ApiResult
     public int Count { get; init; }
 
     /// <summary>
-    /// The locations, nearest first where a distance applies.
+    /// (JSON <c>locations</c>) The locations, nearest first where a distance applies.
     /// </summary>
     [JsonPropertyName("locations")]
-    public IReadOnlyList<NearbyLocation> Locations { get; init; } = [];
+    public IReadOnlyList<NearbyLocation> Items { get; init; } = [];
 }

@@ -24,10 +24,10 @@ public sealed class CatalogTemplateSummary
     public string? LocationType { get; init; }
 
     /// <summary>
-    /// The page-template variant, snake_case (<c>mountain</c>); <see langword="null"/> = wildcard scope.
+    /// (JSON <c>template_variant</c>) The page-template variant, snake_case (<c>mountain</c>); <see langword="null"/> = wildcard scope.
     /// </summary>
     [JsonPropertyName("template_variant")]
-    public string? TemplateVariant { get; init; }
+    public string? Variant { get; init; }
 
     /// <summary>
     /// The template sections.

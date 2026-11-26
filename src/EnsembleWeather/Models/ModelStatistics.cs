@@ -83,4 +83,12 @@ public sealed class ModelStatistics
     /// </summary>
     [JsonPropertyName("interpolated")]
     public bool? Interpolated { get; init; }
+
+    /// <summary>
+    /// The model's own snow level on the NWS scale (the height of the 0.5 C wet-bulb), as
+    /// <c>EnsembleStats.snow_level_wet_bulb</c> is the blend's: its <c>snow_level</c> with every quantile raised by
+    /// 275 m (901 ft), a quantile at <c>0</c> left at <c>0</c>. Omitted when <c>snow_level</c> is.
+    /// </summary>
+    [JsonPropertyName("snow_level_wet_bulb")]
+    public Quantiles? SnowLevelWetBulb { get; init; }
 }

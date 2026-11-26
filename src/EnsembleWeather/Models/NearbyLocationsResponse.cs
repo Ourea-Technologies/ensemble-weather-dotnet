@@ -11,10 +11,10 @@ namespace EnsembleWeather;
 public sealed class NearbyLocationsResponse : ApiResult
 {
     /// <summary>
-    /// The location.
+    /// (JSON <c>location</c>) The location.
     /// </summary>
     [JsonPropertyName("location")]
-    public LocationSummary Location { get; init; } = null!;
+    public LocationSummary Origin { get; init; } = null!;
 
     /// <summary>
     /// The radius applied, after the cap.
@@ -29,8 +29,8 @@ public sealed class NearbyLocationsResponse : ApiResult
     public int Count { get; init; }
 
     /// <summary>
-    /// Nearest first.
+    /// (JSON <c>locations</c>) Nearest first.
     /// </summary>
     [JsonPropertyName("locations")]
-    public IReadOnlyList<NearbyLocation> Locations { get; init; } = [];
+    public IReadOnlyList<NearbyLocation> Items { get; init; } = [];
 }

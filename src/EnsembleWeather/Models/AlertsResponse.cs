@@ -18,10 +18,10 @@ public sealed class AlertsResponse : ApiResult
     public LocationReference Location { get; init; } = null!;
 
     /// <summary>
-    /// The number of active alerts.
+    /// (JSON <c>alert_count</c>) The number of active alerts.
     /// </summary>
     [JsonPropertyName("alert_count")]
-    public int AlertCount { get; init; }
+    public int Count { get; init; }
 
     /// <summary>
     /// Snapshot timestamp (see /current alerts_as_of).
@@ -30,10 +30,10 @@ public sealed class AlertsResponse : ApiResult
     public DateTimeOffset AsOf { get; init; }
 
     /// <summary>
-    /// The active alerts.
+    /// (JSON <c>alerts</c>) The active alerts.
     /// </summary>
     [JsonPropertyName("alerts")]
-    public IReadOnlyList<ActiveAlert> Alerts { get; init; } = [];
+    public IReadOnlyList<ActiveAlert> Items { get; init; } = [];
 
     /// <summary>
     /// The data sources this response drew on and the credit they require.

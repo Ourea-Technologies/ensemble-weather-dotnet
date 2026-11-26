@@ -34,4 +34,10 @@ public sealed class SnowOutlookQuantiles
     /// </summary>
     [JsonPropertyName("next_7d")]
     public Quantiles? Next7Days { get; init; }
+
+    /// <summary>
+    /// Built as the other windows are.
+    /// </summary>
+    [JsonPropertyName("next_72h")]
+    public Quantiles? Next72Hours { get; init; }
 }

@@ -24,10 +24,10 @@ public sealed class LocationsResponse : ApiResult
     public int Count { get; init; }
 
     /// <summary>
-    /// The locations, nearest first where a distance applies.
+    /// (JSON <c>locations</c>) The locations, nearest first where a distance applies.
     /// </summary>
     [JsonPropertyName("locations")]
-    public IReadOnlyList<LocationSummary> Locations { get; init; } = [];
+    public IReadOnlyList<LocationSummary> Items { get; init; } = [];
 
     /// <summary>
     /// Present only on a paged response (<c>limit</c> given) that has more rows after it. Pass it back as

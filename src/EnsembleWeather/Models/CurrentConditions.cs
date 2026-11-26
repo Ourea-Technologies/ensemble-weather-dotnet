@@ -31,23 +31,23 @@ public sealed class CurrentConditions
     public double? FeelsLike { get; init; }
 
     /// <summary>
-    /// The hour's stable condition code, as <c>TimeSeriesPoint.condition</c> (<c>partly_cloudy</c>). Treat unknown
+    /// (JSON <c>condition</c>) The hour's stable condition code, as <c>TimeSeriesPoint.condition</c> (<c>partly_cloudy</c>). Treat unknown
     /// codes as additive.
     /// </summary>
     [JsonPropertyName("condition")]
-    public string Condition { get; init; } = string.Empty;
+    public string Code { get; init; } = string.Empty;
 
     /// <summary>
-    /// The display text for <c>condition</c>, as <c>TimeSeriesPoint.condition_text</c>.
+    /// (JSON <c>condition_text</c>) The display text for <c>condition</c>, as <c>TimeSeriesPoint.condition_text</c>.
     /// </summary>
     [JsonPropertyName("condition_text")]
-    public string ConditionText { get; init; } = string.Empty;
+    public string Text { get; init; } = string.Empty;
 
     /// <summary>
-    /// The condition icon name.
+    /// (JSON <c>condition_icon</c>) The condition icon name.
     /// </summary>
     [JsonPropertyName("condition_icon")]
-    public ConditionIcon ConditionIcon { get; init; }
+    public ConditionIcon Icon { get; init; }
 
     /// <summary>
     /// M/s (metric, kelvin) or mph (imperial).
@@ -97,4 +97,22 @@ public sealed class CurrentConditions
     /// </summary>
     [JsonPropertyName("station")]
     public ObservingStation? Station { get; init; }
+
+    /// <summary>
+    /// The hour in progress's <c>measured</c>, the hour <c>condition</c> and <c>precipitation_probability</c> are
+    /// read from: the radar's published accumulation for that clock hour so far is served above 0 (above 0.00 mm
+    /// and 0.000 in), so <c>condition</c> states the precipitation falling beside a chance that can be small. Show
+    /// "Measured" in place of the chance. Always present. Additive; Cap'n Proto <c>CurrentConditions.measured</c>.
+    /// </summary>
+    [JsonPropertyName("measured")]
+    public bool Measured { get; init; }
+
+    /// <summary>
+    /// Cloud cover, percent (0-100), the mean of the hour in progress's <c>ensemble.cloud_cover</c>: the hour
+    /// <c>condition</c> is read from, so the number and the label describe one hour. The label is the most likely
+    /// sky class of that hour's distribution, so on a wide distribution it can read "Sunny" beside a mean near 50.
+    /// Omitted where the hour serves no cloud cover. Additive; Cap'n Proto <c>CurrentConditions.cloudCover</c>.
+    /// </summary>
+    [JsonPropertyName("cloud_cover")]
+    public double? CloudCover { get; init; }
 }

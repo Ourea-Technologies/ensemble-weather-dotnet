@@ -27,7 +27,7 @@ public sealed class ForecastResponse : ApiResult
     /// <remarks>
     /// The server answers in canonical (sorted) order; the SDK maps each answer back to the term that asked it. Each
     /// answer carries its reference class: variable, comparison, threshold, window and member count. A
-    /// <see langword="null"/> <see cref="ProbabilityResult.Probability"/> means the series does not reach the
+    /// <see langword="null"/> <see cref="ProbabilityResult.Value"/> means the series does not reach the
     /// window's end; it is never 0.
     /// </remarks>
     [JsonPropertyName("probabilities")]
@@ -52,7 +52,7 @@ public sealed class ForecastResponse : ApiResult
     /// The location.
     /// </summary>
     [JsonPropertyName("location")]
-    public LocationReference Location { get; init; } = null!;
+    public ForecastLocation Location { get; init; } = null!;
 
     /// <summary>
     /// The model run this forecast was served from.
@@ -74,16 +74,16 @@ public sealed class ForecastResponse : ApiResult
     public UnitLabels UnitLabels => UnitLabels.For(Units);
 
     /// <summary>
-    /// The forecast series and daily summaries.
+    /// (JSON <c>forecast</c>) The forecast series and daily summaries.
     /// </summary>
     [JsonPropertyName("forecast")]
-    public ForecastData Forecast { get; init; } = null!;
+    public ForecastData Series { get; init; } = null!;
 
     /// <summary>
-    /// Forecasts at the location's other named elevations (ski areas), when requested.
+    /// (JSON <c>elevation_forecasts</c>) Forecasts at the location's other named elevations (ski areas), when requested.
     /// </summary>
     [JsonPropertyName("elevation_forecasts")]
-    public IReadOnlyList<ElevationForecast> ElevationForecasts { get; init; } = [];
+    public IReadOnlyList<ElevationForecast> Elevations { get; init; } = [];
 
     /// <summary>
     /// Whether the live nowcast layer is baked in. <c>true</c> = merged legacy shape (uncacheable). <c>false</c> =
@@ -146,4 +146,33 @@ public sealed class ForecastResponse : ApiResult
     /// </summary>
     [JsonPropertyName("attribution")]
     public ResponseAttribution Attribution { get; init; } = null!;
+
+    /// <summary>
+    /// The avalanche center's danger rating for the forecast zone the location's point is in, from avalanche.org's
+    /// public map layer. Link-first: the danger level, the zone and center names, and a link to the center's full
+    /// forecast, which is the thing to read -- Ourea never serves the forecast's text and never rates danger
+    /// itself. Absent when the feature is off on this server or the point is in no avalanche center's zone. Fail
+    /// closed: when the zone has not been seen in a successful poll recently, or its product has expired
+    /// (<c>valid_until</c> passed), <c>status</c> is <c>unavailable</c> and <c>danger_level</c> is <c>null</c> --
+    /// an old rating is never served. Show <c>attribution</c> with the block. Colorado (additive): where this
+    /// server reads CAIC's own feed, a Colorado point gets its CAIC forecast area's rating instead of
+    /// avalanche.org's single statewide CAIC zone. The level is the HIGHEST of CAIC's three elevation bands (above,
+    /// near and below treeline) for the current day, the convention of the avalanche.org map. CAIC regroups its
+    /// areas as conditions change, so the area's <c>zone_id</c> can change from day to day, and <c>forecast_url</c>
+    /// opens CAIC's map at the point. If CAIC's feed is stale or down, a Colorado point gets <c>unavailable</c>,
+    /// never the statewide rating. A point in an area where CAIC issues no forecast gets <c>no_rating</c>. CAIC's
+    /// areas have no names, so <c>zone_name</c> is <c>CAIC forecast area</c>. The Cap'n Proto body carries the same
+    /// as <c>ForecastResponse.avalanche</c> (set when <c>hasAvalanche</c>).
+    /// </summary>
+    [JsonPropertyName("avalanche")]
+    public AvalancheForecast? Avalanche { get; init; }
+
+    /// <summary>
+    /// The snow on the ground at the location's own point at the hour the request is served, from the snowpack
+    /// model. Present only where a snowpack column runs for the point and its newest run is not stale; there is no
+    /// other source for this number, so elsewhere the field is absent. A sensor's own measured depth is on its
+    /// sensor row (<c>/current</c>).
+    /// </summary>
+    [JsonPropertyName("snow_on_ground")]
+    public SnowOnGround? SnowOnGround { get; init; }
 }

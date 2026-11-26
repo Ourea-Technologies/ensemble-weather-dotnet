@@ -29,10 +29,10 @@ public sealed class CatalogNearbyStation
     public string Network { get; init; } = string.Empty;
 
     /// <summary>
-    /// The live-feed status, snake_case: <c>active</c>, <c>intermittent</c>, <c>inactive</c>, <c>decommissioned</c> or <c>unknown</c>.
+    /// (JSON <c>station_status</c>) The live-feed status, snake_case: <c>active</c>, <c>intermittent</c>, <c>inactive</c>, <c>decommissioned</c> or <c>unknown</c>.
     /// </summary>
     [JsonPropertyName("station_status")]
-    public string StationStatus { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
 
     /// <summary>
     /// The distance, kilometres.

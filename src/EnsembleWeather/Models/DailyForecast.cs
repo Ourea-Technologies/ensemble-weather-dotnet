@@ -23,7 +23,7 @@ public sealed class DailyForecast
     /// unknown codes as additive.
     /// </summary>
     [JsonPropertyName("condition")]
-    public WeatherCondition Condition { get; init; }
+    public Condition Condition { get; init; }
 
     /// <summary>
     /// Human-readable weather condition for the day — a daytime label, on the same rule as the hourly
@@ -205,4 +205,139 @@ public sealed class DailyForecast
     /// </summary>
     [JsonPropertyName("temperature_climatology")]
     public DayClimatology? TemperatureClimatology { get; init; }
+
+    /// <summary>
+    /// Present only on a part day -- the leading date of a run whose reference init falls after its local midnight
+    /// (today, for most cycles) -- and absent on a whole day. The instant (UTC) from which the row's values
+    /// describe the date: its <c>high</c>, <c>low</c>, totals and probabilities are over <c>covered_from</c> to the
+    /// end of the local day, not the whole calendar day. The hours between local midnight and <c>covered_from</c>
+    /// are not in the forecast series, so a part day's total can be well under the day's; compare a whole day with
+    /// the climate (<c>departure</c> and <c>percentile</c> are absent on a part day for the same reason). One
+    /// exception. With the nowcast applied, the precipitation total, its probabilities and its if-wet amounts also
+    /// include the radar-measured precipitation of the hours between local midnight and <c>covered_from</c> (MRMS
+    /// radar-only, where the radar observed the point well), so today's total keeps the rain that already fell when
+    /// the reference run advances. The high and low still start at <c>covered_from</c>. The snowfall total includes
+    /// the snow of that measured precipitation, each measured hour's water at the snow-to-water ratio of the older
+    /// run's forecast for that hour, and the day's precipitation type and label count it as that forecast's type
+    /// (snow on a cold day, not rain); until that older run's forecast has been read for the point (in the
+    /// background, after each new run), the measured water counts without snow, as before. Not on a pinned
+    /// <c>run</c>. Its row starts at the run's init in every value: no hour before the init is counted, measured or
+    /// forecast.
+    /// </summary>
+    [JsonPropertyName("covered_from")]
+    public DateTimeOffset? CoveredFrom { get; init; }
+
+    /// <summary>
+    /// Present only on a day part of which is a measurement -- the leading date, when the radar (MRMS radar-only)
+    /// measured hours between its local midnight and the reference init -- and absent otherwise. Always absent on a
+    /// pinned <c>run</c>: a pinned row counts nothing from before the run's init, so its <c>total_precipitation</c>
+    /// and <c>total_snowfall</c> are its served hours'. <c>amount</c> is that measured precipitation, in the
+    /// response's precipitation unit (as <c>precipitation_display.amount</c>); <c>through</c> is the end (UTC) of
+    /// its last measured hour. The day's <c>total_precipitation</c> and <c>total_snowfall</c> include it with its
+    /// measurement error: its band is no longer only the forecast hours' spread, because a radar amount is itself
+    /// uncertain (against MRMS MultiSensor QPE, the scoring truth, a radar-only day sum runs from about 0.7x to
+    /// 1.2x at 15 mm or more, wider when lighter). The day's <c>mean</c> does not count <c>amount</c> in full, so a
+    /// first day's <c>total_precipitation.mean</c> can be below <c>measured_precipitation.amount</c>. <c>amount</c>
+    /// is the radar's own sum; the total counts it at the measured ratio of truth to radar for an amount of its
+    /// size, about 0.87 to 0.93: 0.914 of it up to 1.9 mm, 0.868 at 9.0 mm, 0.925 from 22.1 mm (the radar amount in
+    /// mm, whatever the response unit). Between those amounts the water counted rises in a straight line with the
+    /// amount measured, so the ratio has no step and more measured water never counts for less. Example: 11.33 mm
+    /// measured counts as 10.06 mm (0.888), and with 0.02 mm in the hours still forecast the day's <c>mean</c> is
+    /// 10.08 mm. Each percentile takes the ratio's own quantile the same way.
+    /// </summary>
+    [JsonPropertyName("measured_precipitation")]
+    public MeasuredPrecipitation? MeasuredPrecipitation { get; init; }
+
+    /// <summary>
+    /// The day's snow character. <c>wet</c> when half or more of the water that fell as the day's snow fell in
+    /// hours whose snow was wet (each hour weighted by its <c>ensemble.snowfall.mean</c> over its
+    /// <c>ensemble.slr.p50</c>, the water it brought); otherwise the density class of the day's snow-to-liquid
+    /// ratio, <c>slr</c>: its snow over the water that fell as that snow, the way a day's ratio is observed. A
+    /// heavy dense hour outweighs a dusting of powder. Present exactly when the day serves snowfall
+    /// (<c>total_snowfall.mean</c> above 0) and <c>precipitation_display.kind</c> is not <c>none</c>; absent
+    /// otherwise. There is no daily Light/Heavy Snow condition: intensity is a rate, and the NWS heavy-snow amount
+    /// criteria differ by region.
+    /// </summary>
+    [JsonPropertyName("snow_character")]
+    public SnowCharacter? SnowCharacter { get; init; }
+
+    /// <summary>
+    /// The day's snow-to-liquid ratio, to one decimal: the ratio <c>snow_character</c> classifies on a day that is
+    /// not <c>wet</c>. Present exactly when <c>snow_character</c> is.
+    /// </summary>
+    [JsonPropertyName("slr")]
+    public double? SnowToLiquidRatio { get; init; }
+
+    /// <summary>
+    /// The snow level over the day's wet hours -- the hours the day's <c>precipitation_type</c> reads (the hours
+    /// that serve a precipitation type): the lowest and highest hourly <c>ensemble.snow_level.mean</c> and their
+    /// precipitation-weighted mean. <c>Snow_level</c> and <c>snow_level_mean</c> read the same hours with the same
+    /// weights on such a day, so <c>snow_level.mean</c> is this <c>mean</c>; the p10-p90 of <c>snow_level</c> is
+    /// the members' spread, and this is the day's own range in time while it precipitates. Omitted on a day with no
+    /// wet hour. The RAIN LINE, as <c>snow_level</c> is.
+    /// </summary>
+    [JsonPropertyName("snow_level_range")]
+    public SnowLevelRange? SnowLevelRange { get; init; }
+
+    /// <summary>
+    /// The day's snow level on the NWS scale -- the height of the 0.5 C wet-bulb. It is the day's <c>snow_level</c>
+    /// on that scale, the same statistic over the same hours -- each rank the mean of the hourly
+    /// <c>ensemble.snow_level_wet_bulb</c> ranks over the hours <c>snow_level</c> reads (the wet hours, weighted by
+    /// their precipitation, on a day that has any; every hour on a dry day) -- so each rank is the
+    /// <c>snow_level</c> rank raised by 275 m (901 ft), as on the hour, and <c>mean</c> is
+    /// <c>snow_level_wet_bulb_range.mean</c>. (An hourly rank at <c>0</c>, snow to sea level, is <c>0</c> on both
+    /// scales, so on a day with such hours a rank is less than 275 m above <c>snow_level</c>'s, and is <c>0</c>
+    /// only where every hour it reads is.) Omitted when no hour serves a snow level.
+    /// </summary>
+    [JsonPropertyName("snow_level_wet_bulb")]
+    public Quantiles? SnowLevelWetBulb { get; init; }
+
+    /// <summary>
+    /// <c>Snow_level_range</c> on the NWS scale -- over the same wet hours, the lowest and highest hourly
+    /// <c>ensemble.snow_level_wet_bulb.mean</c> and their precipitation-weighted mean (which is
+    /// <c>snow_level_wet_bulb.mean</c>). Each is the <c>snow_level_range</c> value raised by 275 m (901 ft), an
+    /// hour at <c>0</c> (snow to sea level) counted at <c>0</c>. Show this range as the day's "snow level". Omitted
+    /// exactly when <c>snow_level_range</c> is.
+    /// </summary>
+    [JsonPropertyName("snow_level_wet_bulb_range")]
+    public SnowLevelRange? SnowLevelWetBulbRange { get; init; }
+
+    /// <summary>
+    /// The day's climate normal at the forecast point: the mean, over the day of year +/-15 days of every year of
+    /// the station's record, of the very quantities this row states -- the local CALENDAR date's maximum hourly
+    /// temperature (<c>high</c>, the quantity <c>high</c> is), its minimum (<c>low</c>) and its precipitation TOTAL
+    /// (<c>precipitation</c>, dry days included; a daily total, never an hourly amount). Units follow the request's
+    /// <c>units</c> (°C / mm metric, °F / in imperial), converted as the row's own values are; <c>distance_km</c>
+    /// is always km. Where it comes from. The nearest climatology station within 60 km of the point and within 300
+    /// m of its elevation (a station far above or below the point describes another climate, and no lapse rate
+    /// carries a normal across a valley inversion) that holds calendar-day normals (<c>source: station</c>, today a
+    /// SNOTEL station's own hourly record, at least ten years of complete local days); else the ERA5 0.25° cell the
+    /// point lies in (<c>source: era5_cell</c>). The ERA5 normals are sampled at four hours a day and state no
+    /// calendar-day maximum, minimum or total, so no cell answers today. No approximation: where neither has a
+    /// normal the whole object is absent, and an absent member (<c>precipitation</c> in a window too dry to fit) is
+    /// absent rather than estimated. The source is credited in <c>attribution</c>.
+    /// </summary>
+    [JsonPropertyName("normal")]
+    public DayNormal? Normal { get; init; }
+
+    /// <summary>
+    /// The served headline minus the normal, in the request's units: <c>high.p50 - normal.high</c> and <c>low.p50 -
+    /// normal.low</c>. Positive is warmer than normal. Present only with <c>normal</c>, and absent on a date the
+    /// forecast covers only from partway through (the first date of a run that starts after local midnight), whose
+    /// high and low are over part of the day while the normal is over all of it.
+    /// </summary>
+    [JsonPropertyName("departure")]
+    public DayDeparture? Departure { get; init; }
+
+    /// <summary>
+    /// How unusual the day is: where the served headline (<c>p50</c>) falls in the day's climatological
+    /// distribution, as a percentile 0-100, <c>Pr{climate &lt;= forecast}</c> -- 95 for <c>precipitation</c> reads
+    /// "wetter than 95% of this date's days". <c>high</c> and <c>low</c> read the normal's Gaussian (mean and
+    /// standard deviation of the calendar-day maximum / minimum); <c>precipitation</c> reads its zero-inflated
+    /// gamma (a dry atom plus a gamma fitted to the wet days), so a dry forecast sits AT the atom and reads the
+    /// climatological share of dry days. A member is absent where its normal is, or where that normal has no
+    /// distribution to place a value in (no fitted mixture, zero spread). Absent as <c>departure</c> is.
+    /// </summary>
+    [JsonPropertyName("percentile")]
+    public DayPercentile? Percentile { get; init; }
 }

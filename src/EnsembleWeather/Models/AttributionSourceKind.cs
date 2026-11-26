@@ -16,7 +16,7 @@ namespace EnsembleWeather;
 [JsonConverter(typeof(Serialization.AttributionSourceKindConverter))]
 public readonly struct AttributionSourceKind : IEquatable<AttributionSourceKind>
 {
-    private static readonly string[] Known = ["alerts", "basemap", "climatology", "model", "observation", "peer", "places", "terrain"];
+    private static readonly string[] Known = ["alerts", "avalanche_forecast", "basemap", "climatology", "model", "observation", "peer", "places", "terrain"];
     private readonly string? _value;
 
     /// <summary>Initializes a value from its wire string.</summary>
@@ -29,6 +29,9 @@ public readonly struct AttributionSourceKind : IEquatable<AttributionSourceKind>
 
     /// <summary><c>alerts</c>.</summary>
     public static AttributionSourceKind Alerts { get; } = new("alerts");
+
+    /// <summary><c>avalanche_forecast</c>.</summary>
+    public static AttributionSourceKind AvalancheForecast { get; } = new("avalanche_forecast");
 
     /// <summary><c>basemap</c>.</summary>
     public static AttributionSourceKind Basemap { get; } = new("basemap");

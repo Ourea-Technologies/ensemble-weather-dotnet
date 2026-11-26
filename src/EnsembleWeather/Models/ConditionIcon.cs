@@ -16,7 +16,7 @@ namespace EnsembleWeather;
 [JsonConverter(typeof(Serialization.ConditionIconConverter))]
 public readonly struct ConditionIcon : IEquatable<ConditionIcon>
 {
-    private static readonly string[] Known = ["chance_rain", "chance_showers", "cloudy", "freezing_rain", "heavy_rain", "light_rain", "mostly_cloudy", "mostly_sunny", "night_chance_showers", "night_clear", "night_cloudy", "night_freezing_rain", "night_heavy_rain", "night_light_rain", "night_moon_chance_showers", "night_moon_showers_likely", "night_mostly_clear", "night_mostly_cloudy", "night_partly_cloudy", "night_rain", "night_rain_snow_mix", "night_showers_likely", "night_snow", "partly_cloudy", "rain", "rain_likely", "rain_snow_mix", "showers", "showers_likely", "snow", "sun_chance_showers", "sun_showers", "sun_showers_likely", "sunny", "night_moon_showers", "night_chance_rain", "night_rain_likely", "night_showers"];
+    private static readonly string[] Known = ["chance_rain", "chance_showers", "cloudy", "freezing_rain", "heavy_rain", "heavy_snow", "light_rain", "light_snow", "mostly_cloudy", "mostly_sunny", "night_chance_rain", "night_chance_showers", "night_clear", "night_cloudy", "night_freezing_rain", "night_heavy_rain", "night_heavy_snow", "night_light_rain", "night_light_snow", "night_moon_chance_showers", "night_moon_showers", "night_moon_showers_likely", "night_mostly_clear", "night_mostly_cloudy", "night_partly_cloudy", "night_rain", "night_rain_likely", "night_rain_snow_mix", "night_showers", "night_showers_likely", "night_snow", "partly_cloudy", "rain", "rain_likely", "rain_snow_mix", "showers", "showers_likely", "snow", "sun_chance_showers", "sun_showers", "sun_showers_likely", "sunny"];
     private readonly string? _value;
 
     /// <summary>Initializes a value from its wire string.</summary>
@@ -42,14 +42,23 @@ public readonly struct ConditionIcon : IEquatable<ConditionIcon>
     /// <summary><c>heavy_rain</c>.</summary>
     public static ConditionIcon HeavyRain { get; } = new("heavy_rain");
 
+    /// <summary><c>heavy_snow</c>.</summary>
+    public static ConditionIcon HeavySnow { get; } = new("heavy_snow");
+
     /// <summary><c>light_rain</c>.</summary>
     public static ConditionIcon LightRain { get; } = new("light_rain");
+
+    /// <summary><c>light_snow</c>.</summary>
+    public static ConditionIcon LightSnow { get; } = new("light_snow");
 
     /// <summary><c>mostly_cloudy</c>.</summary>
     public static ConditionIcon MostlyCloudy { get; } = new("mostly_cloudy");
 
     /// <summary><c>mostly_sunny</c>.</summary>
     public static ConditionIcon MostlySunny { get; } = new("mostly_sunny");
+
+    /// <summary><c>night_chance_rain</c>.</summary>
+    public static ConditionIcon NightChanceRain { get; } = new("night_chance_rain");
 
     /// <summary><c>night_chance_showers</c>.</summary>
     public static ConditionIcon NightChanceShowers { get; } = new("night_chance_showers");
@@ -66,11 +75,20 @@ public readonly struct ConditionIcon : IEquatable<ConditionIcon>
     /// <summary><c>night_heavy_rain</c>.</summary>
     public static ConditionIcon NightHeavyRain { get; } = new("night_heavy_rain");
 
+    /// <summary><c>night_heavy_snow</c>.</summary>
+    public static ConditionIcon NightHeavySnow { get; } = new("night_heavy_snow");
+
     /// <summary><c>night_light_rain</c>.</summary>
     public static ConditionIcon NightLightRain { get; } = new("night_light_rain");
 
+    /// <summary><c>night_light_snow</c>.</summary>
+    public static ConditionIcon NightLightSnow { get; } = new("night_light_snow");
+
     /// <summary><c>night_moon_chance_showers</c>.</summary>
     public static ConditionIcon NightMoonChanceShowers { get; } = new("night_moon_chance_showers");
+
+    /// <summary><c>night_moon_showers</c>.</summary>
+    public static ConditionIcon NightMoonShowers { get; } = new("night_moon_showers");
 
     /// <summary><c>night_moon_showers_likely</c>.</summary>
     public static ConditionIcon NightMoonShowersLikely { get; } = new("night_moon_showers_likely");
@@ -87,8 +105,14 @@ public readonly struct ConditionIcon : IEquatable<ConditionIcon>
     /// <summary><c>night_rain</c>.</summary>
     public static ConditionIcon NightRain { get; } = new("night_rain");
 
+    /// <summary><c>night_rain_likely</c>.</summary>
+    public static ConditionIcon NightRainLikely { get; } = new("night_rain_likely");
+
     /// <summary><c>night_rain_snow_mix</c>.</summary>
     public static ConditionIcon NightRainSnowMix { get; } = new("night_rain_snow_mix");
+
+    /// <summary><c>night_showers</c>.</summary>
+    public static ConditionIcon NightShowers { get; } = new("night_showers");
 
     /// <summary><c>night_showers_likely</c>.</summary>
     public static ConditionIcon NightShowersLikely { get; } = new("night_showers_likely");
@@ -128,18 +152,6 @@ public readonly struct ConditionIcon : IEquatable<ConditionIcon>
 
     /// <summary><c>sunny</c>.</summary>
     public static ConditionIcon Sunny { get; } = new("sunny");
-
-    /// <summary><c>night_moon_showers</c>.</summary>
-    public static ConditionIcon NightMoonShowers { get; } = new("night_moon_showers");
-
-    /// <summary><c>night_chance_rain</c>.</summary>
-    public static ConditionIcon NightChanceRain { get; } = new("night_chance_rain");
-
-    /// <summary><c>night_rain_likely</c>.</summary>
-    public static ConditionIcon NightRainLikely { get; } = new("night_rain_likely");
-
-    /// <summary><c>night_showers</c>.</summary>
-    public static ConditionIcon NightShowers { get; } = new("night_showers");
 
     /// <summary>Gets the wire string, exactly as the API sent it.</summary>
     public string Value => _value ?? string.Empty;

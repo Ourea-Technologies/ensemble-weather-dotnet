@@ -49,11 +49,11 @@ public sealed class CatalogResolvedEntry
     public int DisplayOrder { get; init; }
 
     /// <summary>
-    /// The requested locale if ANY field of this entry carried a translation, else the entry's base locale. Partial
+    /// (JSON <c>resolved_locale</c>) The requested locale if ANY field of this entry carried a translation, else the entry's base locale. Partial
     /// coverage overlays per field — that IS the fallback model.
     /// </summary>
     [JsonPropertyName("resolved_locale")]
-    public string ResolvedLocale { get; init; } = string.Empty;
+    public string Locale { get; init; } = string.Empty;
 
     /// <summary>
     /// When the entry was last updated.

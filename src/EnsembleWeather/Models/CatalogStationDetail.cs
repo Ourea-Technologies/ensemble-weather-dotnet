@@ -89,10 +89,10 @@ public sealed class CatalogStationDetail : ApiResult
     public string? Network { get; init; }
 
     /// <summary>
-    /// The station id in its source network.
+    /// (JSON <c>source_station_id</c>) The station id in its source network.
     /// </summary>
     [JsonPropertyName("source_station_id")]
-    public string? SourceStationId { get; init; }
+    public string? SourceId { get; init; }
 
     /// <summary>
     /// Elevation above mean sea level, metres.
@@ -113,10 +113,10 @@ public sealed class CatalogStationDetail : ApiResult
     public IReadOnlyList<string>? SensorCapabilities { get; init; }
 
     /// <summary>
-    /// The station status.
+    /// (JSON <c>station_status</c>) The station status.
     /// </summary>
     [JsonPropertyName("station_status")]
-    public string? StationStatus { get; init; }
+    public string? Status { get; init; }
 
     /// <summary>
     /// When the station last reported.
@@ -151,10 +151,10 @@ public sealed class CatalogStationDetail : ApiResult
     public int? UpdateFrequencyMinutes { get; init; }
 
     /// <summary>
-    /// The station's page.
+    /// (JSON <c>station_url</c>) The station's page.
     /// </summary>
     [JsonPropertyName("station_url")]
-    public string? StationUrl { get; init; }
+    public string? Url { get; init; }
 
     /// <summary>
     /// The station's data page.
@@ -227,4 +227,11 @@ public sealed class CatalogStationDetail : ApiResult
     /// </summary>
     [JsonPropertyName("content")]
     public IReadOnlyList<CatalogResolvedEntry> Content { get; init; } = [];
+
+    /// <summary>
+    /// Whether search engines should index this station's page. True for a published station or one the CMS has
+    /// enriched (tier 1 or above); false for a bare roster station, whose page a client serves with <c>noindex</c>.
+    /// </summary>
+    [JsonPropertyName("indexable")]
+    public bool Indexable { get; init; }
 }
